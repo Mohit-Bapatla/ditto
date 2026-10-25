@@ -27,7 +27,7 @@ In-app browser via CUA, actual mousePressed/mouseMoved/mouseReleased events; nev
 3. Network failure: stopped only the local QA server, physically swiped, verified same card and actionable retry; restarted and physically retried successfully. Reload retained the saved decision.
 4. Circle voting: physical right drag advanced to the next real idea. Four fictional demo members finished independently, revealed saved consensus, generated an explicitly labeled non-AI itinerary, all approved, and RSVP changed to going. Calendar authorization/content are covered by integration tests.
 5. Separate browser-cookie sessions on localhost and friend.localhost: Jamie QA created a personal profile and Circle; Taylor QA followed the invite, created a distinct profile without losing the invite, and joined. Jamie physically voted; Taylor saw 1/2 finished with their own pending card. Taylor physically voted; the real saved result showed everyone in. This is two web sessions in one browser engine, not two physical devices.
-6. A 101-character activity title exposed metadata clipping at375. Smaller long-title typography and reduced caption top padding fixed it; before/fixed screenshots saved.
+6. A 102-character activity title exposed metadata clipping at375. Smaller long-title typography and reduced caption top padding fixed it; before/fixed screenshots saved.
 7. Broken image: temporarily changed only the newly created local QA idea's photo to a missing local URL. Render showed a truthful photo-unavailable fallback. Original image was restored. No production data was changed.
 8. Loading: a loopback-only proxy intentionally delayed `/api/state` by4seconds; real loading skeleton and status captured. Proxy is test-only, outside the repository.
 

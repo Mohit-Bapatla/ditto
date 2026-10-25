@@ -184,4 +184,4 @@ Use native dialog modality, Escape, a named close button and scrollable content.
 - **Don't** remove useful feedback globally to implement reduced motion.
 - **Don't** promise dark theme support or physical-device verification from this light-theme source documentation.
 
-Implementation notes: `ActivityPhoto` preserves media bounds and displays an explicit photo-unavailable fallback for failed group imagery. Activity titles over 70 characters use a smaller caption type size so metadata remains visible; this was checked with a 101-character title at 375px. This changes presentation only, never the stored title.
+Implementation notes: `ActivityPhoto` preserves media bounds and displays an explicit photo-unavailable fallback for failed group imagery. Activity titles over 70 characters use a smaller caption type size so metadata remains visible; this was checked with a 102-character title at 375px. This changes presentation only, never the stored title.
