@@ -16,6 +16,7 @@ export type Activity = {
   category: string;
   image: string;
   venue: string;
+  venueData?: Venue;
   city: string;
   start: string;
   capacity: number;
