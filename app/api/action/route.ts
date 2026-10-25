@@ -1,3 +1,4 @@
+import { PublicError } from "@/lib/errors";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth, sameOrigin, failure, rateLimit } from "@/lib/http";
@@ -97,7 +98,7 @@ export async function POST(req: NextRequest) {
               s.owner,
             )
           )
-            throw new Error(
+            throw new PublicError(
               "You can only switch identities in your own sandbox.",
             );
           run("UPDATE sessions SET user_id=? WHERE id=?", b.user, s.id);
@@ -134,7 +135,7 @@ export async function POST(req: NextRequest) {
         }
         case "circle": {
           if (person(s.user).demo)
-            throw new Error(
+            throw new PublicError(
               "Save your personal profile first to create a shared Circle.",
             );
           resultId = createCircle(s, b.name, b.description, b.city, b.budget);
@@ -142,12 +143,12 @@ export async function POST(req: NextRequest) {
         }
         case "join": {
           if (person(s.user).demo)
-            throw new Error(
+            throw new PublicError(
               "Save your personal profile before joining a shared Circle.",
             );
           const c = one("SELECT * FROM circles WHERE invite=?", b.invite);
           if (!c || JSON.parse(String(c.data)).demo)
-            throw new Error(
+            throw new PublicError(
               "This invite is invalid or belongs to a private demo.",
             );
           run("INSERT OR IGNORE INTO members VALUES(?,?)", c.id, s.user);
@@ -171,7 +172,7 @@ export async function POST(req: NextRequest) {
           break;
         case "activity": {
           if (new Date(b.start).getTime() < Date.now())
-            throw new Error("Choose a future date.");
+            throw new PublicError("Choose a future date.");
           const a = {
             ...b,
             id: id(),
@@ -193,16 +194,16 @@ export async function POST(req: NextRequest) {
         case "approve":
         case "rsvp": {
           const row = one("SELECT * FROM plans WHERE id=?", b.plan);
-          if (!row) throw new Error("Plan not found.");
+          if (!row) throw new PublicError("Plan not found.");
           requireMember(s, String(row.circle_id));
           const p = planState(row);
           if (!p.eligible.includes(s.user))
-            throw new Error("You joined after this plan was proposed.");
+            throw new PublicError("You joined after this plan was proposed.");
           if (b.type === "approve")
             run("INSERT OR IGNORE INTO approvals VALUES(?,?)", b.plan, s.user);
           else {
             if (p.status !== "confirmed")
-              throw new Error("The plan is still awaiting approval.");
+              throw new PublicError("The plan is still awaiting approval.");
             if (b.going)
               run("INSERT OR IGNORE INTO rsvps VALUES(?,?)", b.plan, s.user);
             else

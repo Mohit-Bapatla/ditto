@@ -1,3 +1,4 @@
+import { PublicError } from "./errors";
 import { z } from "zod";
 import type { Venue } from "./types";
 const localSchema = z.object({
@@ -42,7 +43,7 @@ async function serp(
   ttl = 600000,
 ): Promise<Record<string, unknown>> {
   if (!process.env.SERPAPI_API_KEY)
-    throw new Error(
+    throw new PublicError(
       "Live place search needs SERPAPI_API_KEY. No search results have been simulated.",
     );
   const key = JSON.stringify(params);
@@ -57,12 +58,12 @@ async function serp(
     signal: AbortSignal.timeout(20000),
   });
   if (!res.ok)
-    throw new Error(
+    throw new PublicError(
       "Place provider is unavailable or over quota. Please try later.",
     );
   const data = await res.json();
   if (data.error)
-    throw new Error("The place provider could not complete this search.");
+    throw new PublicError("The place provider could not complete this search.");
   if (cache.size > 250) cache.clear();
   cache.set(key, { until: Date.now() + ttl, value: data });
   return data;
@@ -118,7 +119,7 @@ export async function modelJSON(
   context: unknown,
 ): Promise<unknown> {
   const key = process.env.MODEL_API_KEY;
-  if (!key) throw new Error("Add MODEL_API_KEY to enable live AI.");
+  if (!key) throw new PublicError("Add MODEL_API_KEY to enable live AI.");
   const base = (process.env.MODEL_BASE_URL || "https://api.meta.ai/v1").replace(
     /\/$/,
     "",
@@ -130,12 +131,12 @@ export async function modelJSON(
       signal: AbortSignal.timeout(15000),
     });
     if (!res.ok)
-      throw new Error(
+      throw new PublicError(
         "Could not verify model access. Check MODEL_API_KEY and META_MODEL.",
       );
     const models = await res.json();
     if (!models.data?.some((m: { id: string }) => m.id === requested))
-      throw new Error(
+      throw new PublicError(
         "META_MODEL is not available to this account. Select a model returned by the provider’s /models endpoint.",
       );
     verifiedModel = requested;
@@ -164,18 +165,18 @@ export async function modelJSON(
     });
     if ((res.status === 429 || res.status >= 500) && attempt === 0) continue;
     if (!res.ok)
-      throw new Error(
+      throw new PublicError(
         "The AI provider could not complete this request. Please try again.",
       );
     const data = await res.json();
     const content = data.choices?.[0]?.message?.content;
     if (typeof content !== "string")
-      throw new Error("AI returned an unreadable response.");
+      throw new PublicError("AI returned an unreadable response.");
     try {
       return JSON.parse(content.replace(/^```(?:json)?\s*|\s*```$/g, ""));
     } catch {
-      throw new Error("AI returned invalid JSON. Please try again.");
+      throw new PublicError("AI returned invalid JSON. Please try again.");
     }
   }
-  throw new Error("AI is temporarily unavailable.");
+  throw new PublicError("AI is temporarily unavailable.");
 }

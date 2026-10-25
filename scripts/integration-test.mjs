@@ -1,11 +1,21 @@
 import assert from "node:assert/strict";
+import { mkdirSync, writeFileSync } from "node:fs";
+import { dirname } from "node:path";
 const base = process.env.TEST_BASE_URL || "http://localhost:3000";
+const origin = process.env.TEST_ORIGIN || new URL(base).origin;
 async function client() {
   const res = await fetch(base + "/api/state");
   assert.equal(res.status, 200);
   let state = await res.json();
-  const cookie = res.headers.get("set-cookie").split(";")[0];
+  const header = res.headers.get("set-cookie");
+  assert.match(header, /HttpOnly/i);
+  assert.match(header, /SameSite=Lax/i);
+  if (base.startsWith("https:") || process.env.EXPECT_SECURE_COOKIE === "true")
+    assert.match(header, /; Secure/i);
+  assert.match(res.headers.get("cache-control"), /no-store/);
+  const cookie = header.split(";")[0];
   return {
+    cookie,
     get state() {
       return state;
     },
@@ -14,12 +24,14 @@ async function client() {
         method: body ? "POST" : "GET",
         headers: {
           cookie,
-          ...(body ? { "Content-Type": "application/json", Origin: base } : {}),
+          ...(body
+            ? { "Content-Type": "application/json", Origin: origin }
+            : {}),
         },
         body: body ? JSON.stringify(body) : undefined,
       });
       const data = await r.json();
-      assert.equal(r.status, expected, JSON.stringify(data));
+      assert.equal(r.status, expected, data.error || "Unexpected HTTP status");
       if (data.state) state = data.state;
       return data;
     },
@@ -143,4 +155,48 @@ assert.equal(
 );
 console.log(
   "PASS: isolated sessions, permissions, persisted interest/attendance, independent private votes, duplicate rejection, match reveal, plan approval, RSVP, ICS authorization, personal profiles, cross-session invites and collaborative voting.",
+);
+
+const csrf = await fetch(base + "/api/action", {
+  method: "POST",
+  headers: {
+    cookie: a.cookie,
+    "Content-Type": "application/json",
+    Origin: "https://invalid.example",
+  },
+  body: JSON.stringify({ type: "resetDeck" }),
+});
+assert.equal(csrf.status, 400);
+const health = await fetch(base + "/api/health");
+assert.equal(health.status, 200);
+assert.deepEqual(await health.json(), { status: "ok" });
+for (const path of [
+  "/.env",
+  "/.env.local",
+  "/data/ditto.sqlite",
+  "/database/schema.sql",
+])
+  assert.equal((await fetch(base + path)).status, 404);
+if (process.env.TEST_SESSION_SNAPSHOT) {
+  const path = process.env.TEST_SESSION_SNAPSHOT;
+  mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+  writeFileSync(
+    path,
+    JSON.stringify({
+      base,
+      users: [
+        { cookie: a.cookie, id: a.state.user.id },
+        { cookie: b.cookie, id: b.state.user.id },
+      ],
+      circle: shared.id,
+      idea: idea.id,
+    }),
+    { mode: 0o600 },
+  );
+  console.log(
+    "Saved private restart verification snapshot (cookies not printed).",
+  );
+}
+console.log(
+  "PASS: cookie flags, no-store state, health, cross-origin rejection, and sensitive file URL checks.",
 );

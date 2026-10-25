@@ -1,9 +1,20 @@
 import type { NextConfig } from "next";
 const config: NextConfig = {
   devIndicators: false,
+  output: "standalone",
+  outputFileTracingIncludes: { "/api/*": ["./database/schema.sql"] },
+  outputFileTracingExcludes: {
+    "/*": ["./.env*", "./data/**/*", "./backups/**/*"],
+  },
   serverExternalPackages: ["node:sqlite"],
   async headers() {
     return [
+      {
+        source: "/api/:path*",
+        headers: [
+          { key: "Cache-Control", value: "private, no-store, max-age=0" },
+        ],
+      },
       {
         source: "/:path*",
         headers: [

@@ -1,3 +1,4 @@
+import { secureCookie } from "@/lib/security";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
 import { createSession, session, state } from "@/lib/db";
@@ -10,7 +11,7 @@ export async function GET() {
     jar.set("ditto_session", s.id, {
       httpOnly: true,
       sameSite: "lax",
-      secure: process.env.COOKIE_SECURE === "true",
+      secure: secureCookie(),
       path: "/",
       maxAge: 60 * 60 * 24 * 30,
     });

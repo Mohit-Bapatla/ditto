@@ -85,8 +85,10 @@ Photos are illustrative Unsplash images selected by category, not venue photos. 
 - No email/SMS, push, scheduled reminders, external calendars, or external private-message access. Sharing is manual; calendar support is a file download, not a write to an account.
 - No chat/autopilot, wildcard mode, venue reservations, availability calendar, host approval queue, uploaded covers, geolocation request, or driving-distance filter. Activities use automatic joining; private activity ideas live inside Circles.
 - No live provider success is claimed until valid credentials are supplied. AI can propose a start and venue; people must verify hours, prices, travel and availability.
-- Single-server, persistent-disk deployment only. Do not deploy this SQLite implementation to ephemeral/serverless storage. Multi-instance production needs a shared database and distributed rate limiting. Automated session expiration/cleanup and abuse controls are not yet implemented.
+- Single-server, persistent-disk deployment only. Do not deploy this SQLite implementation to ephemeral/serverless storage. Multi-instance production needs a shared database and distributed rate limiting. Automated session expiration/cleanup and distributed abuse controls are not yet implemented.
 
 ## Deployment
 
-No hosting deployment is configured. Build and run with `npm run build && npm start` on a Node host with a persistent writable disk and HTTPS reverse proxy; set `COOKIE_SECURE=true`. Back up the SQLite database consistently (SQLite backup API or with the service stopped, including WAL state). The database and `.env*` are ignored by Git.
+Use **one Railway Node service with a persistent `/data` volume**. The repository now includes a standalone Docker image, secure-cookie defaults, explicit production origin checks, database startup/integrity validation, health checks, online backups and cross-session restart tests. Local SQLite data and `.env` files are excluded from the deployment image.
+
+See [the deployment runbook](docs/DEPLOYMENT.md) for exact provisioning, secret configuration, deployment, public acceptance, restart and backup commands. Live demo: **https://ditto-production.up.railway.app**. Public cross-session and persistence checks pass. SerpApi is live; Meta completion requests are blocked by provider billing (HTTP 402), so use the labeled demo itinerary option until billing is resolved. No Supabase migration is required.

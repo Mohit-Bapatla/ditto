@@ -1,0 +1,11 @@
+import { DatabaseSync, backup } from "node:sqlite";
+import { mkdirSync, chmodSync } from "node:fs";
+const path = process.env.DATABASE_PATH;
+if (!path) throw new Error("DATABASE_PATH is required.");
+mkdirSync("/data/backups", { recursive: true, mode: 0o700 });
+const destination = `/data/backups/ditto-${new Date().toISOString().replace(/[:.]/g, "-")}.sqlite`;
+const db = new DatabaseSync(path, { readOnly: true });
+await backup(db, destination);
+db.close();
+chmodSync(destination, 0o600);
+console.log(`Consistent SQLite backup saved: ${destination}`);

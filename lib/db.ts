@@ -1,3 +1,4 @@
+import { PublicError } from "./errors";
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 import { mkdirSync, readFileSync } from "node:fs";
 import { dirname, resolve } from "node:path";
@@ -15,12 +16,12 @@ import {
 const path = resolve(
   /* turbopackIgnore: true */ process.env.DATABASE_PATH || "data/ditto.sqlite",
 );
-mkdirSync(dirname(path), { recursive: true });
+mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
 const globalDb = globalThis as unknown as { dittoDb?: DatabaseSync };
 export const db = globalDb.dittoDb ?? new DatabaseSync(path);
 globalDb.dittoDb = db;
-db.exec(readFileSync(resolve("database/schema.sql"), "utf8"));
 db.exec("PRAGMA busy_timeout=5000");
+db.exec(readFileSync(resolve("database/schema.sql"), "utf8"));
 type Row = Record<string, string | number>;
 export const all = (sql: string, ...args: SQLInputValue[]) =>
   db.prepare(sql).all(...args) as Row[];
@@ -50,7 +51,7 @@ export function session(token: string | undefined): Session | undefined {
 }
 export function person(user: string): Person {
   const r = one("SELECT data FROM profiles WHERE id=?", user);
-  if (!r) throw new Error("Profile not found.");
+  if (!r) throw new PublicError("Profile not found.");
   return parse<Person>(r);
 }
 export function createSession(): Session {
@@ -162,10 +163,10 @@ export function requireMember(s: Session, circle: string) {
       s.user,
     )
   )
-    throw new Error("Circle not found or membership required.");
+    throw new PublicError("Circle not found or membership required.");
   const c = one("SELECT * FROM circles WHERE id=?", circle)!;
   if (parse<{ demo: boolean }>(c).demo && c.owner !== s.owner)
-    throw new Error("Demo Circle is private to its sandbox.");
+    throw new PublicError("Demo Circle is private to its sandbox.");
   return c;
 }
 export function createCircle(
@@ -209,9 +210,9 @@ export function startRound(s: Session, circle: string, threshold: string) {
   requireMember(s, circle);
   const current = circleState(s, circle).round;
   if (current && !current.complete)
-    throw new Error("Finish the current round before starting another.");
+    throw new PublicError("Finish the current round before starting another.");
   const ideas = all("SELECT id FROM ideas WHERE circle_id=?", circle);
-  if (!ideas.length) throw new Error("Add an idea first.");
+  if (!ideas.length) throw new PublicError("Add an idea first.");
   const rid = id();
   run("INSERT INTO rounds VALUES(?,?,?,?)", rid, circle, threshold, Date.now());
   for (const r of ideas) run("INSERT INTO round_ideas VALUES(?,?)", rid, r.id);
@@ -222,7 +223,8 @@ export function startRound(s: Session, circle: string, threshold: string) {
 export function vote(s: Session, circle: string, idea: string, value: boolean) {
   requireMember(s, circle);
   const c = circleState(s, circle);
-  if (!c.round || c.round.complete) throw new Error("No active voting round.");
+  if (!c.round || c.round.complete)
+    throw new PublicError("No active voting round.");
   if (
     !one(
       "SELECT 1 FROM round_members WHERE round_id=? AND user_id=?",
@@ -230,11 +232,11 @@ export function vote(s: Session, circle: string, idea: string, value: boolean) {
       s.user,
     )
   )
-    throw new Error(
+    throw new PublicError(
       "You joined after this round started. Join the next round.",
     );
   if (!c.round.ideaIds.includes(idea))
-    throw new Error("This idea is not in the round.");
+    throw new PublicError("This idea is not in the round.");
   if (
     one(
       "SELECT 1 FROM votes WHERE round_id=? AND idea_id=? AND user_id=?",
@@ -243,7 +245,7 @@ export function vote(s: Session, circle: string, idea: string, value: boolean) {
       s.user,
     )
   )
-    throw new Error("You already voted on this idea.");
+    throw new PublicError("You already voted on this idea.");
   run(
     "INSERT INTO votes VALUES(?,?,?,?)",
     c.round.id,
@@ -254,9 +256,10 @@ export function vote(s: Session, circle: string, idea: string, value: boolean) {
 }
 export function accessibleActivity(s: Session, aid: string) {
   const r = one("SELECT * FROM activities WHERE id=?", aid);
-  if (!r) throw new Error("Activity not found.");
+  if (!r) throw new PublicError("Activity not found.");
   const a = parse<Activity>(r);
-  if (a.demo && r.owner !== s.owner) throw new Error("Activity not found.");
+  if (a.demo && r.owner !== s.owner)
+    throw new PublicError("Activity not found.");
   return a;
 }
 export function swipe(s: Session, aid: string, direction: string) {
@@ -288,7 +291,7 @@ export function attend(s: Session, aid: string, withdraw = false) {
     s.user,
   );
   if (!withdraw && !canJoin(count, a.capacity, !!already))
-    throw new Error("This activity is full.");
+    throw new PublicError("This activity is full.");
   run(
     "INSERT INTO participation VALUES(?,?,?) ON CONFLICT(activity_id,user_id) DO UPDATE SET status=excluded.status",
     aid,

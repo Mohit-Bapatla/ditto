@@ -1,3 +1,4 @@
+import { PublicError } from "@/lib/errors";
 import { NextRequest, NextResponse } from "next/server";
 import { auth, failure } from "@/lib/http";
 import { one, requireMember, planState } from "@/lib/db";
@@ -9,7 +10,7 @@ export async function GET(req: NextRequest) {
       "SELECT * FROM plans WHERE id=?",
       req.nextUrl.searchParams.get("id") || "",
     );
-    if (!row) throw new Error("Plan not found.");
+    if (!row) throw new PublicError("Plan not found.");
     requireMember(s, String(row.circle_id));
     return new NextResponse(calendar(planState(row)), {
       headers: {

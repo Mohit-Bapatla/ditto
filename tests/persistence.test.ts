@@ -43,7 +43,7 @@ test("independent votes stay private, duplicates rejected, unanimous results cor
     d.transaction(() => d.vote(s, c.id, c.ideas[0].id, false)),
   );
   assert.equal(d.circleState(s, c.id).ideas[0].yes, undefined);
-  const other = { ...s, user: c.members[1].id };
+  const other = { ...s, user: c.members.find(m => m.id !== s.user)!.id };
   assert.equal(d.circleState(other, c.id).ideas[0].vote, undefined);
   for (const m of c.members)
     for (const [i, idea] of c.ideas.entries()) {

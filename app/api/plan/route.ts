@@ -1,3 +1,4 @@
+import { PublicError } from "@/lib/errors";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth, failure, rateLimit, sameOrigin } from "@/lib/http";
@@ -18,28 +19,26 @@ export async function POST(req: NextRequest) {
       })
       .parse(await req.json());
     if (new Date(b.start).getTime() < Date.now())
-      throw new Error("Choose a future time.");
+      throw new PublicError("Choose a future time.");
     const c = circleState(s, b.circle);
     if (!c.round?.complete)
-      throw new Error("Finish the group round before planning.");
+      throw new PublicError("Finish the group round before planning.");
     const matches = c.ideas.filter((i) => i.matched);
     if (!matches.length)
-      throw new Error(
+      throw new PublicError(
         "No matches yet. Try a majority round or add some fresh ideas.",
       );
     let title = "Your next good memory",
       explanation =
         "A manually assembled demo draft from your saved matches. Venues and travel times are not verified. No AI was used.",
-      stops: Stop[] = matches
-        .slice(0, 3)
-        .map((i) => ({
-          title: i.title,
-          duration: 90,
-          note: "Choose a venue together. Suggested duration; budget and opening hours need checking.",
-        }));
+      stops: Stop[] = matches.slice(0, 3).map((i) => ({
+        title: i.title,
+        duration: 90,
+        note: "Choose a venue together. Suggested duration; budget and opening hours need checking.",
+      }));
     if (!b.demo) {
       if (!process.env.MODEL_API_KEY || !process.env.SERPAPI_API_KEY)
-        throw new Error(
+        throw new PublicError(
           "Live planning needs MODEL_API_KEY and SERPAPI_API_KEY. You can create an explicitly labeled demo draft instead.",
         );
       const found = (
@@ -48,7 +47,7 @@ export async function POST(req: NextRequest) {
         )
       ).flat();
       if (!found.length)
-        throw new Error("No verified venues found. Try different ideas.");
+        throw new PublicError("No verified venues found. Try different ideas.");
       const generated = parsePlan(
         await modelJSON(
           "Create a group outing from these saved matches and verified venues. Return {title,explanation,stops:[{venueId,title,duration (minutes,30–180),note}]}. Use only supplied venue IDs. Respect budget and explicit votes. Do not claim opening hours or reservations are confirmed. Explain estimated costs as estimates. Include 1–3 stops. The proposed start is a preference, not confirmed availability.",

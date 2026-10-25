@@ -6,3 +6,9 @@ data/
 *.tsbuildinfo
 playwright-report/
 test-results/
+
+.DS_Store
+.railway/
+backups/
+*.sqlite*
+*.db*

@@ -1,3 +1,4 @@
+import { PublicError } from "./errors";
 import { z } from "zod";
 import type { Plan } from "./types";
 export function match(yes: number, total: number, threshold: string) {
@@ -32,7 +33,7 @@ export const intentSchema = z.object({
 export function parsePlan(value: unknown, venueIds: string[]) {
   const plan = aiPlanSchema.parse(value);
   if (plan.stops.some((s) => !venueIds.includes(s.venueId)))
-    throw new Error(
+    throw new PublicError(
       "The model selected an unverified venue. Please try again.",
     );
   return plan;
@@ -50,7 +51,7 @@ const stamp = (d: Date) =>
     .replace(/\.\d{3}/, "");
 export function calendar(plan: Plan) {
   if (plan.status !== "confirmed")
-    throw new Error("The group must approve this plan first.");
+    throw new PublicError("The group must approve this plan first.");
   const start = new Date(plan.start);
   const end = new Date(
     +start +
