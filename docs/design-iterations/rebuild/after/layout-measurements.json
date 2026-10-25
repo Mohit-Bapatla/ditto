@@ -1,0 +1,142 @@
+[
+  {
+    "page": "Discover",
+    "width": 375,
+    "content": 360,
+    "overflow": false,
+    "viewport": 375
+  },
+  {
+    "page": "Circles",
+    "width": 375,
+    "content": 375,
+    "overflow": false,
+    "viewport": 375
+  },
+  {
+    "page": "Plans",
+    "width": 375,
+    "content": 375,
+    "overflow": false,
+    "viewport": 375
+  },
+  {
+    "page": "Profile",
+    "width": 375,
+    "content": 360,
+    "overflow": false,
+    "viewport": 375
+  },
+  {
+    "page": "Discover",
+    "width": 390,
+    "content": 375,
+    "overflow": false,
+    "viewport": 390
+  },
+  {
+    "page": "Circles",
+    "width": 390,
+    "content": 390,
+    "overflow": false,
+    "viewport": 390
+  },
+  {
+    "page": "Plans",
+    "width": 390,
+    "content": 390,
+    "overflow": false,
+    "viewport": 390
+  },
+  {
+    "page": "Profile",
+    "width": 390,
+    "content": 375,
+    "overflow": false,
+    "viewport": 390
+  },
+  {
+    "page": "Discover",
+    "width": 430,
+    "content": 415,
+    "overflow": false,
+    "viewport": 430
+  },
+  {
+    "page": "Circles",
+    "width": 430,
+    "content": 430,
+    "overflow": false,
+    "viewport": 430
+  },
+  {
+    "page": "Plans",
+    "width": 430,
+    "content": 430,
+    "overflow": false,
+    "viewport": 430
+  },
+  {
+    "page": "Profile",
+    "width": 430,
+    "content": 415,
+    "overflow": false,
+    "viewport": 430
+  },
+  {
+    "page": "Discover",
+    "width": 768,
+    "content": 753,
+    "overflow": false,
+    "viewport": 768
+  },
+  {
+    "page": "Circles",
+    "width": 768,
+    "content": 768,
+    "overflow": false,
+    "viewport": 768
+  },
+  {
+    "page": "Plans",
+    "width": 768,
+    "content": 768,
+    "overflow": false,
+    "viewport": 768
+  },
+  {
+    "page": "Profile",
+    "width": 768,
+    "content": 768,
+    "overflow": false,
+    "viewport": 768
+  },
+  {
+    "page": "Discover",
+    "width": 1440,
+    "content": 1425,
+    "overflow": false,
+    "viewport": 1440
+  },
+  {
+    "page": "Circles",
+    "width": 1440,
+    "content": 1440,
+    "overflow": false,
+    "viewport": 1440
+  },
+  {
+    "page": "Plans",
+    "width": 1440,
+    "content": 1440,
+    "overflow": false,
+    "viewport": 1440
+  },
+  {
+    "page": "Profile",
+    "width": 1440,
+    "content": 1440,
+    "overflow": false,
+    "viewport": 1440
+  }
+]

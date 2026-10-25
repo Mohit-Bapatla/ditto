@@ -1,0 +1,1192 @@
+[
+  {
+    "file": ".agents/skills/banner-design/SKILL.md",
+    "bytes": 8326,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/banner-design/references/banner-sizes-and-styles.md",
+    "bytes": 4993,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/brand/SKILL.md",
+    "bytes": 2939,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/brand/references/approval-checklist.md",
+    "bytes": 4245,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/brand/references/asset-organization.md",
+    "bytes": 5110,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/brand/references/brand-guideline-template.md",
+    "bytes": 3572,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/brand/references/color-palette-management.md",
+    "bytes": 4254,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/brand/references/consistency-checklist.md",
+    "bytes": 1926,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/brand/references/logo-usage-rules.md",
+    "bytes": 5464,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/brand/references/messaging-framework.md",
+    "bytes": 1763,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/brand/references/typography-specifications.md",
+    "bytes": 5042,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/brand/references/update.md",
+    "bytes": 3365,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/brand/references/visual-identity.md",
+    "bytes": 1884,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/brand/references/voice-framework.md",
+    "bytes": 1997,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/brand/scripts/extract-colors.cjs",
+    "bytes": 9328,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/brand/scripts/inject-brand-context.cjs",
+    "bytes": 9677,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/brand/scripts/sync-brand-to-tokens.cjs",
+    "bytes": 9545,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/brand/scripts/tests/test_sync_brand_to_tokens.py",
+    "bytes": 1970,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/brand/scripts/validate-asset.cjs",
+    "bytes": 10173,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/brand/templates/brand-guidelines-starter.md",
+    "bytes": 6638,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/SKILL.md",
+    "bytes": 12322,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/data/cip/deliverables.csv",
+    "bytes": 13385,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design/data/cip/industries.csv",
+    "bytes": 4935,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design/data/cip/mockup-contexts.csv",
+    "bytes": 5205,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design/data/cip/styles.csv",
+    "bytes": 5967,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design/data/icon/styles.csv",
+    "bytes": 2250,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design/data/logo/colors.csv",
+    "bytes": 10674,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design/data/logo/industries.csv",
+    "bytes": 13274,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design/data/logo/styles.csv",
+    "bytes": 13678,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design/references/banner-sizes-and-styles.md",
+    "bytes": 4993,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/cip-deliverable-guide.md",
+    "bytes": 1735,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/cip-design.md",
+    "bytes": 4589,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/cip-prompt-engineering.md",
+    "bytes": 2493,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/cip-style-guide.md",
+    "bytes": 2357,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/design-routing.md",
+    "bytes": 5826,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/icon-design.md",
+    "bytes": 4343,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/logo-color-psychology.md",
+    "bytes": 3341,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/logo-design.md",
+    "bytes": 3163,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/logo-prompt-engineering.md",
+    "bytes": 4314,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/logo-style-guide.md",
+    "bytes": 3435,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/slides-copywriting-formulas.md",
+    "bytes": 2604,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/slides-create.md",
+    "bytes": 153,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/slides-html-template.md",
+    "bytes": 9004,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/slides-layout-patterns.md",
+    "bytes": 3691,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/slides-strategies.md",
+    "bytes": 2715,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/slides.md",
+    "bytes": 1742,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/references/social-photos-design.md",
+    "bytes": 11251,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design/scripts/cip/core.py",
+    "bytes": 8062,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design/scripts/cip/generate.py",
+    "bytes": 19430,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design/scripts/cip/render-html.py",
+    "bytes": 13941,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design/scripts/cip/search.py",
+    "bytes": 4524,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design/scripts/icon/generate.py",
+    "bytes": 17151,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design/scripts/logo/core.py",
+    "bytes": 6023,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design/scripts/logo/generate.py",
+    "bytes": 14630,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design/scripts/logo/search.py",
+    "bytes": 4745,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design-system/SKILL.md",
+    "bytes": 6875,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design-system/data/slide-backgrounds.csv",
+    "bytes": 1038,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design-system/data/slide-charts.csv",
+    "bytes": 8631,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design-system/data/slide-color-logic.csv",
+    "bytes": 877,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design-system/data/slide-copy.csv",
+    "bytes": 6427,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design-system/data/slide-layout-logic.csv",
+    "bytes": 981,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design-system/data/slide-layouts.csv",
+    "bytes": 8760,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design-system/data/slide-strategies.csv",
+    "bytes": 8232,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design-system/data/slide-typography.csv",
+    "bytes": 735,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/design-system/references/component-specs.md",
+    "bytes": 6914,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design-system/references/component-tokens.md",
+    "bytes": 4986,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design-system/references/primitive-tokens.md",
+    "bytes": 4562,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design-system/references/semantic-tokens.md",
+    "bytes": 4245,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design-system/references/states-and-variants.md",
+    "bytes": 4771,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design-system/references/tailwind-integration.md",
+    "bytes": 5633,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design-system/references/token-architecture.md",
+    "bytes": 5365,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/design-system/scripts/embed-tokens.cjs",
+    "bytes": 2558,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design-system/scripts/fetch-background.py",
+    "bytes": 12287,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design-system/scripts/generate-slide.py",
+    "bytes": 28595,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design-system/scripts/generate-tokens.cjs",
+    "bytes": 4968,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design-system/scripts/html-token-validator.py",
+    "bytes": 11894,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design-system/scripts/search-slides.py",
+    "bytes": 9210,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design-system/scripts/slide-token-validator.py",
+    "bytes": 973,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design-system/scripts/slide_search_core.py",
+    "bytes": 14756,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design-system/scripts/tests/test_validate_tokens.py",
+    "bytes": 1619,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design-system/scripts/validate-tokens.cjs",
+    "bytes": 5942,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/design-system/templates/design-tokens-starter.json",
+    "bytes": 7184,
+    "kind": "reusable document/source template"
+  },
+  {
+    "file": ".agents/skills/impeccable/SKILL.md",
+    "bytes": 11659,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/agents/impeccable_asset_producer.toml",
+    "bytes": 8429,
+    "kind": "supporting asset or metadata"
+  },
+  {
+    "file": ".agents/skills/impeccable/agents/impeccable_documenter.toml",
+    "bytes": 3203,
+    "kind": "supporting asset or metadata"
+  },
+  {
+    "file": ".agents/skills/impeccable/agents/impeccable_finish_reviewer.toml",
+    "bytes": 15703,
+    "kind": "supporting asset or metadata"
+  },
+  {
+    "file": ".agents/skills/impeccable/agents/impeccable_manual_edit_applier.toml",
+    "bytes": 7032,
+    "kind": "supporting asset or metadata"
+  },
+  {
+    "file": ".agents/skills/impeccable/agents/openai.yaml",
+    "bytes": 236,
+    "kind": "supporting asset or metadata"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/adapt.md",
+    "bytes": 11313,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/adapt.native.md",
+    "bytes": 3910,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/android.md",
+    "bytes": 4093,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/animate.md",
+    "bytes": 5236,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/audit.md",
+    "bytes": 9250,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/audit.native.md",
+    "bytes": 8326,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/bolder.md",
+    "bytes": 3566,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/clarify.md",
+    "bytes": 4590,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/colorize.md",
+    "bytes": 4537,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/component-review.md",
+    "bytes": 8017,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/craft-floor.md",
+    "bytes": 5502,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/craft.md",
+    "bytes": 555,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/critique.md",
+    "bytes": 48958,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/degraded/asset-producer.md",
+    "bytes": 8581,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/degraded/documenter.md",
+    "bytes": 3325,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/degraded/finish-reviewer.md",
+    "bytes": 15803,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/degraded/manual-edit-applier.md",
+    "bytes": 7196,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/delight.md",
+    "bytes": 3716,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/distill.md",
+    "bytes": 5648,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/doctor.md",
+    "bytes": 5563,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/document.md",
+    "bytes": 27523,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/extract.md",
+    "bytes": 3406,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/generate.md",
+    "bytes": 13221,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/harden.md",
+    "bytes": 9305,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/hooks.md",
+    "bytes": 14087,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/init.md",
+    "bytes": 11766,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/ios.md",
+    "bytes": 3812,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/layout.md",
+    "bytes": 5161,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/live-setup.md",
+    "bytes": 8186,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/live.md",
+    "bytes": 36792,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/mode-operate.md",
+    "bytes": 4716,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/mode-persuade.md",
+    "bytes": 3638,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/mode-read.md",
+    "bytes": 4396,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/new-work.md",
+    "bytes": 61778,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/onboard.md",
+    "bytes": 7688,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/operate.md",
+    "bytes": 4145,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/optimize.md",
+    "bytes": 7594,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/overdrive.md",
+    "bytes": 9079,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/polish.md",
+    "bytes": 6646,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/quieter.md",
+    "bytes": 5020,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/region-map.md",
+    "bytes": 3361,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/routing.md",
+    "bytes": 3336,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/shape.md",
+    "bytes": 3547,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/typeset.md",
+    "bytes": 6263,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/reference/visualize.md",
+    "bytes": 13918,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/impeccable/scripts/VERSION",
+    "bytes": 7,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/impeccable/scripts/bin/darwin-arm64/impeccable",
+    "bytes": 17192672,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/impeccable/scripts/command-metadata.json",
+    "bytes": 8392,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/impeccable/scripts/data/font-index-failures.json",
+    "bytes": 2437,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/impeccable/scripts/data/font-index.json",
+    "bytes": 1100013,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/impeccable/scripts/impeccable",
+    "bytes": 8827,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/impeccable/scripts/impeccable.cmd",
+    "bytes": 9306,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/impeccable/scripts/live-browser-dom.js",
+    "bytes": 12283,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/impeccable/scripts/live-browser-ignores.js",
+    "bytes": 10346,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/impeccable/scripts/live-browser-session.js",
+    "bytes": 5751,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/impeccable/scripts/live-browser.js",
+    "bytes": 549710,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/impeccable/scripts/modern-screenshot.umd.js",
+    "bytes": 29290,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/slides/SKILL.md",
+    "bytes": 1137,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/slides/references/copywriting-formulas.md",
+    "bytes": 2604,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/slides/references/create.md",
+    "bytes": 153,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/slides/references/html-template.md",
+    "bytes": 9004,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/slides/references/layout-patterns.md",
+    "bytes": 3691,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/slides/references/slide-strategies.md",
+    "bytes": 2715,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/ui-styling/LICENSE.txt",
+    "bytes": 11357,
+    "kind": "supporting asset or metadata"
+  },
+  {
+    "file": ".agents/skills/ui-styling/SKILL.md",
+    "bytes": 10045,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/ui-styling/references/canvas-design-system.md",
+    "bytes": 7888,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/ui-styling/references/shadcn-accessibility.md",
+    "bytes": 9976,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/ui-styling/references/shadcn-components.md",
+    "bytes": 11155,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/ui-styling/references/shadcn-theming.md",
+    "bytes": 8672,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/ui-styling/references/tailwind-customization.md",
+    "bytes": 10171,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/ui-styling/references/tailwind-responsive.md",
+    "bytes": 8270,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/ui-styling/references/tailwind-utilities.md",
+    "bytes": 9980,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/ui-styling/scripts/requirements.txt",
+    "bytes": 444,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-styling/scripts/shadcn_add.py",
+    "bytes": 8799,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-styling/scripts/tailwind_config_gen.py",
+    "bytes": 14418,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-styling/scripts/tests/coverage-ui.json",
+    "bytes": 35121,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-styling/scripts/tests/requirements.txt",
+    "bytes": 52,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-styling/scripts/tests/test_shadcn_add.py",
+    "bytes": 9919,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-styling/scripts/tests/test_tailwind_config_gen.py",
+    "bytes": 14658,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/SKILL.md",
+    "bytes": 55451,
+    "kind": "workflow or advisory reference"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/app-interface.csv",
+    "bytes": 11046,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/catalog-summary.json",
+    "bytes": 2392,
+    "kind": "supporting asset or metadata"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/charts.csv",
+    "bytes": 23365,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/colors.csv",
+    "bytes": 37940,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/data-provenance.json",
+    "bytes": 36686,
+    "kind": "supporting asset or metadata"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/google-font-licenses.json",
+    "bytes": 433127,
+    "kind": "supporting asset or metadata"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/google-fonts.csv",
+    "bytes": 747241,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/icons.csv",
+    "bytes": 57945,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/landing.csv",
+    "bytes": 25449,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/motion.csv",
+    "bytes": 14679,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/phosphor-icons-upstream.json",
+    "bytes": 823933,
+    "kind": "supporting asset or metadata"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/products.csv",
+    "bytes": 75623,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/react-performance.csv",
+    "bytes": 15080,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/angular.csv",
+    "bytes": 19863,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/astro.csv",
+    "bytes": 14591,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/avalonia.csv",
+    "bytes": 27327,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/flutter.csv",
+    "bytes": 14192,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/html-tailwind.csv",
+    "bytes": 16551,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/javafx.csv",
+    "bytes": 33577,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/jetpack-compose.csv",
+    "bytes": 12295,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/laravel.csv",
+    "bytes": 20163,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/nextjs.csv",
+    "bytes": 18687,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/nuxt-ui.csv",
+    "bytes": 24106,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/nuxtjs.csv",
+    "bytes": 23014,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/react-native.csv",
+    "bytes": 14049,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/react.csv",
+    "bytes": 19036,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/shadcn.csv",
+    "bytes": 23184,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/svelte.csv",
+    "bytes": 15078,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/swiftui.csv",
+    "bytes": 15323,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/threejs.csv",
+    "bytes": 46051,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/uno.csv",
+    "bytes": 30091,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/uwp.csv",
+    "bytes": 24692,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/vue.csv",
+    "bytes": 12813,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/winui.csv",
+    "bytes": 27890,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/stacks/wpf.csv",
+    "bytes": 24158,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/styles.csv",
+    "bytes": 149478,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/typography.csv",
+    "bytes": 49997,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/ui-reasoning.csv",
+    "bytes": 77360,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/data/ux-guidelines.csv",
+    "bytes": 27516,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/__pycache__/core.cpython-314.pyc",
+    "bytes": 50510,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/__pycache__/design_system.cpython-314.pyc",
+    "bytes": 100100,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/__pycache__/reasoning_contract.cpython-314.pyc",
+    "bytes": 8363,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/core.py",
+    "bytes": 41234,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/design_system.py",
+    "bytes": 70937,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/reasoning_contract.py",
+    "bytes": 5824,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/search.py",
+    "bytes": 9123,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/google-api.json",
+    "bytes": 1079,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/google-catalog.json",
+    "bytes": 1772,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/google-existing.csv",
+    "bytes": 480,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/google-metadata.json",
+    "bytes": 328,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/google-overrides.json",
+    "bytes": 97,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/icons-curated.csv",
+    "bytes": 495,
+    "kind": "searchable design recipe dataset"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-core.json",
+    "bytes": 571,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-package.json",
+    "bytes": 370,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-react-exports.json",
+    "bytes": 87,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/fixtures/catalogs/phosphor-react-package.json",
+    "bytes": 81,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-baseline.json",
+    "bytes": 89436,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-cases.json",
+    "bytes": 36734,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/fixtures/relevance-thresholds.json",
+    "bytes": 5079,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/test_catalog_refresh.py",
+    "bytes": 19466,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/test_core.py",
+    "bytes": 16680,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/test_core_data_quality.py",
+    "bytes": 8954,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/test_data_contracts.py",
+    "bytes": 19513,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/test_design_system_mode.py",
+    "bytes": 7690,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/test_native_desktop_stack_freshness.py",
+    "bytes": 8170,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/test_relevance_evaluator.py",
+    "bytes": 8430,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/test_style_taxonomy.py",
+    "bytes": 7425,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/test_text_layout_resilience.py",
+    "bytes": 5874,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/tests/test_web_stack_freshness.py",
+    "bytes": 7699,
+    "kind": "executable tooling"
+  },
+  {
+    "file": ".agents/skills/ui-ux-pro-max/scripts/validate_data.py",
+    "bytes": 52064,
+    "kind": "executable tooling"
+  }
+]
