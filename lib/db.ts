@@ -63,8 +63,20 @@ export function person(user: string): Person {
 }
 export function createSession(): Session {
   return transaction(() => {
-    if (presentationEnabled(process.env, path))
+    if (presentationEnabled(process.env, path)) {
+      // Explicit local recovery mode rejoins an existing sample graph. Normal
+      // presentation sessions remain independent when this setting is absent.
+      const owner = process.env.DITTO_PRESENTATION_OWNER;
+      if (owner) {
+        const profile = one("SELECT id FROM profiles WHERE owner=? AND json_extract(data, '$.name')='Mohit' AND json_extract(data, '$.demo')=1", owner);
+        const fixture = one("SELECT id FROM activities WHERE owner=? AND json_extract(data, '$.fixture.version') IS NOT NULL", owner);
+        if (!profile || !fixture) throw new Error("The restored presentation owner is missing its sample data.");
+        const s = { id: id(), user: String(profile.id), owner };
+        run("INSERT INTO sessions(id,user_id,owner) VALUES(?,?,?)", s.id, s.user, s.owner);
+        return s;
+      }
       return createPresentationSession();
+    }
     // Production visitors get only their own anonymous profile. Demo friends,
     // activities and Circles require explicit opt-in; existing data is untouched.
     if (process.env.DITTO_DEMO_SEED !== "true" &&

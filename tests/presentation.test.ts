@@ -105,6 +105,20 @@ test("presentation sessions preserve privacy, persistence and honest commitments
     "interested",
   );
   assert.equal(db.state(second).activities[0].status, undefined);
+  // Recovery mode resumes only the explicitly selected local sample namespace.
+  process.env.DITTO_PRESENTATION_OWNER = first.owner;
+  const counts = () => ["profiles", "activities", "circles", "plans"].map(table => db.one(`SELECT COUNT(*) AS n FROM ${table}`)!.n);
+  const before = counts();
+  const recovered = db.createSession();
+  assert.notEqual(recovered.id, first.id, "each browser receives its own session token");
+  assert.equal(recovered.owner, first.owner);
+  assert.equal(recovered.user, first.user);
+  assert.deepEqual(db.state(recovered).activities, db.state(first).activities);
+  db.state(db.createSession());
+  assert.deepEqual(counts(), before, "reopening the demo must not reseed or duplicate content");
+  process.env.DITTO_PRESENTATION_OWNER = "missing-owner";
+  assert.throws(() => db.createSession(), /missing its sample data/);
+  delete process.env.DITTO_PRESENTATION_OWNER;
   // Normal mode retains the existing default seed and cannot see owner-scoped fixtures.
   delete process.env.DITTO_PRESENTATION_FIXTURES;
   const normal = db.state(db.createSession());
