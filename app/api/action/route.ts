@@ -1,3 +1,4 @@
+import { normalizeProfilePhoto } from "@/lib/profile-photo";
 import { PublicError } from "@/lib/errors";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -19,15 +20,17 @@ import {
   planState,
   accessibleActivity,
 } from "@/lib/db";
-import { photos } from "@/lib/types";
+import { photos, type Venue } from "@/lib/types";
 const str = z.string().trim().min(1).max(200);
 const uuid = z.string().uuid();
 const schema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("switch"), user: uuid }),
+  z.object({ type: z.literal("profilePhoto"), photo: z.string().max(180000).nullable() }),
   z.object({
     type: z.literal("profile"),
     name: str,
-    avatar: z.string().max(10).default("🪻"),
+    avatar: z.string().max(10).default(""),
+    photo: z.string().max(180000).nullable().optional(),
     city: str,
     interests: z.array(str).max(12).default([]),
     budget: z.number().min(0).max(1000).default(40),
@@ -74,6 +77,7 @@ const schema = z.discriminatedUnion("type", [
     description: z.string().trim().min(1).max(1000),
     category: str,
     venue: str,
+    venueId: z.string().max(300).optional(),
     city: str,
     start: z.iso.datetime(),
     capacity: z.number().int().min(2).max(100),
@@ -128,6 +132,7 @@ const schema = z.discriminatedUnion("type", [
   }),
   z.object({ type: z.literal("unapprove"), plan: uuid }),
   z.object({ type: z.literal("resetDeck") }),
+  z.object({ type: z.literal("undoPass"), activity: uuid }),
 ]);
 export async function POST(req: NextRequest) {
   try {
@@ -136,6 +141,8 @@ export async function POST(req: NextRequest) {
     rateLimit("action:" + s.owner, 120);
     const b = schema.parse(await req.json());
     let resultId: string | undefined;
+    const photo =
+      b.type === "profile" || b.type === "profilePhoto" ? await normalizeProfilePhoto(b.photo) : undefined;
     transaction(() => {
       switch (b.type) {
         case "chat": {
@@ -219,6 +226,10 @@ export async function POST(req: NextRequest) {
               throw new PublicError(
                 "Capacity cannot be below existing attendance.",
               );
+            if (b.venue !== a.venue) {
+              delete a.venueData;
+              a.image = photos[a.category] || photos.Outdoors;
+            }
             Object.assign(a, {
               title: b.title,
               description: b.description,
@@ -277,6 +288,11 @@ export async function POST(req: NextRequest) {
           s.user = b.user;
           break;
         }
+        case "profilePhoto": {
+          const p = person(s.user);
+          run("UPDATE profiles SET data=? WHERE id=?", JSON.stringify({...p,photo:photo || null}), p.id);
+          break;
+        }
         case "profile": {
           let p = person(s.user);
           if (p.demo) {
@@ -293,7 +309,8 @@ export async function POST(req: NextRequest) {
           const data = {
             ...p,
             name: b.name,
-            avatar: b.avatar,
+            avatar: b.avatar || b.name.slice(0, 1).toUpperCase(),
+            ...(photo !== undefined ? { photo: photo || null } : {}),
             city: b.city,
             interests: b.interests,
             budget: b.budget,
@@ -336,6 +353,24 @@ export async function POST(req: NextRequest) {
         case "vote":
           vote(s, b.circle, b.idea, b.vote);
           break;
+        case "undoPass": {
+          accessibleActivity(s, b.activity);
+          const saved = one(
+            "SELECT direction FROM swipes WHERE activity_id=? AND user_id=?",
+            b.activity,
+            s.user,
+          );
+          if (saved?.direction !== "no")
+            throw new PublicError(
+              "Only a passed activity can be undone. Your attendance is unchanged.",
+            );
+          run(
+            "DELETE FROM swipes WHERE activity_id=? AND user_id=? AND direction='no'",
+            b.activity,
+            s.user,
+          );
+          break;
+        }
         case "swipe":
           swipe(s, b.activity, b.direction);
           break;
@@ -357,11 +392,34 @@ export async function POST(req: NextRequest) {
 
           if (new Date(b.start).getTime() < Date.now())
             throw new PublicError("Choose a future date.");
+          let selectedVenue: Venue | undefined;
+          if (b.venueId) {
+            const cached = one(
+              "SELECT data FROM venue_selections WHERE user_id=? AND venue_id=? AND expires_at>?",
+              s.user,
+              b.venueId,
+              Date.now(),
+            );
+            if (!cached)
+              throw new PublicError(
+                "This place selection expired. Search and select it again.",
+              );
+            selectedVenue = JSON.parse(String(cached.data)) as Venue;
+          }
           const a = {
             ...b,
+            ...(selectedVenue
+              ? {
+                  venue:
+                    selectedVenue.name +
+                    (selectedVenue.address ? ", " + selectedVenue.address : ""),
+                  venueData: selectedVenue,
+                }
+              : {}),
             id: id(),
             creator: s.user,
-            image: photos[b.category] || photos.Outdoors,
+            image:
+              selectedVenue?.image || photos[b.category] || photos.Outdoors,
             tags: ["New friends welcome"],
             demo: person(s.user).demo,
           };

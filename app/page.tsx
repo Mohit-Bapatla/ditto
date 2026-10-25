@@ -1,6 +1,25 @@
 "use client";
+import "./discovery.css";
+import "./density.css";
+import "./mobile-finish.css";
+import { BrandLogo } from "./brand-logo";
+import { WeekAgenda } from "./week-agenda";
+import { Avatar, ProfilePhotoInput } from "./profile-photo";
+import {
+  DiscoveryBrowse,
+  DiscoverySocial,
+  CirclePreview,
+} from "./social-context";
+import { ActivityPhoto } from "./activity-photo";
 import { CircleCoordinator } from "./circle-coordinator";
 import { PlanEditor } from "./plan-editor";
+import { GroupVoting } from "./group-voting";
+import {
+  SwipeSurface,
+  type SwipeHandle,
+  type SwipeCommit,
+} from "./swipe-surface";
+import { VenuePicker } from "./venue-picker";
 import {
   useState,
   useEffect,
@@ -8,6 +27,7 @@ import {
   useRef,
   type FormEvent,
   type ReactNode,
+  type Ref,
 } from "react";
 import {
   motion,
@@ -15,6 +35,7 @@ import {
   MotionConfig,
   useMotionValue,
   useTransform,
+  type MotionValue,
 } from "motion/react";
 import {
   Compass,
@@ -36,13 +57,6 @@ import {
   ArrowLeft,
   ExternalLink,
   LoaderCircle,
-  Leaf,
-  Utensils,
-  CircleDot,
-  Gamepad2,
-  Palette,
-  Music,
-  Dumbbell,
   RotateCcw,
   Search,
   CheckCheck,
@@ -57,18 +71,9 @@ import {
   type Plan,
   type Venue,
 } from "@/lib/types";
-const icons = [
-  Compass,
-  Leaf,
-  Utensils,
-  CircleDot,
-  Gamepad2,
-  Palette,
-  Music,
-  Dumbbell,
-];
 const fmt = (s: string) =>
   new Date(s).toLocaleString("en-US", {
+    timeZone: "America/Chicago",
     weekday: "short",
     month: "short",
     day: "numeric",
@@ -92,32 +97,33 @@ async function request(url: string, body?: unknown) {
           body: JSON.stringify(body),
         }
       : { cache: "no-store" },
-  );
-  const data = await res.json();
+  ).catch(() => {
+    throw new Error(
+      "Couldn’t connect to Ditto. Check your connection and try again.",
+    );
+  });
+  const data = await res.json().catch(() => {
+    throw new Error("Ditto couldn’t finish that request. Please try again.");
+  });
   if (!res.ok) throw new Error(data.error || "Could not complete the request.");
   return data;
 }
-function Logo() {
-  return (
-    <span className="wordmark">
-      <span className="brand-mark">
-        <i />
-        <i />
-      </span>
-      ditto
-    </span>
-  );
-}
+function Logo() { return <BrandLogo />; }
 function Avatars({
   members,
 }: {
-  members: { id: string; avatar: string; name: string }[];
+  members: {
+    id: string;
+    avatar: string;
+    name: string;
+    photo?: string | null;
+  }[];
 }) {
   return (
     <div className="avatars">
       {members.slice(0, 5).map((m) => (
         <span key={m.id} title={m.name}>
-          {m.avatar}
+          <Avatar person={m} />
         </span>
       ))}
     </div>
@@ -140,10 +146,20 @@ function Modal({
   }, []);
   return (
     <dialog
+      className="modal"
       ref={ref}
+      aria-label={title}
       onCancel={close}
       onClick={(e) => {
-        if (e.target === e.currentTarget) close();
+        const r = e.currentTarget.getBoundingClientRect();
+        if (
+          e.target === e.currentTarget &&
+          (e.clientX < r.left ||
+            e.clientX > r.right ||
+            e.clientY < r.top ||
+            e.clientY > r.bottom)
+        )
+          close();
       }}
     >
       <div className="modal-head">
@@ -152,7 +168,7 @@ function Modal({
           <X />
         </button>
       </div>
-      {children}
+      <div className="modal-body">{children}</div>
     </dialog>
   );
 }
@@ -161,108 +177,114 @@ function SwipeCard({
   onSwipe,
   onDetails,
   disabled,
+  controlRef,
+  progress,
+  focusHandoffRef,
+  preview = false,
+  wheelGate,
 }: {
   activity: Activity;
-  onSwipe: (yes: boolean) => void;
+  onSwipe: SwipeCommit;
   onDetails: () => void;
   disabled: boolean;
+  controlRef?: Ref<SwipeHandle>;
+  progress?: MotionValue<number>;
+  focusHandoffRef?: { current: boolean };
+  preview?: boolean;
+  wheelGate?: { current: import("@/lib/wheel-gesture").WheelGate };
 }) {
-  const x = useMotionValue(0),
-    rotate = useTransform(x, [-250, 250], [-15, 15]),
-    yes = useTransform(x, [30, 120], [0, 1]),
-    no = useTransform(x, [-120, -30], [1, 0]);
-  return (
-    <motion.article
-      className="swipe-card"
-      style={{ x, rotate }}
-      drag={disabled ? false : "x"}
-      dragConstraints={{ left: 0, right: 0 }}
-      dragElastic={0.7}
-      onDragEnd={(_, info) => {
-        if (Math.abs(info.offset.x) > 95) onSwipe(info.offset.x > 0);
-      }}
-      initial={{ opacity: 0, y: 20, scale: 0.98 }}
-      animate={{ opacity: 1, y: 0, scale: 1 }}
-      exit={{ opacity: 0, scale: 0.94 }}
-      tabIndex={0}
-      aria-label={`${activity.title}. Use left arrow to pass, right arrow for interested.`}
-      onKeyDown={(e) => {
-        if (!disabled && (e.key === "ArrowRight" || e.key === "ArrowLeft")) {
-          e.preventDefault();
-          onSwipe(e.key === "ArrowRight");
-        }
-      }}
-    >
-      <img
-        className="hero-photo"
-        src={activity.image}
-        alt={
-          activity.category === "Outdoors"
-            ? "Sunlit greenery and open space"
-            : `${activity.category} activity inspiration`
-        }
-        draggable={false}
-      />
-      <div className="photo-shade" />
-      <div className="card-top">
-        <span className="pill white">
-          <span className="online-dot" />
-          {activity.category}
-        </span>
-        <span className="pill translucent">
-          {activity.demo ? "Demo activity" : "Community activity"}
-        </span>
-      </div>
-      <motion.div className="swipe-stamp yes" style={{ opacity: yes }}>
-        DITTO!
-      </motion.div>
-      <motion.div className="swipe-stamp no" style={{ opacity: no }}>
-        PASS
-      </motion.div>
-      <div className="card-caption">
-        <span className="eyebrow">A LITTLE OUTSIDE YOUR EVERYDAY</span>
-        <h2>{activity.title}</h2>
-        <p>
-          <MapPin size={15} />
-          {activity.venue} <span>·</span> {activity.city}
-        </p>
-      </div>
-      <div className="card-details">
-        <div className="card-facts">
-          <span>
-            <CalendarDays size={16} />
-            {fmt(activity.start)}
-          </span>
-          <strong>
-            {activity.budget === 0 ? "Free" : `~$${activity.budget} / person`}
-          </strong>
-        </div>
-        <p>{activity.description}</p>
-        <div className="card-bottom">
-          <div>
-            <span className="tiny-avatar">
-              {activity.category === "Outdoors" ? "🌞" : "✌️"}
-            </span>
-            <span>
-              {activity.attending} / {activity.capacity} going{" "}
-              <small>Hosted by {activity.host || "a community member"}</small>
-            </span>
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const venuePhoto = Boolean(activity.venueData?.image);
+  const content = (
+    <>
+      <div className={`outing-photo ${photoFailed ? "photo-unavailable" : ""}`}>
+        {!photoFailed ? (
+          <img
+            src={activity.image}
+            alt={
+              venuePhoto
+                ? activity.venueData!.name
+                : `${activity.category} inspiration, not the venue`
+            }
+            draggable={false}
+            onError={() => setPhotoFailed(true)}
+          />
+        ) : (
+          <div className="photo-fallback">
+            <MapPin size={32} />
+            <span>{activity.venueData?.name || activity.category}</span>
+            <small>Photo unavailable</small>
           </div>
+        )}
+        <span className="outing-category">
+          {activity.category}
+
+        </span>
+        <span className="photo-credit">
+          {photoFailed
+            ? ""
+            : venuePhoto
+              ? "Venue photo · SerpApi"
+              : ""}
+        </span>
+      </div>
+      <div
+        className={`outing-info ${activity.title.length > 70 ? "long-title" : ""}`}
+      >
+        <div className="outing-when">
+          <span>
+            {activity.fixture
+              ? `${activity.fixture.area} · ${activity.budget ? `$${activity.budget} allowance` : "Free idea"}`
+              : fmt(activity.start)}
+          </span>
+        </div>
+        <h2>{activity.title}</h2>
+        <p className="outing-place">
+          {activity.venueData?.name || activity.venue}
+        </p>
+        <div className="outing-people">
+          <span className="host-initial"><Avatar person={{ name: activity.host || "Your community", photo: activity.hostPhoto }} /></span>
+          <span>With {activity.host || "your community"}</span>
           <button
-            className="round-small"
+            className="outing-details"
             onClick={onDetails}
             aria-label="View activity details"
           >
-            <ArrowUpRight size={20} />
+            <span>Details</span>
+            <ArrowUpRight size={16} />
           </button>
         </div>
       </div>
-    </motion.article>
+    </>
+  );
+  return preview ? (
+    <div className="outing-card preview-card">{content}</div>
+  ) : (
+    <SwipeSurface
+      className="outing-card"
+      disabled={disabled}
+      onSwipe={onSwipe}
+      wheelGate={wheelGate}
+      controlRef={controlRef}
+      progress={progress}
+      focusHandoffRef={focusHandoffRef}
+      label={`${activity.title}. Left arrow to pass, right arrow for Ditto.`}
+    >
+      {content}
+    </SwipeSurface>
   );
 }
 export default function Home() {
+  const swipeControl = useRef<SwipeHandle>(null);
+  const wheelGate = useRef({ lastEvent: -Infinity, quietUntil: 0 });
+  const swipeFocus = useRef(false);
+  const swipeProgress = useMotionValue(0);
+  const nextScale = useTransform(swipeProgress, [0, 1], [0.98, 1]);
+  const nextY = useTransform(swipeProgress, [0, 1], [5, 0]);
   const [data, setData] = useState<State>();
+  const [now, setNow] = useState(() => Date.now());
   const [page, setPage] = useState("Discover");
+  const [showSettings, setShowSettings] = useState(false);
   const [selected, setSelected] = useState<string>();
   const [modal, setModal] = useState<string>();
   const [detail, setDetail] = useState<Activity>();
@@ -271,6 +293,7 @@ export default function Home() {
   const [city, setCity] = useState("");
   const [available, setAvailable] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
   const [toast, setToast] = useState("");
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -283,11 +306,21 @@ export default function Home() {
   const [planStart, setPlanStart] = useState(tomorrow());
   const [origin, setOrigin] = useState("UT Austin");
   const [drive, setDrive] = useState("");
+  const [lastPass, setLastPass] = useState<string>();
+  const [selectedVenue, setSelectedVenue] = useState<Venue>();
+  const [activityCity, setActivityCity] = useState("");
+  const [afterProfile, setAfterProfile] = useState<string>();
   const pending = useRef(false);
+  const stateVersion = useRef(0);
   const activityNonce = useRef<string>("");
   const refresh = useCallback(async () => {
     try {
-      setData(await request("/api/state"));
+      const version = stateVersion.current;
+      const next = await request("/api/state");
+      if (version === stateVersion.current) {
+        setData(next);
+        setNow(Date.now());
+      }
     } catch (e) {
       setError((e as Error).message);
     }
@@ -315,13 +348,20 @@ export default function Home() {
       return () => clearTimeout(t);
     }
   }, [toast]);
-  const act = async (body: unknown, message?: string) => {
+  const act = async (
+    body: unknown,
+    message?: string,
+    beforePublish?: () => Promise<void>,
+  ) => {
     if (pending.current) return;
     pending.current = true;
+    stateVersion.current++;
     setBusy(true);
     setError("");
     try {
       const r = await request("/api/action", body);
+      if (beforePublish) await beforePublish();
+      stateVersion.current++;
       setData(r.state);
       if (message) setToast(message);
       return r;
@@ -334,12 +374,14 @@ export default function Home() {
   };
   const close = () => {
     activityNonce.current = "";
+    setSelectedVenue(undefined);
     setModal(undefined);
     setDetail(undefined);
     setError("");
     setDrive("");
   };
   const navigate = (p: string) => {
+    window.scrollTo({ top: 0, behavior: "instant" });
     setPage(p);
     setSelected(undefined);
     setError("");
@@ -357,14 +399,19 @@ export default function Home() {
         (!available || a.attending < a.capacity),
     ) || [];
   const top = deck[0];
-  const onSwipe = async (yes: boolean) => {
-    if (top)
-      await act(
+  const onSwipe: SwipeCommit = async (yes, afterSave) => {
+    if (top) {
+      const r = await act(
         { type: "swipe", activity: top.id, direction: yes ? "yes" : "no" },
         yes
           ? "Saved to your interested list. Join when you’re ready."
           : undefined,
+        afterSave,
       );
+      if (r) setLastPass(yes ? undefined : top.id);
+      return Boolean(r);
+    }
+    return false;
   };
   async function submit(e: FormEvent<HTMLFormElement>, type: string) {
     e.preventDefault();
@@ -378,6 +425,7 @@ export default function Home() {
         nonce:
           activityNonce.current ||
           (activityNonce.current = crypto.randomUUID()),
+        ...(selectedVenue ? { venueId: selectedVenue.id } : {}),
         capacity: Number(values.capacity),
         start: new Date(String(values.start)).toISOString(),
       };
@@ -391,11 +439,15 @@ export default function Home() {
       };
     const r = await act(
       body,
-      type === "profile" ? "Your profile is saved." : "All set!",
+      type === "profilePhoto" ? "Your picture is saved." : type === "profile" ? "Your profile is saved." : "All set!",
     );
     if (r) {
       close();
-      if (type === "profile" && invite) setModal("join");
+      if (type === "profile") {
+        if (invite) setModal("join");
+        else if (afterProfile) setModal(afterProfile);
+        setAfterProfile(undefined);
+      }
       if (type === "circle") {
         setSelected(r.id);
         setPage("Circles");
@@ -447,7 +499,7 @@ export default function Home() {
       setCircleTab("Plans");
       setToast(
         demo
-          ? "Demo draft created. Every member still needs to approve."
+          ? "Draft ready for your Circle to review."
           : "Your plan is ready for everyone to review.",
       );
     } catch (e) {
@@ -469,12 +521,25 @@ export default function Home() {
     return (
       <main className="loading">
         <Logo />
-        <LoaderCircle className="spin" />
-        <p>{error || "Finding your next good memory…"}</p>
+        <div className="loading-preview" aria-hidden="true">
+          <div className="skeleton skeleton-title" />
+          <div className="skeleton skeleton-card" />
+          <div className="skeleton skeleton-actions" />
+        </div>
+        <p role="status">{error || "Getting your activities ready…"}</p>
         {error && <button onClick={refresh}>Try again</button>}
       </main>
     );
+  const openCircle = (id: string) => {
+    setPage("Circles");
+    setSelected(id);
+    setCircleTab("Ideas");
+  };
   const allPlans = data.circles.flatMap((c) => c.plans);
+  const pendingPlans = allPlans.filter((p) => p.status !== "confirmed");
+  const pastPlans = allPlans.filter(
+    (p) => p.status === "confirmed" && new Date(p.start).getTime() <= now,
+  );
   const interested = data.activities.filter(
     (a) => a.status === "interested" || a.status === "attending",
   );
@@ -494,7 +559,7 @@ export default function Home() {
             : "Awaiting group approval"}
         </span>
         <span className="small muted">
-          {p.source === "demo" ? "Demo draft · no AI" : "Meta AI + SerpApi"}
+          {p.source === "demo" ? "Group plan" : "Meta AI + SerpApi"}
         </span>
       </div>
       <h2>{p.title}</h2>
@@ -525,7 +590,7 @@ export default function Home() {
         <CalendarDays size={17} />
         {fmt(p.start)}{" "}
         <span className="small">
-          ({Intl.DateTimeFormat().resolvedOptions().timeZone})
+          (America/Chicago)
         </span>
       </p>
       <div className="itinerary">
@@ -533,6 +598,15 @@ export default function Home() {
           <div className="stop" key={i}>
             <span className="stop-number">{i + 1}</span>
             <div>
+              {stop.venue?.image && (
+                <img
+                  className="stop-photo"
+                  src={stop.venue.image}
+                  alt={stop.venue.name}
+                  loading="lazy"
+                  referrerPolicy="no-referrer"
+                />
+              )}
               <h3>{stop.title}</h3>
               <p className="small">
                 {new Date(
@@ -548,8 +622,9 @@ export default function Home() {
                 ).toLocaleTimeString([], {
                   hour: "numeric",
                   minute: "2-digit",
+                  timeZone: "America/Chicago",
                 })}{" "}
-                · proposed time{" "}
+                · {p.status === "confirmed" ? "Scheduled" : "Proposed time"}{" "}
                 {i > 0 && !stop.drive ? "(travel not included)" : ""}
               </p>
               <p>
@@ -578,6 +653,25 @@ export default function Home() {
             </div>
           </div>
         ))}
+      </div>
+      <div className="approval-progress">
+        <div
+          className="progress-track"
+          role="progressbar"
+          aria-label="Group approvals"
+          aria-valuenow={p.approvals.length}
+          aria-valuemin={0}
+          aria-valuemax={p.eligible.length}
+        >
+          <div
+            style={{
+              width: `${(p.approvals.length / p.eligible.length) * 100}%`,
+            }}
+          />
+        </div>
+        <strong>
+          {p.approvals.length} of {p.eligible.length} approved
+        </strong>
       </div>
       <p className="small muted">
         {p.approvals.length} / {p.eligible.length} approvals · Opening hours,
@@ -662,16 +756,18 @@ export default function Home() {
   return (
     <MotionConfig reducedMotion="user">
       <div className="app-shell">
-        <aside className="sidebar">
+        <a className="skip-link" href="#main-content">
+          Skip to content
+        </a>
+        <nav className="app-nav" aria-label="Main navigation">
           <button
-            className="logo-button"
+            className="nav-brand"
             onClick={() => navigate("Discover")}
             aria-label="Ditto home"
           >
             <Logo />
           </button>
-          <div className="nav-label">MAKE ROOM FOR REAL LIFE</div>
-          <nav>
+          <div className="nav-items">
             {[
               { name: "Discover", icon: Compass },
               { name: "Circles", icon: Users },
@@ -681,54 +777,21 @@ export default function Home() {
               <button
                 key={name}
                 className={page === name ? "active" : ""}
+                aria-current={page === name ? "page" : undefined}
                 onClick={() => navigate(name)}
               >
-                <Icon size={21} />
+                <Icon size={22} aria-hidden="true" />
                 <span>{name}</span>
-                {name === "Circles" && <small>{data.circles.length}</small>}
               </button>
             ))}
-          </nav>
-          <div className="sidebar-note">
-            <span className="mini-mark">✳</span>
-            <h3>“We should hang out.”</h3>
-            <p>
-              Let’s make that
-              <br />
-              actually happen.
-            </p>
-            <button
-              onClick={() => {
-                setPage("Circles");
-                setSelected(data.circles[0]?.id);
-              }}
-            >
-              Find your people <ArrowUpRight size={16} />
-            </button>
           </div>
-          <div className="sidebar-bottom">
-            <span className="pill lavender small">
-              ✦ {data.user.demo ? "Demo sandbox" : "Personal session"}
-            </span>
-            <button
-              className="profile-mini"
-              onClick={() => navigate("Profile")}
-            >
-              <span className="avatar">{data.user.avatar}</span>
-              <span>
-                <strong>{data.user.name}</strong>
-                <small>{data.user.city}</small>
-              </span>
-              <ChevronDown size={16} />
-            </button>
-          </div>
-        </aside>
+        </nav>
         <div className="workspace">
           <header className="topbar">
             <div className="mobile-logo">
               <Logo />
             </div>
-            <span className="desktop-only">Good people. Great plans.</span>
+
             <div className="top-actions">
               <button
                 className="location-button"
@@ -744,11 +807,14 @@ export default function Home() {
                 aria-label="Open profile"
                 onClick={() => navigate("Profile")}
               >
-                {data.user.avatar}
+                <Avatar person={data.user} />
               </button>
             </div>
           </header>
-          <main className="main-content">
+          <main
+            className={`main-content ${page === "Discover" ? "discover-page" : ""}`}
+            id="main-content"
+          >
             {error && !modal && !detail && (
               <div role="alert" className="error-banner">
                 {error}
@@ -759,66 +825,82 @@ export default function Home() {
             )}
             {page === "Discover" && (
               <>
-                <div className="page-heading">
+                <div className="discover-toolbar">
                   <div>
-                    <div className="eyebrow purple">
-                      LESS SCROLLING. MORE LIVING.
-                    </div>
-                    <h1>
-                      Your kind of <span className="serif">good time.</span>
-                      <span className="heading-spark">✳</span>
-                    </h1>
-                    <p>
-                      Find something you love. Meet people who feel the same.
-                    </p>
+                    <h1>Discover</h1>
+                    <span>{city || data.user.city}</span>
                   </div>
-                  <button
-                    className="secondary create-btn"
-                    onClick={() => setModal("activity")}
-                  >
-                    <Plus size={17} />
-                    Create activity
-                  </button>
-                </div>
-                <div className="filter-row">
-                  <div className="category-list">
-                    {categories.map((cat, i) => {
-                      const Icon = icons[i];
-                      return (
-                        <button
-                          className={category === cat ? "selected" : ""}
-                          key={cat}
-                          onClick={() => setCategory(cat)}
-                        >
-                          <Icon size={15} />
-                          {cat}
-                        </button>
-                      );
-                    })}
+                  <div className="discover-tools">
+                    <button
+                      className="filter-btn"
+                      onClick={() => setModal("filters")}
+                      aria-label={
+                        category === "All vibes"
+                          ? "Filters: all activities"
+                          : `Filters: ${category}`
+                      }
+                    >
+                      <SlidersHorizontal size={20} />
+                      <span>
+                        {category === "All vibes" ? "Filters" : category}
+                      </span>
+                    </button>
+                    <button
+                      className="icon-btn"
+                      aria-label={`Find real places in ${city || data.user.city}`}
+                      onClick={() => {
+                        setSearch("");
+                        setModal("search");
+                      }}
+                    >
+                      <Search size={21} />
+                    </button>
+                    <button
+                      className="icon-btn"
+                      aria-label="Create activity"
+                      onClick={() => setModal("activity")}
+                    >
+                      <Plus size={23} />
+                    </button>
                   </div>
-                  <button
-                    className="filter-btn"
-                    onClick={() => setModal("filters")}
-                    aria-label="Filter activities"
-                  >
-                    <SlidersHorizontal size={18} />
-                  </button>
                 </div>
                 <div className="discover-grid">
+                  <DiscoveryBrowse
+                    data={data}
+                    category={category}
+                    onCategory={setCategory}
+                    onFilters={() => setModal("filters")}
+                    onCircle={openCircle}
+                    onActivity={setDetail}
+                  />
                   <section className="deck-section">
-                    <div className="section-meta">
-                      <span>
-                        <span className="online-dot" /> A LITTLE POSSIBILITY,
-                        NEAR YOU
-                      </span>
-                      <small>{deck.length} to discover</small>
-                    </div>
-                    <div className="deck-stack">
+                    <div className="deck-stack physical-stack">
+                      {deck[1] && (
+                        <motion.div
+                          className="next-card"
+                          aria-hidden="true"
+                          inert
+                          style={{ scale: nextScale, y: nextY }}
+                        >
+                          <SwipeCard
+                            key={deck[1].id}
+                            activity={deck[1]}
+                            onSwipe={onSwipe}
+                            onDetails={() => {}}
+                            disabled
+                            preview
+                          />
+                        </motion.div>
+                      )}
                       <AnimatePresence mode="wait">
                         {top ? (
                           <SwipeCard
                             key={top.id}
                             activity={top}
+                            wheelGate={wheelGate}
+                            controlRef={swipeControl}
+                            focusHandoffRef={swipeFocus}
+                            progress={swipeProgress}
                             disabled={busy}
                             onSwipe={onSwipe}
                             onDetails={() => setDetail(top)}
@@ -830,12 +912,25 @@ export default function Home() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                           >
-                            <span className="empty-icon">✦</span>
-                            <h2>You’re all caught up.</h2>
+                            <img
+                              className="brand-art"
+                              src="/brand/invitations.webp"
+                              alt=""
+                              width={180}
+                              height={150}
+                            />
+                            <h2>You’re all caught up</h2>
                             <p>
-                              Good things take a little space. Try another vibe
-                              or revisit the deck.
+                              No more activities match these filters. Change
+                              your filters, revisit the deck, or create
+                              something new.
                             </p>
+                            <button
+                              className="secondary"
+                              onClick={() => setModal("filters")}
+                            >
+                              Change filters
+                            </button>
                             <button
                               className="primary"
                               onClick={() =>
@@ -857,110 +952,53 @@ export default function Home() {
                         className="swipe-action pass"
                         aria-label="Pass on activity"
                         disabled={!top || busy}
-                        onClick={() => onSwipe(false)}
+                        onClick={() => void swipeControl.current?.swipe(false)}
                       >
-                        <X size={28} />
+                        <X size={24} />
+                        <small>Pass</small>
                       </button>
-                      <span>
-                        Not your thing?
-                        <br />
-                        <strong>Find your ditto</strong>
-                      </span>
+                      <button
+                        className="undo-action"
+                        disabled={!lastPass || busy}
+                        aria-label="Undo last pass"
+                        onClick={async () => {
+                          if (
+                            lastPass &&
+                            (await act(
+                              { type: "undoPass", activity: lastPass },
+                              "Pass undone. Take another look.",
+                            ))
+                          )
+                            setLastPass(undefined);
+                        }}
+                      >
+                        <RotateCcw size={19} />
+                        <small>Undo pass</small>
+                      </button>
                       <button
                         className="swipe-action heart"
                         aria-label="Interested in activity"
                         disabled={!top || busy}
-                        onClick={() => onSwipe(true)}
+                        onClick={() => void swipeControl.current?.swipe(true)}
                       >
-                        <Heart size={28} />
+                        <Heart size={24} />
+                        <small>Ditto</small>
                       </button>
                     </div>
                     <div className="swipe-hint">
-                      ← Pass <span>Drag a card or use the buttons</span>{" "}
-                      Interested →
+                      Find your next yes.
                     </div>
                   </section>
-                  <aside className="discovery-aside">
-                    <div className="circle-promo">
-                      <div className="between">
-                        <span className="eyebrow">BETTER WITH YOUR PEOPLE</span>
-                        <span className="orbital">
-                          <i />
-                          <i />
-                        </span>
-                      </div>
-                      <h2>
-                        The group chat.
-                        <br />
-                        <span className="serif">With actual plans.</span>
-                      </h2>
-                      <p>
-                        Your friends. A few ideas. One big
-                        <br className="desktop-only" /> “okay, let’s do it.”
-                      </p>
-                      <button
-                        className="primary"
-                        onClick={() => {
-                          setPage("Circles");
-                          setSelected(data.circles[0]?.id);
-                          setCircleTab("Ideas");
-                        }}
-                      >
-                        Find your group’s ditto <ArrowRight size={16} />
-                      </button>
-                      <div className="social-proof">
-                        <Avatars
-                          members={data.circles[0]?.members || [data.user]}
-                        />
-                        <span>
-                          {data.circles[0]?.name || "Your next Circle"}
-                          <small>
-                            {data.circles[0]?.demo
-                              ? "Fictional crew. Real decisions."
-                              : "Make a little room for each other."}
-                          </small>
-                        </span>
-                      </div>
-                    </div>
-                    <div className="inspiration">
-                      <div className="between">
-                        <span className="eyebrow">A LITTLE INSPIRATION</span>
-                        <Sparkles size={17} />
-                      </div>
-                      <h3>What are you in the mood for?</h3>
-                      <p>
-                        Tell Ditto your vibe. Find real places to make it
-                        happen.
-                      </p>
-                      <button
-                        className="search-prompt"
-                        onClick={() => {
-                          setSearch("Something active under $20");
-                          setModal("search");
-                        }}
-                      >
-                        “Something active under $20”
-                        <ArrowUpRight size={17} />
-                      </button>
-                      <span className="source-note">
-                        Meta AI + places from SerpApi
-                      </span>
-                    </div>
-                    <div className="manifesto">
-                      <span>✳</span>
-                      <p>
-                        Less “we should.”
-                        <br />
-                        More <em>“remember when?”</em>
-                      </p>
-                      <small>YOU WANNA GO? DITTO</small>
-                    </div>
-                  </aside>
-                </div>
-                <div className="demo-footnote">
-                  {data.user.demo
-                    ? "You’re exploring fictional activities in your private demo sandbox. Photos are illustrative."
-                    : "Activities are community-created meetups. Venue availability is not verified."}
+                  <DiscoverySocial
+                    now={now}
+                    data={data}
+                    onCircle={openCircle}
+                    onChat={(id) => {
+                      openCircle(id);
+                      setCircleTab("Chat & AI");
+                    }}
+                    onPlans={() => navigate("Plans")}
+                  />
                 </div>
               </>
             )}
@@ -968,23 +1006,29 @@ export default function Home() {
               <>
                 <div className="page-heading">
                   <div>
-                    <div className="eyebrow purple">
-                      YOUR PEOPLE, YOUR PLANS
-                    </div>
-                    <h1>
-                      Good things come{" "}
-                      <span className="serif">in Circles.</span>
-                    </h1>
-                    <p>A little less back-and-forth. A lot more together.</p>
+                    <h1>Your Circles</h1>
+                    <p>Bring your people. Find your next plan.</p>
                   </div>
                   <button
                     className="primary"
-                    onClick={() =>
-                      setModal(data.user.demo ? "profile" : "circle")
-                    }
+                    onClick={() => {
+                      if (data.user.demo) setAfterProfile("circle");
+                      setModal(data.user.demo ? "profile" : "circle");
+                    }}
                   >
                     <Plus size={17} />
                     Create a Circle
+                  </button>
+                </div>
+                <div className="collection-tools">
+                  <span>
+                    {data.circles.length} Circles · shared ideas, real decisions
+                  </span>
+                  <button
+                    className="text-link"
+                    onClick={() => setModal("join")}
+                  >
+                    Join with an invite <ArrowRight size={16} />
                   </button>
                 </div>
                 <div className="circle-grid">
@@ -998,9 +1042,18 @@ export default function Home() {
                       }}
                     >
                       <div className="tile-art">
-                        <span>✳</span>
-                        <span>✽</span>
-                        <span>✦</span>
+                        <ActivityPhoto
+                          key={circle.ideas[0]?.image}
+                          src={circle.ideas[0]?.image || ""}
+                          alt={`${circle.name} activity inspiration`}
+                        />
+                        <small>
+                          {circle.plans.some((p) => p.status === "confirmed")
+                            ? "Plan confirmed"
+                            : circle.round && !circle.round.complete
+                              ? "Voting is open"
+                              : "Make your next plan"}
+                        </small>
                       </div>
                       <div className="between">
                         <h2>{circle.name}</h2>
@@ -1014,22 +1067,11 @@ export default function Home() {
                           {circle.ideas.length} ideas
                         </span>
                         <span>
-                          {circle.demo ? "Demo Circle" : "Private Circle"}
+                          {circle.demo ? "Your Circle" : "Private Circle"}
                         </span>
                       </div>
                     </button>
                   ))}
-                  <button
-                    className="circle-tile join-tile"
-                    onClick={() => setModal("join")}
-                  >
-                    <Users size={35} />
-                    <h2>Got an invite?</h2>
-                    <p>Good company is one link away.</p>
-                    <span className="text-link">
-                      Join a Circle <ArrowRight size={16} />
-                    </span>
-                  </button>
                 </div>
               </>
             )}
@@ -1044,15 +1086,7 @@ export default function Home() {
                 </button>
                 <div className="page-heading circle-heading">
                   <div>
-                    <div className="eyebrow purple">
-                      {c.demo
-                        ? "FICTIONAL FRIENDS · PRIVATE DEMO"
-                        : "YOUR PRIVATE CIRCLE"}
-                    </div>
-                    <h1>
-                      {c.name}
-                      <span className="heading-spark">✳</span>
-                    </h1>
+                    <h1>{c.name}</h1>
                     <p>{c.description}</p>
                   </div>
                   <div>
@@ -1062,28 +1096,7 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-                {c.demo ? (
-                  <div className="demo-switch">
-                    <span>
-                      <strong>Try every perspective.</strong> Switch fictional
-                      members to cast independent votes.
-                    </span>
-                    <div>
-                      {data.demoUsers
-                        .filter((p) => c.members.some((m) => m.id === p.id))
-                        .map((p) => (
-                          <button
-                            className={p.id === data.user.id ? "selected" : ""}
-                            key={p.id}
-                            disabled={busy}
-                            onClick={() => act({ type: "switch", user: p.id })}
-                          >
-                            {p.avatar} {p.name}
-                          </button>
-                        ))}
-                    </div>
-                  </div>
-                ) : (
+                {!c.demo && (
                   <div className="invite-row">
                     <span className="small muted">
                       Invite a friend to make decisions together.
@@ -1104,6 +1117,7 @@ export default function Home() {
                     <button
                       key={t}
                       className={circleTab === t ? "active" : ""}
+                      aria-pressed={circleTab === t}
                       onClick={() => setCircleTab(t)}
                     >
                       {t}
@@ -1128,20 +1142,16 @@ export default function Home() {
                 )}
                 {circleTab === "Ideas" && (
                   <>
-                    <div className="round-banner">
+                    <details
+                      className="round-banner"
+                      open={!c.round || c.round.complete}
+                    >
+                      <summary>
+                        {c.round
+                          ? `${c.round.completed} of ${c.round.total} members finished`
+                          : "What should we do together?"}
+                      </summary>
                       <div>
-                        <span className="eyebrow purple">
-                          {c.round?.complete
-                            ? "ROUND COMPLETE"
-                            : c.round
-                              ? "FIND YOUR COMMON GROUND"
-                              : "A GOOD PLAN STARTS WITH AN IDEA"}
-                        </span>
-                        <h2>
-                          {c.round
-                            ? `${c.round.completed} of ${c.round.total} members finished`
-                            : "What should we do together?"}
-                        </h2>
                         <p>
                           {c.round
                             ? "Votes stay private until everyone finishes."
@@ -1172,7 +1182,7 @@ export default function Home() {
                           </span>
                         )}
                       </div>
-                    </div>
+                    </details>
                     {c.round && (
                       <div className="progress-track">
                         <div
@@ -1182,79 +1192,97 @@ export default function Home() {
                         />
                       </div>
                     )}
-                    <div className="idea-grid">
-                      {c.ideas.map((idea: Idea) => (
-                        <article className="idea-card" key={idea.id}>
-                          <img
-                            src={idea.image}
-                            alt={`${idea.category} inspiration`}
-                          />
-                          <div className="idea-content">
-                            <span className="eyebrow purple">
-                              {idea.category}
-                            </span>
-                            <h3>{idea.title}</h3>
-                            {idea.notes && (
-                              <p className="small muted">{idea.notes}</p>
-                            )}
-                            <p className="small muted">
-                              From{" "}
-                              {c.members.find((m) => m.id === idea.creator)
-                                ?.name || "a member"}
-                            </p>
-                            {c.round &&
-                            !c.round.complete &&
-                            c.round.ideaIds.includes(idea.id) ? (
-                              idea.vote === undefined ? (
-                                <div className="vote-buttons">
-                                  <button
-                                    disabled={busy}
-                                    onClick={() =>
-                                      act({
-                                        type: "vote",
-                                        circle: c.id,
-                                        idea: idea.id,
-                                        vote: false,
-                                      })
-                                    }
-                                  >
-                                    <X size={17} />
-                                    Pass
-                                  </button>
-                                  <button
-                                    disabled={busy}
-                                    onClick={() =>
-                                      act(
-                                        {
+                    {c.round && !c.round.complete && (
+                      <GroupVoting
+                        circle={c}
+                        busy={busy}
+                        act={act}
+                        onChat={() => setCircleTab("Chat & AI")}
+                      />
+                    )}
+                    <div
+                      className={`idea-grid ${c.round && !c.round.complete ? "round-review" : ""}`}
+                    >
+                      {c.ideas
+                        .filter(
+                          (idea) =>
+                            !c.round ||
+                            c.round.complete ||
+                            !c.round.ideaIds.includes(idea.id) ||
+                            idea.vote !== undefined,
+                        )
+                        .map((idea: Idea) => (
+                          <article className="idea-card" key={idea.id}>
+                            <img
+                              src={idea.image}
+                              alt={`${idea.category} inspiration`}
+                            />
+                            <div className="idea-content">
+                              <span className="eyebrow purple">
+                                {idea.category}
+                              </span>
+                              <h3>{idea.title}</h3>
+                              {idea.notes && (
+                                <p className="small muted">{idea.notes}</p>
+                              )}
+                              <p className="small muted">
+                                From{" "}
+                                {c.members.find((m) => m.id === idea.creator)
+                                  ?.name || "a member"}
+                              </p>
+                              {c.round &&
+                              !c.round.complete &&
+                              c.round.ideaIds.includes(idea.id) ? (
+                                idea.vote === undefined ? (
+                                  <div className="vote-buttons">
+                                    <button
+                                      disabled={busy}
+                                      onClick={() =>
+                                        act({
                                           type: "vote",
                                           circle: c.id,
                                           idea: idea.id,
-                                          vote: true,
-                                        },
-                                        "Your vote is saved.",
-                                      )
-                                    }
-                                  >
-                                    <Heart size={17} />
-                                    Ditto
-                                  </button>
-                                </div>
+                                          vote: false,
+                                        })
+                                      }
+                                    >
+                                      <X size={17} />
+                                      Pass
+                                    </button>
+                                    <button
+                                      disabled={busy}
+                                      onClick={() =>
+                                        act(
+                                          {
+                                            type: "vote",
+                                            circle: c.id,
+                                            idea: idea.id,
+                                            vote: true,
+                                          },
+                                          "Your vote is saved.",
+                                        )
+                                      }
+                                    >
+                                      <Heart size={17} />
+                                      Ditto
+                                    </button>
+                                  </div>
+                                ) : (
+                                  <div className="voted">
+                                    <Check size={17} />
+                                    You voted {idea.vote ? "yes" : "pass"}
+                                  </div>
+                                )
                               ) : (
-                                <div className="voted">
-                                  <Check size={17} />
-                                  You voted {idea.vote ? "yes" : "pass"}
-                                </div>
-                              )
-                            ) : (
-                              <span className="small muted">
-                                {c.round?.complete && idea.yes !== undefined
-                                  ? `${idea.yes} / ${c.round.total} said yes`
-                                  : "Ready for the next round"}
-                              </span>
-                            )}
-                          </div>
-                        </article>
-                      ))}
+                                <span className="small muted">
+                                  {c.round?.complete && idea.yes !== undefined
+                                    ? `${idea.yes} / ${c.round.total} said yes`
+                                    : "Ready for the next round"}
+                                </span>
+                              )}
+                            </div>
+                          </article>
+                        ))}
                     </div>
                     {c.round?.complete && (
                       <button
@@ -1275,9 +1303,9 @@ export default function Home() {
                         initial={{ opacity: 0, y: 20 }}
                         animate={{ opacity: 1, y: 0 }}
                       >
-                        <div className="match-sparkles">
-                          ✦ <span>✳</span> ✧
-                        </div>
+                        <span className="match-symbol" aria-hidden="true">
+                          <CheckCheck size={32} />
+                        </span>
                         <Avatars members={c.members} />
                         <div className="eyebrow purple">
                           THE FEELING IS MUTUAL
@@ -1298,7 +1326,7 @@ export default function Home() {
                             .sort((a, b) => (b.yes || 0) - (a.yes || 0))
                             .map((i) => (
                               <div key={i.id}>
-                                <span>{i.matched ? "💜" : "✦"}</span>
+                                <img src={i.image} alt="" />
                                 <strong>{i.title}</strong>
                                 <span
                                   className={`pill ${i.matched ? "lavender" : ""}`}
@@ -1367,57 +1395,106 @@ export default function Home() {
               <>
                 <div className="page-heading">
                   <div>
-                    <div className="eyebrow purple">MAKE “SOMEDAY” A DATE</div>
-                    <h1>
-                      Things to <span className="serif">look forward to.</span>
-                    </h1>
+                    <h1>Your plans</h1>
                     <p>Your group plans and activities you’re interested in.</p>
                   </div>
                 </div>
-                {allPlans.length > 0 && (
-                  <div className="plans-list">{allPlans.map(planView)}</div>
-                )}
-                <h2 className="section-title">
-                  Your activity shortlist <span>{interested.length}</span>
-                </h2>
-                <div className="shortlist">
-                  {interested.map((a) => (
-                    <article key={a.id}>
-                      <img src={a.image} alt="Activity inspiration" />
-                      <div>
-                        <span className="eyebrow purple">
-                          {a.status === "attending"
-                            ? "YOU’RE GOING"
-                            : "INTERESTED"}
-                        </span>
-                        <h3>{a.title}</h3>
-                        <p className="small muted">
-                          {fmt(a.start)} · {a.attending}/{a.capacity} going
+                <WeekAgenda
+                  data={data}
+                  now={now}
+                  renderPlan={planView}
+                  onActivity={setDetail}
+                  onCreate={() => {
+                    navigate("Circles");
+                    setSelected(undefined);
+                  }}
+                />
+                <details className="all-date-plans"><summary>All saved activities & group decisions <ChevronDown size={18}/></summary><div className="plans-overview">
+                  <section className="pending-section">
+                    <h2 className="section-title">Awaiting group decisions</h2>
+                    {pendingPlans.map((p) => (
+                      <details className="pending-plan" key={p.id}>
+                        <summary>
+                          <span>
+                            <strong>{p.title}</strong>
+                            <small>
+                              {p.approvals.length} of {p.eligible.length}{" "}
+                              approved · Review proposal
+                            </small>
+                          </span>
+                          <ChevronDown size={18} />
+                        </summary>
+                        {planView(p)}
+                      </details>
+                    ))}
+                    {data.circles
+                      .filter((c) => c.round && !c.round.complete)
+                      .map((circle) => (
+                        <CirclePreview
+                          key={circle.id}
+                          circle={circle}
+                          onOpen={openCircle}
+                        />
+                      ))}
+                    {!pendingPlans.length &&
+                      !data.circles.some(
+                        (c) => c.round && !c.round.complete,
+                      ) && (
+                        <p className="muted">
+                          No pending decisions. Suggest an idea in a Circle.
                         </p>
+                      )}
+                  </section>
+                  <section>
+                    <h2 className="section-title">
+                      Activities you’re interested in{" "}
+                      <span>{interested.length}</span>
+                    </h2>
+                    <div className="shortlist">
+                      {interested.map((a) => (
+                        <article key={a.id}>
+                          <img src={a.image} alt="Activity inspiration" />
+                          <div>
+                            <span className="eyebrow purple">
+                              {a.status === "attending"
+                                ? "YOU’RE GOING"
+                                : "INTERESTED"}
+                            </span>
+                            <h3>{a.title}</h3>
+                            <p className="small muted">
+                              {a.fixture
+                                ? `${a.fixture.area} · ${a.budget ? `$${a.budget} allowance` : "Free idea"}`
+                                : `${fmt(a.start)} · ${a.attending}/${a.capacity} going`}
+                            </p>
+                          </div>
+                          <button
+                            className="secondary"
+                            onClick={() => setDetail(a)}
+                          >
+                            View <ArrowUpRight size={15} />
+                          </button>
+                        </article>
+                      ))}
+                    </div>
+                    {!interested.length && (
+                      <div className="compact-empty">
+                        <p>Save something that catches your eye.</p>
+                        <button
+                          className="text-link"
+                          onClick={() => navigate("Discover")}
+                        >
+                          Explore activities <ArrowRight size={16} />
+                        </button>
                       </div>
-                      <button
-                        className="secondary"
-                        onClick={() => setDetail(a)}
-                      >
-                        View <ArrowUpRight size={15} />
-                      </button>
-                    </article>
-                  ))}
+                    )}
+                  </section>
                 </div>
-                {!interested.length && !allPlans.length && (
-                  <div className="empty-state">
-                    <CalendarDays />
-                    <h2>A wide-open calendar. A little possibility.</h2>
-                    <p>
-                      Save an activity or match with your Circle to get started.
-                    </p>
-                    <button
-                      className="primary"
-                      onClick={() => navigate("Discover")}
-                    >
-                      Explore activities
-                    </button>
-                  </div>
+                </details>
+                {pastPlans.length > 0 && (
+                  <section>
+                    <h2 className="section-title">Past plans</h2>
+                    {pastPlans.map(planView)}
+                  </section>
                 )}
               </>
             )}
@@ -1425,18 +1502,30 @@ export default function Home() {
               <>
                 <div className="page-heading">
                   <div>
-                    <div className="eyebrow purple">COME AS YOU ARE</div>
-                    <h1>
-                      Your kind of <span className="serif">person.</span>
-                    </h1>
-                    <p>A few things that make you, you.</p>
+                    <h1>{showSettings ? "Settings" : "Your profile"}</h1>
+                    <p>
+                      {showSettings
+                        ? "Your browser session and connected services."
+                        : "Make the next outing feel like you."}
+                    </p>
                   </div>
                 </div>
-                <div className="profile-grid">
+                <button
+                  className="text-link settings-toggle"
+                  onClick={() => setShowSettings(!showSettings)}
+                >
+                  {showSettings
+                    ? "Back to profile"
+                    : "Settings"}{" "}
+                  <ArrowRight size={16} />
+                </button>
+                <div
+                  className={`profile-grid ${showSettings ? "show-settings" : ""}`}
+                >
                   <section className="profile-card">
-                    <span className="large-avatar">{data.user.avatar}</span>
+                    <button className="large-avatar profile-photo-button" aria-label="Change profile picture" onClick={() => setModal("profilePhoto")}><Avatar person={data.user} /></button>
                     <h2>{data.user.name}</h2>
-                    <p className="muted">
+                    <p className="profile-location muted">
                       <MapPin size={15} />
                       {data.user.city}
                     </p>
@@ -1458,55 +1547,126 @@ export default function Home() {
                       <ArrowRight size={16} />
                     </button>
                   </section>
-                  <section className="settings-card">
-                    <h2>Make yourself at home.</h2>
-                    <p>
-                      Personal profiles use a persistent session in this
-                      browser. No passwords, no complicated sign-up.
-                    </p>
-                    <h3>Explore the demo</h3>
-                    <p className="small muted">
-                      These fictional identities belong only to your sandbox.
-                      They cannot access someone else’s private Circle.
-                    </p>
-                    <div className="profile-switch-list">
-                      {data.demoUsers.map((p) => (
+                  {!showSettings && (
+                    <section className="profile-social">
+                      <h2>Your people</h2>
+                      <p className="muted">
+                        A different Circle for every kind of plan.
+                      </p>
+                      <div className="membership-grid">
+                        {data.circles.map((circle) => (
+                          <CirclePreview
+                            key={circle.id}
+                            circle={circle}
+                            onOpen={openCircle}
+                          />
+                        ))}
+                      </div>
+                      <h2>Explore your interests</h2>
+                      <div className="interest-explore">
+                        {data.user.interests.slice(0, 3).map((interest) => {
+
+                          return (
+                            <button
+                              key={interest}
+                              onClick={() => {
+                                setCategory(interest);
+                                navigate("Discover");
+                              }}
+                            >
+
+                              <span>
+                                {interest} <ArrowUpRight size={15} />
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <h2>On your radar</h2>
+                      {interested.slice(0, 3).map((a) => (
                         <button
-                          className={p.id === data.user.id ? "selected" : ""}
-                          key={p.id}
-                          onClick={() => act({ type: "switch", user: p.id })}
+                          className="context-row"
+                          key={a.id}
+                          onClick={() => setDetail(a)}
                         >
-                          {p.avatar} {p.name}
-                          {p.id === data.user.id && <Check size={16} />}
+                          <span className="context-thumb">
+                            <ActivityPhoto
+                              src={a.image}
+                              alt="Activity inspiration"
+                            />
+                          </span>
+                          <span>
+                            <strong>{a.title}</strong>
+                            <small>
+                              {a.category} · {a.fixture?.area || a.city}
+                            </small>
+                          </span>
+                          <ArrowUpRight size={16} />
                         </button>
                       ))}
-                    </div>
-                    <h3>Connected capabilities</h3>
-                    <div className="status-row">
-                      <span>Meta Muse Spark</span>
-                      <span className="pill lavender">
-                        {data.integrations.meta
-                          ? data.integrations.live
-                            ? "Enabled · key configured"
-                            : "Paused · key configured"
-                          : "API key needed"}
-                      </span>
-                    </div>
-                    <div className="status-row">
-                      <span>SerpApi places</span>
-                      <span className="pill lavender">
-                        {data.integrations.serpapi
-                          ? data.integrations.live
-                            ? "Enabled · key configured"
-                            : "Paused · key configured"
-                          : "API key needed"}
-                      </span>
-                    </div>
-                    <p className="small muted">
-                      Keys stay on the server. Live calls are never replaced
-                      with simulated results. Demo plans are explicitly labeled.
-                    </p>
-                  </section>
+                      {!interested.length && (
+                        <p className="muted">
+                          Your saved activities will appear here.
+                        </p>
+                      )}
+                    </section>
+                  )}
+                  {showSettings && (
+                    <section className="settings-card">
+                      <h2>Your session</h2>
+                      <p>
+                        Personal profiles use a persistent session in this
+                        browser. No passwords, no complicated sign-up.
+                      </p>
+                      <h3>Explore the demo</h3>
+                      <p className="small muted">
+                        These fictional identities belong only to your sandbox.
+                        They cannot access someone else’s private Circle.
+                      </p>
+                      <div className="profile-switch-list">
+                        {data.demoUsers.map((p) => (
+                          <button
+                            className={p.id === data.user.id ? "selected" : ""}
+                            key={p.id}
+                            onClick={() => act({ type: "switch", user: p.id })}
+                          >
+                            <span className="inline-avatar">
+                              <Avatar person={p} />
+                            </span>{" "}
+                            {p.name}
+                            {p.id === data.user.id && <Check size={16} />}
+                          </button>
+                        ))}
+                      </div>
+                      <details className="capability-details">
+                        <summary>Connected services</summary>
+                        <div className="status-row">
+                          <span>Meta Muse Spark</span>
+                          <span className="pill lavender">
+                            {data.integrations.meta
+                              ? data.integrations.live
+                                ? "Enabled · key configured"
+                                : "Paused · key configured"
+                              : "API key needed"}
+                          </span>
+                        </div>
+                        <div className="status-row">
+                          <span>SerpApi places</span>
+                          <span className="pill lavender">
+                            {data.integrations.serpapi
+                              ? data.integrations.live
+                                ? "Enabled · key configured"
+                                : "Paused · key configured"
+                              : "API key needed"}
+                          </span>
+                        </div>
+                        <p className="small muted">
+                          Keys stay on the server. Live calls are never replaced
+                          with simulated results. Plans from templates are marked as group plans.
+                        </p>
+                      </details>
+                    </section>
+                  )}
                 </div>
               </>
             )}
@@ -1527,18 +1687,19 @@ export default function Home() {
           <Modal
             title={
               detail
-                ? "A little more about it"
+                ? "Activity details"
                 : (
                     {
-                      activity: "Put a good idea out there.",
-                      circle: "Make room for your people.",
+                      activity: "Create an activity",
+                      circle: "Create a Circle",
                       idea: "What should we try?",
                       round: "Let everyone have a say.",
                       plan: "From “we should” to “let’s go”.",
-                      profile: "Hey, nice to meet you.",
-                      filters: "Find your kind of good time.",
-                      search: "A little inspiration, grounded in real places.",
-                      join: "You’re in good company.",
+                      profile: "Make it your own",
+                      profilePhoto: "Your profile picture",
+                      filters: "Filter activities",
+                      search: "Find a real place",
+                      join: "Join your people",
                     } as Record<string, string>
                   )[modal!] || ""
             }
@@ -1558,7 +1719,7 @@ export default function Home() {
                 />
                 <span className="pill lavender">
                   {detail.cancelled ? "Cancelled · " : ""}
-                  {detail.demo ? "Fictional demo meetup" : "Community meetup"} ·
+                  {detail.demo ? "Activity" : "Community meetup"} ·
                   Automatic joining
                 </span>
                 <h2>{detail.title}</h2>
@@ -1717,11 +1878,22 @@ export default function Home() {
                 </button>
                 {drive && <p>{drive}</p>}
                 <p className="small muted">
-                  No booking or reservation is made. Photos are illustrative.
+                  No booking or reservation is made.{" "}
+                  {detail.venueData?.image
+                    ? "Venue photo supplied by SerpApi."
+                    : "Activity inspiration · venue selected together."}
                 </p>
                 <button
-                  className="primary full"
-                  disabled={busy}
+                  className="primary full sticky-submit"
+                  disabled={
+                    busy ||
+                    (data.activities.find((a) => a.id === detail.id)?.status !==
+                      "attending" &&
+                      (!!detail.cancelled ||
+                        !!detail.expired ||
+                        (data.activities.find((a) => a.id === detail.id)
+                          ?.attending || 0) >= detail.capacity))
+                  }
                   onClick={async () => {
                     const going =
                       data.activities.find((a) => a.id === detail.id)
@@ -1738,13 +1910,35 @@ export default function Home() {
                   {data.activities.find((a) => a.id === detail.id)?.status ===
                   "attending"
                     ? "Withdraw attendance"
-                    : "Join activity"}
+                    : detail.cancelled
+                      ? "Activity cancelled"
+                      : detail.expired
+                        ? "Activity ended"
+                        : (data.activities.find((a) => a.id === detail.id)
+                              ?.attending || 0) >= detail.capacity
+                          ? "Activity full"
+                          : "Join activity"}
                   <ArrowRight size={17} />
                 </button>
               </>
             )}
             {modal === "filters" && (
               <>
+                <fieldset>
+                  <legend>Activity category</legend>
+                  <div className="category-picker">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        className={category === cat ? "selected" : ""}
+                        aria-pressed={category === cat}
+                        onClick={() => setCategory(cat)}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
                 <div className="field">
                   <label htmlFor="cityfilter">City</label>
                   <input
@@ -1780,11 +1974,19 @@ export default function Home() {
                 </button>
               </>
             )}
+            {modal === "profilePhoto" && <form onSubmit={e => submit(e,"profilePhoto")}><ProfilePhotoInput onBusy={setPhotoBusy} photo={data.user.photo} name={data.user.name}/><button className="primary full" disabled={busy || photoBusy}>Save picture</button></form>}
             {modal === "profile" && (
               <form onSubmit={(e) => submit(e, "profile")}>
+                <div className="onboarding-brand"><BrandLogo /></div>
+                <ProfilePhotoInput
+                  onBusy={setPhotoBusy}
+                  photo={data.user.photo}
+                  name={data.user.demo ? "" : data.user.name}
+                />
                 <p className="muted">
-                  Meet people through things you actually want to do. Your new
-                  personal profile is separate from the fictional demo crew.
+                  {data.user.demo
+                    ? "Create your personal profile to start planning with friends."
+                    : "Your picture, interests, and next good plan."}
                 </p>
                 <div className="field">
                   <label htmlFor="name">Your name</label>
@@ -1798,20 +2000,6 @@ export default function Home() {
                   />
                 </div>
                 <div className="field">
-                  <label htmlFor="avatar">Avatar (optional)</label>
-                  <select
-                    id="avatar"
-                    name="avatar"
-                    defaultValue={data.user.avatar}
-                  >
-                    {["🪻", "🍊", "🌻", "🌊", "🪩", "🍄", "🌵", "🦋"].map(
-                      (a) => (
-                        <option key={a}>{a}</option>
-                      ),
-                    )}
-                  </select>
-                </div>
-                <div className="field">
                   <label htmlFor="city">Your city</label>
                   <input
                     id="city"
@@ -1820,39 +2008,44 @@ export default function Home() {
                     defaultValue={data.user.city}
                   />
                 </div>
-                <fieldset>
-                  <legend>Interests (optional — skip for now)</legend>
-                  <div className="interest-options">
-                    {categories.slice(1).map((i) => (
-                      <label key={i}>
-                        <input
-                          type="checkbox"
-                          name="interests"
-                          value={i}
-                          defaultChecked={
-                            !data.user.demo && data.user.interests.includes(i)
-                          }
-                        />
-                        {i}
-                      </label>
-                    ))}
+                <div className="optional-profile">
+                  <fieldset>
+                    <legend>Interests (optional — skip for now)</legend>
+                    <div className="interest-options">
+                      {categories.slice(1).map((i) => (
+                        <label key={i}>
+                          <input
+                            type="checkbox"
+                            name="interests"
+                            value={i}
+                            defaultChecked={
+                              !data.user.demo && data.user.interests.includes(i)
+                            }
+                          />
+                          {i}
+                        </label>
+                      ))}
+                    </div>
+                  </fieldset>
+                  <div className="field">
+                    <label htmlFor="budget">
+                      Outing budget (optional, defaults to $40)
+                    </label>
+                    <input
+                      id="budget"
+                      name="budget"
+                      type="number"
+                      min="0"
+                      max="1000"
+                      defaultValue={
+                        data.user.demo ? undefined : data.user.budget
+                      }
+                    />
                   </div>
-                </fieldset>
-                <div className="field">
-                  <label htmlFor="budget">
-                    Outing budget (optional, defaults to $40)
-                  </label>
-                  <input
-                    id="budget"
-                    name="budget"
-                    type="number"
-                    min="0"
-                    max="1000"
-                    defaultValue={data.user.demo ? undefined : data.user.budget}
-                  />
                 </div>
-                <button className="primary full" disabled={busy}>
-                  Let’s go <ArrowRight size={17} />
+                <button className="primary full" disabled={busy || photoBusy}>
+                  {data.user.demo ? "Create profile" : "Save profile"}{" "}
+                  <ArrowRight size={17} />
                 </button>
               </form>
             )}
@@ -1896,6 +2089,7 @@ export default function Home() {
                         id="description"
                         name="description"
                         maxLength={500}
+                        required={modal === "activity"}
                         placeholder="What’s the plan? Who’s it for?"
                       />
                     </div>
@@ -1906,6 +2100,10 @@ export default function Home() {
                         name="city"
                         required
                         defaultValue={data.user.city}
+                        onChange={(e) => {
+                          setActivityCity(e.target.value);
+                          setSelectedVenue(undefined);
+                        }}
                       />
                     </div>
                     <div className="field">
@@ -1926,18 +2124,31 @@ export default function Home() {
                 )}
                 {modal === "activity" && (
                   <>
+                    <VenuePicker
+                      city={activityCity || data.user.city}
+                      selected={selectedVenue}
+                      onSelect={setSelectedVenue}
+                    />
                     <div className="field">
                       <label htmlFor="venue">Meeting place</label>
                       <input
                         id="venue"
                         name="venue"
+                        key={selectedVenue?.id || "manual"}
+                        defaultValue={
+                          selectedVenue
+                            ? `${selectedVenue.name}, ${selectedVenue.address || ""}`
+                            : ""
+                        }
+                        readOnly={!!selectedVenue}
                         required
-                        placeholder="A public place or verified venue address"
+                        placeholder="Enter a public meeting place, or select above"
                       />
                     </div>
                     <p className="small muted">
-                      Use Discover’s place search to find a verified venue, then
-                      enter its address here.
+                      Selected venues carry their supplied photo into your
+                      activity. A manual address uses a labeled inspiration
+                      photo.
                     </p>
                     <div className="field-row">
                       <div className="field">
@@ -1965,9 +2176,11 @@ export default function Home() {
                     </div>
                     <p className="small muted">
                       {data.user.demo
-                        ? "Visible only inside your demo sandbox."
+                        ? "Visible to your current group."
                         : "Public activity with automatic joining."}{" "}
-                      A category cover photo will be selected.
+                      {selectedVenue?.image
+                        ? "The selected venue photo will be used."
+                        : "A category inspiration photo will be used."}
                     </p>
                   </>
                 )}
@@ -2161,11 +2374,10 @@ export default function Home() {
                   disabled={busy}
                   onClick={() => generate(true)}
                 >
-                  Create a labeled demo draft
+                  Create a plan from your matches
                 </button>
                 <p className="small muted">
-                  Demo drafts use your real saved matches, but no AI or verified
-                  venues. No reservations or messages will be sent.
+                  Build a simple itinerary, then choose venues with your Circle.
                 </p>
               </>
             )}
@@ -2203,11 +2415,32 @@ export default function Home() {
                 </div>
                 <p className="small muted">
                   {searchNote ||
-                    "No simulated results. Live search requires SERPAPI_API_KEY."}
+                    "Search real venue listings. Prices, opening hours and availability can change."}
                 </p>
+                {busy && (
+                  <div
+                    className="skeleton venue-skeleton"
+                    role="status"
+                    aria-label="Searching places"
+                  />
+                )}
                 <div className="venue-results">
                   {found.map((v) => (
                     <article key={v.id}>
+                      {v.image ? (
+                        <img
+                          className="venue-photo"
+                          src={v.image}
+                          alt={v.name}
+                          loading="lazy"
+                          referrerPolicy="no-referrer"
+                        />
+                      ) : (
+                        <div className="photo-placeholder">
+                          <MapPin />
+                          <span>No venue photo supplied</span>
+                        </div>
+                      )}
                       <h3>{v.name}</h3>
                       <p>{v.address}</p>
                       <p className="small muted">
@@ -2218,6 +2451,16 @@ export default function Home() {
                       <a href={v.url} target="_blank" rel="noreferrer">
                         View on Maps <ExternalLink size={13} />
                       </a>
+                      <button
+                        className="secondary"
+                        onClick={() => {
+                          setSelectedVenue(v);
+                          setActivityCity(city || data.user.city);
+                          setModal("activity");
+                        }}
+                      >
+                        Plan something here <ArrowRight size={14} />
+                      </button>
                       <button
                         className="text-link"
                         onClick={() => copy(v.name + ", " + (v.address || ""))}

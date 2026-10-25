@@ -1,0 +1,290 @@
+[
+  {
+    "file": "skill-audit/discover-after-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:44:18.123035+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "skill-audit/drag-left-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:44:31.657918+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "skill-audit/discover-before-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:38:10.771235+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "skill-audit/drag-right-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:44:25.363156+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "skill-audit/discover-after-1440.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:44:17.816793+00:00",
+    "viewportWidth": 1440,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "skill-audit/discover-before-1440.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:42:16.855119+00:00",
+    "viewportWidth": 1440,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/snapback-restored-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:07.299802+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/left-exit-3-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:19.796311+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/right-exit-2-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:27.480472+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/snapback-in-motion-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:28:58.968316+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/left-exit-2-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:19.779782+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/right-exit-3-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:27.497206+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/partial-right-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:28:58.883631+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/left-exit-0-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:19.737935+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/right-exit-1-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:27.465222+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/next-after-pass-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:26.994812+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/held-left-375.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:31:22.939650+00:00",
+    "viewportWidth": 375,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/group-next-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:41:35.558256+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/left-exit-1-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:19.763481+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/right-exit-0-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:27.433217+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/right-exit-5-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:27.530269+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/left-exit-4-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:19.829942+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/group-held-right-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:41:30.010020+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/held-left-430.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:31:24.262571+00:00",
+    "viewportWidth": 430,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/right-exit-4-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:27.513624+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/left-exit-5-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:19.845600+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/right-exit-6-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:27.546899+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/next-after-ditto-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:31:22.111156+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/left-exit-7-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:19.992875+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/held-left-1440.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:31:25.461273+00:00",
+    "viewportWidth": 1440,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/partial-left-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:19.681854+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/idle-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:28:50.352202+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/right-exit-7-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:27.565347+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/network-failure-recovered-1440.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:32:02.394541+00:00",
+    "viewportWidth": 1440,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/left-exit-6-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:29:19.898274+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  },
+  {
+    "file": "swipe/group-held-left-390.png",
+    "sourceUrl": "http://localhost:3102/",
+    "capturedAt": "2026-10-25T04:41:43.455655+00:00",
+    "viewportWidth": 390,
+    "method": "Real rendered interface; CDP mouse input for drag states",
+    "note": "Full-page width may exclude browser scrollbar. Filename states describe observed UI, not a generated approximation."
+  }
+]

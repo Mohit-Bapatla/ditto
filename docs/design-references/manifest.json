@@ -1,0 +1,73 @@
+[
+  {
+    "app": "tinder",
+    "screen": "match",
+    "sourceUrl": "https://www.tinderpressroom.com/app-images#gallery_gallery_0:19580",
+    "capturedAt": "2026-10-25T03:48:08.266Z",
+    "insight": "A single emotional agreement moment with one next action.",
+    "filename": "references/tinder-match.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "tinder",
+    "screen": "interests",
+    "sourceUrl": "https://www.tinderpressroom.com/app-images#gallery_gallery_0:19581",
+    "capturedAt": "2026-10-25T03:48:13.702Z",
+    "insight": "Compact wrapping interest chips with explicit selection state.",
+    "filename": "references/tinder-interests.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "partiful",
+    "screen": "event-mobile",
+    "sourceUrl": "https://partiful.com/e/6wF7VEPi1hGJsRfLldE4?source=discover",
+    "capturedAt": "2026-10-25T03:51:09.925Z",
+    "insight": "Mobile artwork, time and place grouped before RSVP; guest activity gated.",
+    "filename": "references/partiful-event-mobile.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "luma",
+    "screen": "event-mobile",
+    "sourceUrl": "https://luma.com/daq73jm5",
+    "capturedAt": "2026-10-25T03:51:25.385Z",
+    "insight": "Date/location rows remain readable below full-width cover art.",
+    "filename": "references/luma-event-mobile.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "doordash",
+    "screen": "restaurants-mobile",
+    "sourceUrl": "https://www.doordash.com/restaurants-near-me/",
+    "capturedAt": "2026-10-25T03:51:35.575Z",
+    "insight": "Mobile venue results preserve photo plus compact comparable facts.",
+    "filename": "references/doordash-restaurants-mobile.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "airbnb",
+    "screen": "discover-mobile",
+    "sourceUrl": "https://www.airbnb.com/",
+    "capturedAt": "2026-10-25T03:51:48.260Z",
+    "insight": "Mobile navigation and photography-led shelves.",
+    "filename": "references/airbnb-discover-mobile.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "airbnb",
+    "screen": "search-mobile",
+    "sourceUrl": "https://www.airbnb.com/",
+    "capturedAt": "2026-10-25T03:52:05.117Z",
+    "insight": "Verified mobile full-screen search: one expanded section, collapsed date/guest rows, fixed bottom action.",
+    "filename": "references/airbnb-search-mobile.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "Mobbin",
+    "screen": "public access boundary",
+    "sourceUrl": "https://mobbin.com/",
+    "capturedAt": "2026-10-25",
+    "filename": "references/mobbin-public-access.png",
+    "insight": "Public home is marketing, not production app evidence. Library access requires login; not used as a product screen reference."
+  }
+]

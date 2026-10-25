@@ -2,20 +2,31 @@ export type Person = {
   id: string;
   name: string;
   avatar: string;
+  photo?: string | null;
   city: string;
   interests: string[];
   budget: number;
   demo: boolean;
 };
 export type Activity = {
+  fixture?: {
+    version: string;
+    index: number;
+    area: string;
+    schedule: string;
+    cost: string;
+    image: string;
+  };
   id: string;
   creator: string;
   host?: string;
+  hostPhoto?: string | null;
   title: string;
   description: string;
   category: string;
   image: string;
   venue: string;
+  venueData?: Venue;
   city: string;
   start: string;
   capacity: number;

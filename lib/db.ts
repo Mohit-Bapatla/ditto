@@ -1,3 +1,9 @@
+import {
+  presentationActivities,
+  presentationCircles,
+  presentationEnabled,
+  presentationVersion,
+} from "./presentation-fixtures";
 import { liveProvidersEnabled } from "./provider-policy";
 import { PublicError } from "./errors";
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
@@ -57,6 +63,8 @@ export function person(user: string): Person {
 }
 export function createSession(): Session {
   return transaction(() => {
+    if (presentationEnabled(process.env, path))
+      return createPresentationSession();
     const owner = id(),
       token = id();
     const users = ["Alex", "Jordan", "Maya", "Sam"].map((name, i) => ({
@@ -155,6 +163,147 @@ export function createSession(): Session {
     });
     return s;
   });
+}
+/** Each browser gets its own owner namespace; fixture values are stable, auth IDs are not. */
+function createPresentationSession(): Session {
+  const owner = id();
+  const users: Person[] = ["Mohit", "Edwin", "Paxton"].map((name, i) => ({
+    id: id(),
+    name,
+    avatar: ["M", "E", "P"][i],
+    city: "Austin, TX",
+    interests: [
+      ["Sports", "Food", "Games"],
+      ["Fitness", "Games", "Food"],
+      ["Outdoors", "Arts", "Music"],
+    ][i],
+    budget: [25, 30, 20][i],
+    demo: true,
+  }));
+  users.forEach((p) =>
+    run("INSERT INTO profiles VALUES(?,?,?)", p.id, owner, JSON.stringify(p)),
+  );
+  const s = { id: id(), user: users[0].id, owner };
+  run(
+    "INSERT INTO sessions(id,user_id,owner) VALUES(?,?,?)",
+    s.id,
+    s.user,
+    owner,
+  );
+  const anchor = new Date();
+  anchor.setUTCHours(23, 0, 0, 0);
+  const activities = presentationActivities.map(
+    ([title, category, area, budget, capacity, image, description], i) => {
+      const activity = {
+        id: id(),
+        creator: users[i % 3].id,
+        title,
+        category,
+        venue: `${area} · choose a venue together`,
+        city: "Austin, TX",
+        budget,
+        capacity,
+        image: `/activities/${image}.webp`,
+        description,
+        start: new Date(+anchor + ((i % 12) + 1) * 86400000).toISOString(),
+        tags: ["All levels welcome", "Choose a time together"],
+        demo: true,
+        fixture: {
+          version: presentationVersion,
+          index: i,
+          area,
+          schedule: "illustrative",
+          cost: "planning allowance",
+          image: "representative",
+        },
+      };
+      run(
+        "INSERT INTO activities VALUES(?,?,?,?)",
+        activity.id,
+        owner,
+        activity.creator,
+        JSON.stringify(activity),
+      );
+      return activity;
+    },
+  );
+  // Seed saved interests only, never attendance, approval or RSVP.
+  [2, 5, 14, 18].forEach((i) => swipe(s, activities[i].id, "yes"));
+  presentationCircles.forEach((fixture, ci) => {
+    const cid = createCircle(
+      s,
+      fixture.name,
+      fixture.description,
+      "Austin, TX",
+      30,
+      true,
+    );
+    users
+      .slice(1)
+      .forEach((p) => run("INSERT INTO members VALUES(?,?)", cid, p.id));
+    fixture.picks.forEach((ai, ii) => {
+      const a = activities[ai];
+      const idea = {
+        id: id(),
+        title: a.title,
+        category: a.category,
+        image: a.image,
+        creator: users[ii % 3].id,
+      };
+      run(
+        "INSERT INTO ideas VALUES(?,?,?)",
+        idea.id,
+        cid,
+        JSON.stringify(idea),
+      );
+    });
+    startRound(s, cid, "everyone");
+    const ideas = circleState(s, cid).ideas;
+    // One completed sample perspective; everyone else's votes stay private.
+    ideas.forEach((idea, i) =>
+      vote({ ...s, user: users[1].id }, cid, idea.id, i !== 3),
+    );
+    const text = [
+      "Pickleball or tacos? Add your vote and let’s choose together.",
+      "Chess and coffee sounds like a good project break.",
+      "Karaoke or bowling? I’m adding both so we can vote.",
+      "Anyone up for a low-key hike? Let’s compare ideas.",
+    ][ci];
+    run(
+      "INSERT INTO messages(id,circle_id,user_id,text,created_at,nonce) VALUES(?,?,?,?,?,?)",
+      id(),
+      cid,
+      users[(ci % 2) + 1].id,
+      text,
+      new Date(+anchor - (ci + 1) * 3600000 - 86400000).toISOString(),
+      id(),
+    );
+    if (ci === 1) {
+      const pid = id();
+      const plan: Plan = {
+        id: pid,
+        circle: cid,
+        title: "Coffee, chess, and a proper break",
+        explanation:
+          "A sample proposal to review together. Timing and venues are illustrative; review the details before approving.",
+        start: activities[2].start,
+        stops: [
+          {
+            title: "Chess and coffee",
+            duration: 90,
+            note: "Choose a café together; illustrative $10 allowance.",
+          },
+        ],
+        source: "demo",
+        status: "proposed",
+        approvals: [],
+        eligible: users.map((p) => p.id),
+        rsvps: [],
+      };
+      run("INSERT INTO plans VALUES(?,?,?)", pid, cid, JSON.stringify(plan));
+    }
+  });
+  return s;
 }
 export function requireMember(s: Session, circle: string) {
   if (
@@ -386,7 +535,36 @@ export function circleState(s: Session, cid: string): Circle {
   }
   return c;
 }
+// Persistent, isolated presentation plans. Never runs against a deployed/live database.
+function seedPresentationPlans(s: Session) {
+  if (!presentationEnabled(process.env, path)) return;
+  const circles = all("SELECT * FROM circles WHERE owner=? ORDER BY rowid", s.owner);
+  if (!circles.length || one("SELECT 1 FROM plans p JOIN circles c ON c.id=p.circle_id WHERE c.owner=? AND json_extract(p.data, '$.template')='presentation-polish-v1'", s.owner)) return;
+  const activities = all("SELECT data FROM activities WHERE owner=?", s.owner).map(r => parse<Activity>(r));
+  if (!activities.some(a => a.fixture)) return;
+  const old = all("SELECT p.* FROM plans p JOIN circles c ON c.id=p.circle_id WHERE c.owner=?", s.owner);
+  old.forEach(row => { const p = parse<Plan>(row); if (p.title === "Coffee, chess, and a proper break" && p.source === "demo") { p.explanation = "Bring a board, grab a coffee, and make time for a proper catch-up."; p.stops.forEach(stop => { stop.note = "Hyde Park. Bring a board and choose a café together."; }); run("UPDATE plans SET data=? WHERE id=?", JSON.stringify(p),p.id); } });
+  const picks = ["Pickleball doubles", "Bouldering session", "Arcade night", "Sunset hike"];
+  const anchor = new Date();
+  anchor.setUTCHours(23, 0, 0, 0);
+  circles.slice(0,4).forEach((row, index) => {
+    const cid = String(row.id), a = activities.find(a => a.title === picks[index]);
+    if (!a) return;
+    const eligible = all("SELECT user_id FROM members WHERE circle_id=?", cid).map(r => String(r.user_id));
+    const pid = id();
+    const plan: Plan = { id:pid, circle:cid, title:a.title, explanation:a.description,
+      start:new Date(+anchor + (index + 1) * 86400000).toISOString(),
+      stops:[{title:a.title, duration:90, note:`${a.fixture?.area || a.city}. ${a.description}`}],
+      source:"demo", template:"presentation-polish-v1", status:"proposed", approvals:[], eligible, rsvps:[] };
+    run("INSERT INTO plans VALUES(?,?,?)",pid,cid,JSON.stringify(plan));
+    // Explicit sample commitments; regular users' plans and approvals are untouched.
+    const approved = index === 0 ? eligible : eligible.slice(0,1);
+    approved.forEach(uid => run("INSERT INTO approvals VALUES(?,?)",pid,uid));
+    if (index === 0) eligible.forEach(uid => run("INSERT INTO rsvps VALUES(?,?)",pid,uid));
+  });
+}
 export function state(s: Session): State {
+  seedPresentationPlans(s);
   return {
     user: person(s.user),
     demoUsers: all("SELECT data FROM profiles WHERE owner=?", s.owner).map(
@@ -403,6 +581,7 @@ export function state(s: Session): State {
           ...a,
           expired: new Date(a.start).getTime() <= Date.now(),
           host: person(a.creator).name,
+          hostPhoto: person(a.creator).photo,
           attending: Number(
             one(
               "SELECT count(*) n FROM participation WHERE activity_id=? AND status='attending'",

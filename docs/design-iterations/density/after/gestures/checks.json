@@ -1,0 +1,17 @@
+[
+  {
+    "width": 375,
+    "phase": "returning",
+    "title": "Bouldering session"
+  },
+  {
+    "width": 430,
+    "phase": "returning",
+    "title": "Bouldering session"
+  },
+  {
+    "width": 1440,
+    "phase": "idle",
+    "title": "Bouldering session"
+  }
+]

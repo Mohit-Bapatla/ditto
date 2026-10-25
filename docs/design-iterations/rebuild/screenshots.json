@@ -1,0 +1,968 @@
+[
+  {
+    "file": "before/circles-1440.png",
+    "width": 1440,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:51.734Z"
+  },
+  {
+    "file": "before/circles-375.png",
+    "width": 375,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:36.560Z"
+  },
+  {
+    "file": "before/circles-390.png",
+    "width": 390,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:39.577Z"
+  },
+  {
+    "file": "before/circles-430.png",
+    "width": 430,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:42.561Z"
+  },
+  {
+    "file": "before/circles-768.png",
+    "width": 753,
+    "height": 901,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:47.658Z"
+  },
+  {
+    "file": "before/discover-1440.png",
+    "width": 1425,
+    "height": 1038,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:51.222Z"
+  },
+  {
+    "file": "before/discover-375.png",
+    "width": 375,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:36.091Z"
+  },
+  {
+    "file": "before/discover-390.png",
+    "width": 390,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:39.159Z"
+  },
+  {
+    "file": "before/discover-430.png",
+    "width": 430,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:42.046Z"
+  },
+  {
+    "file": "before/discover-768.png",
+    "width": 753,
+    "height": 1018,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:46.135Z"
+  },
+  {
+    "file": "before/plans-1440.png",
+    "width": 1440,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:52.216Z"
+  },
+  {
+    "file": "before/plans-375.png",
+    "width": 375,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:37.166Z"
+  },
+  {
+    "file": "before/plans-390.png",
+    "width": 390,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:39.956Z"
+  },
+  {
+    "file": "before/plans-430.png",
+    "width": 430,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:42.957Z"
+  },
+  {
+    "file": "before/plans-768.png",
+    "width": 768,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:48.168Z"
+  },
+  {
+    "file": "before/profile-1440.png",
+    "width": 1440,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:52.714Z"
+  },
+  {
+    "file": "before/profile-375.png",
+    "width": 360,
+    "height": 1271,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:38.751Z"
+  },
+  {
+    "file": "before/profile-390.png",
+    "width": 375,
+    "height": 1271,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:41.462Z"
+  },
+  {
+    "file": "before/profile-430.png",
+    "width": 415,
+    "height": 1179,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:44.611Z"
+  },
+  {
+    "file": "before/profile-768.png",
+    "width": 753,
+    "height": 1258,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:00:49.701Z"
+  },
+  {
+    "file": "round-1/circles-1440.png",
+    "width": 1440,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T04:58:52.329Z"
+  },
+  {
+    "file": "round-1/circles-390.png",
+    "width": 390,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T04:58:49.260Z"
+  },
+  {
+    "file": "round-1/discover-1440.png",
+    "width": 1440,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T04:58:51.919Z"
+  },
+  {
+    "file": "round-1/discover-390.png",
+    "width": 375,
+    "height": 867,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T04:58:48.745Z"
+  },
+  {
+    "file": "round-1/plans-1440.png",
+    "width": 1440,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T04:58:52.839Z"
+  },
+  {
+    "file": "round-1/plans-390.png",
+    "width": 390,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T04:58:49.759Z"
+  },
+  {
+    "file": "round-1/profile-1440.png",
+    "width": 1440,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T04:58:53.342Z"
+  },
+  {
+    "file": "round-1/profile-390.png",
+    "width": 375,
+    "height": 1002,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T04:58:51.302Z"
+  },
+  {
+    "file": "round-1/voting-390.png",
+    "width": 375,
+    "height": 1657,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T04:59:27.727Z"
+  },
+  {
+    "file": "after/activity-details-1440.png",
+    "width": 1425,
+    "height": 945,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:00.601Z"
+  },
+  {
+    "file": "after/activity-details-375.png",
+    "width": 360,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:03:55.417Z"
+  },
+  {
+    "file": "after/activity-details-390.png",
+    "width": 375,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:03:56.716Z"
+  },
+  {
+    "file": "after/activity-details-430.png",
+    "width": 415,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:03:58.071Z"
+  },
+  {
+    "file": "after/activity-details-768.png",
+    "width": 753,
+    "height": 945,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:03:59.393Z"
+  },
+  {
+    "file": "after/broken-photo-375.png",
+    "width": 360,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:12:54.683Z"
+  },
+  {
+    "file": "after/chat-1440.png",
+    "width": 1425,
+    "height": 1445,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:40.531Z"
+  },
+  {
+    "file": "after/chat-375.png",
+    "width": 360,
+    "height": 2139,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:35.776Z"
+  },
+  {
+    "file": "after/chat-390.png",
+    "width": 375,
+    "height": 2139,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:36.968Z"
+  },
+  {
+    "file": "after/chat-430.png",
+    "width": 415,
+    "height": 2096,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:38.117Z"
+  },
+  {
+    "file": "after/chat-768.png",
+    "width": 753,
+    "height": 1934,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:39.324Z"
+  },
+  {
+    "file": "after/circle-create-1440.png",
+    "width": 1440,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:59.647Z"
+  },
+  {
+    "file": "after/circle-create-375.png",
+    "width": 375,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:58.509Z"
+  },
+  {
+    "file": "after/circle-create-390.png",
+    "width": 390,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:58.924Z"
+  },
+  {
+    "file": "after/circle-create-430.png",
+    "width": 430,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:59.338Z"
+  },
+  {
+    "file": "after/circle-create-768.png",
+    "width": 768,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:59.523Z"
+  },
+  {
+    "file": "after/circles-1440.png",
+    "width": 1440,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:08.513Z"
+  },
+  {
+    "file": "after/circles-375.png",
+    "width": 375,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:48.683Z"
+  },
+  {
+    "file": "after/circles-390.png",
+    "width": 390,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:53.873Z"
+  },
+  {
+    "file": "after/circles-430.png",
+    "width": 430,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:59.083Z"
+  },
+  {
+    "file": "after/circles-768.png",
+    "width": 768,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:04.436Z"
+  },
+  {
+    "file": "after/consensus-1440.png",
+    "width": 1425,
+    "height": 1233,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:06:01.994Z"
+  },
+  {
+    "file": "after/consensus-375.png",
+    "width": 360,
+    "height": 1225,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:05:56.505Z"
+  },
+  {
+    "file": "after/consensus-390.png",
+    "width": 375,
+    "height": 1225,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:05:57.953Z"
+  },
+  {
+    "file": "after/consensus-430.png",
+    "width": 415,
+    "height": 1207,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:05:59.310Z"
+  },
+  {
+    "file": "after/consensus-768.png",
+    "width": 753,
+    "height": 1233,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:06:00.647Z"
+  },
+  {
+    "file": "after/discover-1440.png",
+    "width": 1425,
+    "height": 945,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:07.982Z"
+  },
+  {
+    "file": "after/discover-375.png",
+    "width": 360,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:48.053Z"
+  },
+  {
+    "file": "after/discover-390.png",
+    "width": 375,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:53.204Z"
+  },
+  {
+    "file": "after/discover-430.png",
+    "width": 415,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:58.492Z"
+  },
+  {
+    "file": "after/discover-768.png",
+    "width": 753,
+    "height": 945,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:03.795Z"
+  },
+  {
+    "file": "after/drag-left-1440.png",
+    "width": 1425,
+    "height": 792,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:30.613Z"
+  },
+  {
+    "file": "after/drag-left-375.png",
+    "width": 360,
+    "height": 810,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:29.284Z"
+  },
+  {
+    "file": "after/drag-left-430.png",
+    "width": 415,
+    "height": 815,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:29.909Z"
+  },
+  {
+    "file": "after/drag-right-1440.png",
+    "width": 1425,
+    "height": 792,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:30.238Z"
+  },
+  {
+    "file": "after/drag-right-375.png",
+    "width": 360,
+    "height": 810,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:28.880Z"
+  },
+  {
+    "file": "after/drag-right-430.png",
+    "width": 415,
+    "height": 815,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:29.633Z"
+  },
+  {
+    "file": "after/empty-deck-390.png",
+    "width": 375,
+    "height": 856,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:14:39.008Z"
+  },
+  {
+    "file": "after/filters-1440.png",
+    "width": 1425,
+    "height": 945,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:11.552Z"
+  },
+  {
+    "file": "after/filters-375.png",
+    "width": 360,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:06.363Z"
+  },
+  {
+    "file": "after/filters-390.png",
+    "width": 375,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:07.644Z"
+  },
+  {
+    "file": "after/filters-430.png",
+    "width": 415,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:08.894Z"
+  },
+  {
+    "file": "after/filters-768.png",
+    "width": 753,
+    "height": 945,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:10.224Z"
+  },
+  {
+    "file": "after/final-discovery-390.png",
+    "width": 375,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:14:58.496Z"
+  },
+  {
+    "file": "after/group-drag-390.png",
+    "width": 508,
+    "height": 1183,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:05:15.916Z"
+  },
+  {
+    "file": "after/group-voting-1440.png",
+    "width": 1425,
+    "height": 1390,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:26.319Z"
+  },
+  {
+    "file": "after/group-voting-375.png",
+    "width": 360,
+    "height": 1183,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:21.096Z"
+  },
+  {
+    "file": "after/group-voting-390.png",
+    "width": 375,
+    "height": 1183,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:22.418Z"
+  },
+  {
+    "file": "after/group-voting-430.png",
+    "width": 415,
+    "height": 1183,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:23.736Z"
+  },
+  {
+    "file": "after/group-voting-768.png",
+    "width": 753,
+    "height": 1390,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:25.056Z"
+  },
+  {
+    "file": "after/incomplete-drag.png",
+    "width": 375,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:58.587Z"
+  },
+  {
+    "file": "after/invitation-1440.png",
+    "width": 1440,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:10:06.539Z"
+  },
+  {
+    "file": "after/invitation-375.png",
+    "width": 375,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:10:05.528Z"
+  },
+  {
+    "file": "after/invitation-390.png",
+    "width": 390,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:10:05.844Z"
+  },
+  {
+    "file": "after/invitation-430.png",
+    "width": 430,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:10:06.152Z"
+  },
+  {
+    "file": "after/invitation-768.png",
+    "width": 768,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:10:06.443Z"
+  },
+  {
+    "file": "after/left-exit-0.png",
+    "width": 375,
+    "height": 812,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:57.122Z"
+  },
+  {
+    "file": "after/left-exit-1.png",
+    "width": 375,
+    "height": 812,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:57.160Z"
+  },
+  {
+    "file": "after/left-exit-2.png",
+    "width": 375,
+    "height": 812,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:57.205Z"
+  },
+  {
+    "file": "after/left-exit-3.png",
+    "width": 375,
+    "height": 812,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:57.227Z"
+  },
+  {
+    "file": "after/left-exit-4.png",
+    "width": 375,
+    "height": 812,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:57.267Z"
+  },
+  {
+    "file": "after/loading-390.png",
+    "width": 390,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:13:47.725Z"
+  },
+  {
+    "file": "after/long-title-voting-375-fixed.png",
+    "width": 360,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:12:19.861Z"
+  },
+  {
+    "file": "after/long-title-voting-375.png",
+    "width": 360,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:10:40.954Z"
+  },
+  {
+    "file": "after/network-failure.png",
+    "width": 375,
+    "height": 1015,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:02.503Z"
+  },
+  {
+    "file": "after/onboarding-1440.png",
+    "width": 1440,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:13.925Z"
+  },
+  {
+    "file": "after/onboarding-375.png",
+    "width": 375,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:12.894Z"
+  },
+  {
+    "file": "after/onboarding-390.png",
+    "width": 390,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:13.308Z"
+  },
+  {
+    "file": "after/onboarding-430.png",
+    "width": 430,
+    "height": 844,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:13.560Z"
+  },
+  {
+    "file": "after/onboarding-768.png",
+    "width": 768,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:04:13.797Z"
+  },
+  {
+    "file": "after/plan-confirmed-1440.png",
+    "width": 1425,
+    "height": 1614,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:07:06.858Z"
+  },
+  {
+    "file": "after/plan-confirmed-375.png",
+    "width": 360,
+    "height": 1842,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:07:01.738Z"
+  },
+  {
+    "file": "after/plan-confirmed-390.png",
+    "width": 375,
+    "height": 1804,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:07:02.994Z"
+  },
+  {
+    "file": "after/plan-confirmed-430.png",
+    "width": 415,
+    "height": 1750,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:07:04.201Z"
+  },
+  {
+    "file": "after/plan-confirmed-768.png",
+    "width": 753,
+    "height": 1636,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:07:05.530Z"
+  },
+  {
+    "file": "after/plan-create-1440.png",
+    "width": 1425,
+    "height": 1233,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:06:11.612Z"
+  },
+  {
+    "file": "after/plan-create-375.png",
+    "width": 360,
+    "height": 1225,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:06:06.737Z"
+  },
+  {
+    "file": "after/plan-create-390.png",
+    "width": 375,
+    "height": 1225,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:06:08.089Z"
+  },
+  {
+    "file": "after/plan-create-430.png",
+    "width": 415,
+    "height": 1207,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:06:09.301Z"
+  },
+  {
+    "file": "after/plan-create-768.png",
+    "width": 753,
+    "height": 1233,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:06:10.469Z"
+  },
+  {
+    "file": "after/plan-review-1440.png",
+    "width": 1425,
+    "height": 1536,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:06:40.426Z"
+  },
+  {
+    "file": "after/plan-review-375.png",
+    "width": 360,
+    "height": 1730,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:06:35.539Z"
+  },
+  {
+    "file": "after/plan-review-390.png",
+    "width": 375,
+    "height": 1692,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:06:36.875Z"
+  },
+  {
+    "file": "after/plan-review-430.png",
+    "width": 415,
+    "height": 1640,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:06:38.088Z"
+  },
+  {
+    "file": "after/plan-review-768.png",
+    "width": 753,
+    "height": 1558,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:06:39.274Z"
+  },
+  {
+    "file": "after/plans-1440.png",
+    "width": 1425,
+    "height": 1632,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:10.060Z"
+  },
+  {
+    "file": "after/plans-375.png",
+    "width": 360,
+    "height": 1855,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:50.148Z"
+  },
+  {
+    "file": "after/plans-390.png",
+    "width": 375,
+    "height": 1766,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:55.317Z"
+  },
+  {
+    "file": "after/plans-430.png",
+    "width": 415,
+    "height": 1711,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:00.576Z"
+  },
+  {
+    "file": "after/plans-768.png",
+    "width": 753,
+    "height": 1654,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:05.895Z"
+  },
+  {
+    "file": "after/profile-1440.png",
+    "width": 1440,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:10.696Z"
+  },
+  {
+    "file": "after/profile-375.png",
+    "width": 360,
+    "height": 1008,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:51.599Z"
+  },
+  {
+    "file": "after/profile-390.png",
+    "width": 375,
+    "height": 987,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:08:56.921Z"
+  },
+  {
+    "file": "after/profile-430.png",
+    "width": 415,
+    "height": 987,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:02.124Z"
+  },
+  {
+    "file": "after/profile-768.png",
+    "width": 768,
+    "height": 900,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:09:06.370Z"
+  },
+  {
+    "file": "after/right-exit-0.png",
+    "width": 375,
+    "height": 812,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:49.437Z"
+  },
+  {
+    "file": "after/right-exit-1.png",
+    "width": 375,
+    "height": 812,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:49.492Z"
+  },
+  {
+    "file": "after/right-exit-2.png",
+    "width": 375,
+    "height": 812,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:49.513Z"
+  },
+  {
+    "file": "after/right-exit-3.png",
+    "width": 375,
+    "height": 812,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:49.543Z"
+  },
+  {
+    "file": "after/right-exit-4.png",
+    "width": 375,
+    "height": 812,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:49.594Z"
+  },
+  {
+    "file": "after/right-next.png",
+    "width": 375,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:50.810Z"
+  },
+  {
+    "file": "after/snapback.png",
+    "width": 390,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:02:08.886Z"
+  },
+  {
+    "file": "after/swipe-idle-390.png",
+    "width": 375,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:43.758Z"
+  },
+  {
+    "file": "after/swipe-left-held-390.png",
+    "width": 390,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:52.031Z"
+  },
+  {
+    "file": "after/swipe-right-held-390.png",
+    "width": 390,
+    "height": 921,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:01:44.954Z"
+  },
+  {
+    "file": "after/two-session-consensus.png",
+    "width": 360,
+    "height": 1172,
+    "kind": "actual local application screenshot",
+    "captured": "2026-10-25T05:13:07.368Z"
+  },
+  {
+    "file": "prototypes/a.png",
+    "width": 390,
+    "height": 844,
+    "kind": "rendered editable HTML concept",
+    "captured": "2026-10-25T04:55:56.391Z"
+  },
+  {
+    "file": "prototypes/b.png",
+    "width": 390,
+    "height": 844,
+    "kind": "rendered editable HTML concept",
+    "captured": "2026-10-25T04:55:56.645Z"
+  },
+  {
+    "file": "prototypes/c.png",
+    "width": 390,
+    "height": 844,
+    "kind": "rendered editable HTML concept",
+    "captured": "2026-10-25T04:55:57.011Z"
+  }
+]

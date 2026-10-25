@@ -1,8 +1,9 @@
 "use client";
-import { useState } from "react";
+import { useState, useRef, useEffect } from "react";
 import type { Circle } from "@/lib/types";
 import { categories } from "@/lib/types";
 import { groupFacts } from "@/lib/coordination";
+import { Avatar } from "./profile-photo";
 type Proposal = {
   id: string;
   title: string;
@@ -26,6 +27,14 @@ export function CircleCoordinator({
   act: (body: unknown, message?: string) => Promise<unknown>;
   onPlaces: (query: string) => void;
 }) {
+  const [selecting, setSelecting] = useState(false);
+  const log = useRef<HTMLDivElement>(null);
+  const nearBottom = useRef(true);
+  const latestMessageId = c.messages.at(-1)?.id;
+  useEffect(() => {
+    if (nearBottom.current && log.current)
+      log.current.scrollTop = log.current.scrollHeight;
+  }, [latestMessageId]);
   const [text, setText] = useState("");
   const [nonce, setNonce] = useState(() => crypto.randomUUID());
   const [selected, setSelected] = useState<string[]>([]);
@@ -67,13 +76,30 @@ export function CircleCoordinator({
   return (
     <div className="coordination-grid">
       <section className="plan-card chat-panel">
-        <span className="eyebrow purple">GOOD PLANS START HERE</span>
-        <h2>The conversation.</h2>
+        <h2>Your group chat</h2>
         <p className="muted small">
           Private to this Circle · updates every five seconds · showing the
           latest 100 messages.
         </p>
+        <div className="chat-tools">
+          <span>{c.members.length} people · private</span>
+          <button
+            type="button"
+            aria-pressed={selecting}
+            onClick={() => setSelecting(!selecting)}
+          >
+            {selecting ? "Done selecting" : "Select messages for a plan"}
+          </button>
+        </div>
         <div
+          ref={log}
+          onScroll={(e) => {
+            nearBottom.current =
+              e.currentTarget.scrollHeight -
+                e.currentTarget.scrollTop -
+                e.currentTarget.clientHeight <
+              60;
+          }}
           className="chat-log"
           role="log"
           aria-label="Circle messages"
@@ -91,7 +117,7 @@ export function CircleCoordinator({
             >
               <div className="between">
                 <strong>
-                  {m.avatar} {m.name}
+                  <span className="inline-avatar"><Avatar person={c.members.find(member => member.id === m.user) || {name:m.name}}/></span> {m.name}
                 </strong>
                 <time dateTime={m.createdAt}>
                   {new Date(m.createdAt).toLocaleTimeString([], {
@@ -101,21 +127,23 @@ export function CircleCoordinator({
                 </time>
               </div>
               <p>{m.text}</p>
-              <label className="small">
-                <input
-                  type="checkbox"
-                  aria-label={`Select message: ${m.text}`}
-                  checked={selected.includes(m.id)}
-                  onChange={(e) =>
-                    setSelected(
-                      e.target.checked
-                        ? [...selected, m.id].slice(-20)
-                        : selected.filter((id) => id !== m.id),
-                    )
-                  }
-                />{" "}
-                Include in proposal review
-              </label>
+              {selecting && (
+                <label className="small">
+                  <input
+                    type="checkbox"
+                    aria-label={`Select message: ${m.text}`}
+                    checked={selected.includes(m.id)}
+                    onChange={(e) =>
+                      setSelected(
+                        e.target.checked
+                          ? [...selected, m.id].slice(-20)
+                          : selected.filter((id) => id !== m.id),
+                      )
+                    }
+                  />{" "}
+                  Include in proposal review
+                </label>
+              )}
             </article>
           ))}
         </div>
@@ -147,7 +175,7 @@ export function CircleCoordinator({
           </button>
         </form>
         <details>
-          <summary>Sample conversation for fixture demo</summary>
+          <summary>Try a planning conversation</summary>
           <p className="small">
             Send these as separate members, then select the messages. This is a
             fixed sample, not live AI extraction.
@@ -161,11 +189,10 @@ export function CircleCoordinator({
         </details>
       </section>
       <section className="plan-card autopilot-panel">
-        <span className="eyebrow purple">SOCIAL AUTOPILOT</span>
-        <h2>From “we should” to a plan.</h2>
+        <h2>Plan from your chat</h2>
         <p>
-          Select up to 20 relevant messages. Review a suggestion, edit it, then
-          let everyone vote.
+          {selected.length} of 20 messages selected. Review the suggestion, edit
+          it, then let everyone vote.
         </p>
         <label className="checkbox-label">
           <input
@@ -194,8 +221,7 @@ export function CircleCoordinator({
         </div>
         {!live && (
           <p className="small muted">
-            Live providers paused. The sample uses a deterministic fixture; no
-            message leaves Ditto
+            Live AI is paused. You can still organize the conversation here.
           </p>
         )}
         {busy && <p role="status">Preparing your review…</p>}
@@ -226,7 +252,7 @@ export function CircleCoordinator({
           >
             <span className="pill lavender">
               {proposal.source === "demo"
-                ? "Fixture proposal · no AI"
+                ? "Suggested plan · review together"
                 : "AI suggestion · review required"}
             </span>
             <h3>Looks like a plan is forming!</h3>
@@ -375,7 +401,7 @@ export function CircleCoordinator({
           <div>
             <p className="pill lavender">
               {source === "demo"
-                ? "Deterministic review · no AI"
+                ? "Ideas to discuss"
                 : "AI-suggested compromises · not agreement"}
             </p>
             {suggestions.map((s, i) => (

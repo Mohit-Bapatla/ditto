@@ -1,0 +1,17 @@
+# Focused mobile review
+
+disposition: fix
+
+Reviewed the actual `after/plans-390.png`, `pointer-partial-390.png` and `pointer-left-390.png`, plus `app/week-agenda.tsx`, `app/profile-photo.tsx` and `app/mobile-finish.css`. No app edits or detector findings. Private profile photographs were not copied or included in this report; the photo-editor finding below is source-based rather than a claim about particular people’s pictures.
+
+The week selector gives Plans a useful chronological entry point. The held-drag images clearly show physical translation, rotation, progressive DITTO/PASS feedback and the next card underneath; card edges moving outside the viewport during an intentional gesture are expected, not a clipping defect. Still images do not independently verify snapback, commit timing or backend submission.
+
+## Three actionable issues
+
+1. **P2 — The agenda duplicates the same pending plan and saved activities farther down the page.** The coffee/chess proposal appears in the selected day and again under Awaiting group decisions; Chess and coffee and the food crawl appear both in the day and the complete saved list. The screenshot exceeds 2,000px for a small dataset. Keep the day agenda as the primary view; make all-date pending/saved collections compact disclosures or a clearly separate view, or show only other-date items with an explicit heading. Preserve access to every record. Acceptance: the selected day’s entries are not repeated in the default mobile reading path, while other dates remain discoverable.
+
+2. **P2 — Calendar dots conflate saved interest, RSVP and group approval.** Source labels a day “Confirmed” only when it has a confirmed group plan, while *every* interested/attending activity makes it “Tentative.” A user’s actual attending activity therefore receives the same hollow dot as casual interest. The row correctly says “You RSVP’d,” but the week overview can suggest the opposite level of commitment. Define marker categories from real state and use precise visible legend text, such as “Group approved / RSVP” and “Interested / awaiting approval,” or separate saved interests from commitment markers. Keep distinct accessible day labels. Acceptance: interest-only, RSVP-only, pending-plan and approved-plan days each communicate their state consistently between the week strip and detail rows, without implying venue booking.
+
+3. **P2 — Profile cropping cannot recover an off-center face in a landscape photo.** `renderCrop` always centers the horizontal source coordinate; only zoom and vertical position are adjustable. Zoom makes this limitation stronger for a person near either side. Add horizontal position alongside vertical/zoom, or use a directly pannable preview with accessible controls. Retain the circular preview and existing processing/error feedback. Acceptance: a landscape source with its subject near either edge can be framed without replacing the photo, and crop controls remain usable on a 390px phone. This does not require exposing private photos in documentation; use a non-private test image.
+
+No P0 or P1 observed in this bounded review. The three fixes refine density and meaning within the existing design; they do not justify a rebuild. No claim is made about unprovided photo-editor renders, full accessibility conformance, real-device camera behavior or regression results. Questions skipped because the user authorized autonomous work.

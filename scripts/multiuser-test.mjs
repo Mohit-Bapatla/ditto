@@ -343,6 +343,28 @@ for (const invalid of [
   await a.act({ ...event, nonce: randomUUID(), ...invalid }, 400);
 await a.refresh();
 assert.equal(a.state.activities.find((a) => a.id === ev.id).cancelled, true);
+// Undo is intentionally pass-only and cannot remove saved interest or attendance.
+const undoActivity = (
+  await a.act({ ...event, nonce: randomUUID(), title: "Undo acceptance" })
+).id;
+await b.act({ type: "swipe", activity: undoActivity, direction: "no" });
+await b.act({ type: "undoPass", activity: undoActivity });
+await b.refresh();
+assert.equal(
+  b.state.activities.find((x) => x.id === undoActivity).swipe,
+  undefined,
+);
+await b.act({ type: "swipe", activity: undoActivity, direction: "yes" });
+await b.act({ type: "undoPass", activity: undoActivity }, 400);
+await b.refresh();
+assert.equal(
+  b.state.activities.find((x) => x.id === undoActivity).status,
+  "interested",
+);
+await a.act(
+  { ...event, nonce: randomUUID(), venueId: "forged-selection" },
+  400,
+);
 if (process.env.TEST_SAVE_USERS) {
   mkdirSync("test-results", { recursive: true });
   writeFileSync(

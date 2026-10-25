@@ -1,0 +1,438 @@
+/* Immersive invitation: the image and identity form one continuous gesture target. */
+.discover-page {
+  max-width: 520px;
+  padding: 8px 16px 24px;
+  overflow-x: clip;
+}
+.discover-toolbar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 8px;
+  min-height: 48px;
+  margin-bottom: 8px;
+}
+.discover-toolbar h1 {
+  font-size: 24px;
+  margin: 0;
+}
+.discover-toolbar > div > span {
+  display: none;
+}
+.discover-tools {
+  display: flex;
+  align-items: center;
+  gap: 0;
+}
+.discover-tools .icon-btn {
+  border: 0;
+  background: transparent;
+}
+.discover-tools .filter-btn {
+  width: auto;
+  min-height: 44px;
+  padding: 0 10px;
+  gap: 8px;
+  background: transparent;
+  border: 0;
+  font-size: 12px;
+}
+.discover-grid {
+  display: block;
+}
+.deck-stack {
+  position: relative;
+  margin: 0;
+}
+.deck-stack:before {
+  display: none;
+}
+.physical-stack {
+  isolation: isolate;
+  margin-bottom: 6px;
+}
+.next-card {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  pointer-events: none;
+  transform-origin: 50% 100%;
+}
+.physical-stack > .swipe-surface {
+  position: relative;
+  z-index: 2;
+}
+.outing-card {
+  position: relative;
+  height: clamp(420px, calc(100svh - 286px), 620px);
+  border: 0;
+  border-radius: 24px;
+  overflow: hidden;
+  background: var(--ink);
+  color: white;
+}
+.outing-photo {
+  position: absolute;
+  inset: 0;
+  background: #3b3035;
+}
+.outing-photo > img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+.outing-photo:after {
+  content: "";
+  position: absolute;
+  inset: 25% 0 0;
+  background: linear-gradient(transparent, #16101555 32%, #161015f5 100%);
+  pointer-events: none;
+}
+.outing-category {
+  position: absolute;
+  top: 16px;
+  left: 18px;
+  font-size: 12px;
+  font-weight: 600;
+  padding: 5px 9px;
+  border-radius: 6px;
+  background: #241b22c9;
+  color: #fff;
+  z-index: 1;
+}
+.photo-credit {
+  position: absolute;
+  right: 16px;
+  top: 20px;
+  font-size: 10px;
+  padding: 3px 5px;
+  color: white;
+  background: #241b22c9;
+  z-index: 1;
+  border-radius: 4px;
+}
+.photo-credit:empty {
+  display: none;
+}
+.outing-info {
+  position: absolute;
+  inset: auto 0 0;
+  padding: 24px 22px 18px;
+  z-index: 2;
+}
+.outing-when {
+  font-size: 12px;
+  font-weight: 600;
+  margin-bottom: 8px;
+}
+.outing-info h2 {
+  font-family: var(--font-display), sans-serif;
+  font-weight: 700;
+  font-size: clamp(28px, 7.7vw, 36px);
+  letter-spacing: -0.03em;
+  line-height: 1.04;
+  margin: 0 0 12px;
+  overflow-wrap: anywhere;
+  text-wrap: balance;
+}
+.outing-place {
+  font-size: 14px;
+  line-height: 1.4;
+  margin: 0 0 12px;
+}
+.outing-people {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  font-size: 12px;
+}
+.host-initial {
+  display: grid;
+  place-items: center;
+  width: 28px;
+  height: 28px;
+  border-radius: 50%;
+  background: #fff2;
+  font-weight: 700;
+}
+.outing-details {
+  margin-left: auto;
+  display: flex;
+  align-items: center;
+  gap: 4px;
+  min-height: 44px;
+  color: #fff;
+  font-size: 12px;
+  font-weight: 700;
+  padding: 0 0 0 12px;
+}
+.photo-fallback {
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-start;
+  padding: 70px 24px;
+  gap: 12px;
+  color: #fff;
+}
+.photo-fallback span {
+  font-family: var(--font-display);
+  font-size: 26px;
+}
+.photo-fallback small {
+  font-size: 12px;
+}
+.discover-page .swipe-controls {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 22px;
+  padding: 0;
+  margin: 18px 0 0;
+  position: static;
+  background: transparent;
+}
+.discover-page .swipe-action,
+.discover-page .undo-action {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0;
+  width: 56px;
+  height: 56px;
+  min-height: 56px;
+  padding: 0;
+  border: 0;
+  border-radius: 50%;
+  background: white;
+  box-shadow: 0 3px 16px #211b2009;
+  margin: 0;
+}
+.discover-page .undo-action {
+  order: -1;
+  width: 44px;
+  height: 44px;
+  min-height: 44px;
+  color: var(--muted);
+}
+.discover-page .swipe-action.pass {
+  color: var(--vote-no);
+}
+.discover-page .swipe-action.heart {
+  background: white;
+  color: var(--vote-yes);
+}
+.discover-page .swipe-action.heart:hover {
+  background: #e2f4e9;
+}
+.discover-page .swipe-action.pass:hover {
+  background: #fce6e6;
+}
+.discover-page .swipe-action small,
+.discover-page .undo-action small {
+  display: none;
+}
+.discover-page .swipe-hint {
+  display: block;
+  text-align: center;
+  font-size: 11px;
+  color: var(--muted);
+  margin-top: 10px;
+}
+.discover-page .demo-footnote {
+  font-size: 11px;
+  color: var(--muted);
+  line-height: 1.5;
+  text-align: center;
+  margin: 24px 8px 0;
+}
+@media (min-width: 761px) {
+  .discover-page {
+    max-width: 580px;
+    padding-top: 12px;
+  }
+  .outing-card {
+    height: clamp(350px, calc(100svh - 250px), 640px);
+  }
+  .outing-info h2 {
+    font-size: 36px;
+    max-width: 15ch;
+  }
+}
+@media (max-width: 760px) {
+  .discover-page {
+    padding: 4px 12px 20px;
+  }
+  .outing-card {
+    height: clamp(
+      380px,
+      calc(
+        100svh - 286px - env(safe-area-inset-top) - env(safe-area-inset-bottom)
+      ),
+      620px
+    );
+  }
+  .outing-info {
+    padding: 22px 20px 14px;
+  }
+  .discover-page .swipe-controls {
+    margin-top: 14px;
+  }
+}
+@media (max-width: 360px) {
+  .discover-tools .filter-btn span {
+    display: none;
+  }
+  .outing-info h2 {
+    font-size: 28px;
+  }
+  .photo-credit {
+    top: 52px;
+    left: 18px;
+    right: auto;
+  }
+}
+.swipe-surface {
+  position: relative;
+  z-index: 2;
+}
+.swipe-surface {
+  transition: none !important;
+  will-change: auto;
+  -webkit-user-select: none;
+  user-select: none;
+}
+.swipe-feedback {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
+  pointer-events: none;
+  z-index: 8;
+  border: 3px solid;
+}
+.swipe-feedback.positive {
+  border-color: var(--vote-yes-edge);
+  background: linear-gradient(110deg, #16b96b80, #16b96b18 85%);
+}
+.swipe-feedback.negative {
+  border-color: var(--vote-no-edge);
+  background: linear-gradient(250deg, #ed365080, #ed365018 85%);
+}
+.swipe-feedback span {
+  position: absolute;
+  top: 64px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-shadow: 0 2px 20px #0008;
+  font-size: clamp(62px, 12vw, 88px);
+  line-height: 1.1;
+  font-weight: 850;
+  letter-spacing: -0.03em;
+}
+.swipe-feedback.positive span {
+  left: 24px;
+  color: #40f39a;
+}
+.swipe-feedback.negative span {
+  right: 24px;
+  color: #ff5269;
+}
+.swipe-saving,
+.swipe-failure {
+  position: absolute;
+  left: 16px;
+  right: 16px;
+  bottom: 10px;
+  padding: 8px 12px;
+  background: #20221fee;
+  color: white;
+  border-radius: 8px;
+  font-size: 12px;
+  z-index: 10;
+  text-align: center;
+}
+.swipe-failure {
+  background: #fff1ed;
+  color: #8e2725;
+  border: 1px solid #dfb4ac;
+}
+.swipe-surface[data-swipe-phase="exiting"] .swipe-feedback {
+  animation: swipe-confirm 0.32s ease-out;
+}
+@keyframes swipe-confirm {
+  0% {
+    box-shadow: inset 0 0 0 0 currentColor;
+  }
+  40% {
+    box-shadow: inset 0 0 0 5px currentColor;
+  }
+  100% {
+    box-shadow: inset 0 0 0 0 currentColor;
+  }
+}
+.swipe-feedback.positive {
+  color: var(--vote-yes-edge);
+}
+.swipe-feedback.negative {
+  color: var(--vote-no-edge);
+}
+@media (prefers-reduced-motion: reduce) {
+  .swipe-surface[data-swipe-phase="exiting"] .swipe-feedback {
+    animation: none;
+  }
+}
+.group-stack {
+  position: relative;
+  isolation: isolate;
+  margin-bottom: 18px;
+}
+.group-stack > .swipe-surface {
+  z-index: 2;
+}
+.group-preview {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  z-index: 0;
+}
+
+.swipe-surface[data-swipe-phase="dragging"],
+.swipe-surface[data-swipe-phase="exiting"] {
+  will-change: transform;
+}
+
+.group-photo-note {
+  position: absolute;
+  top: 14px;
+  right: 14px;
+  padding: 4px 8px;
+  border-radius: 4px;
+  background: #20221fe6;
+  color: white;
+  font-size: 11px;
+  pointer-events: none;
+}
+.outing-info.long-title h2 {
+  font-size: 26px;
+  line-height: 1.1;
+}
+.outing-place {
+  overflow-wrap: anywhere;
+}
+.outing-people > span:nth-child(2) {
+  min-width: 0;
+  overflow-wrap: anywhere;
+}
+.outing-details {
+  flex-shrink: 0;
+}
+
+.swipe-screen-feedback {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
+}

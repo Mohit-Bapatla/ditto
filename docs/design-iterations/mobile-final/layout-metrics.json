@@ -1,0 +1,122 @@
+[
+  {
+    "screen": "Discover",
+    "scrollWidth": 360,
+    "width": 375
+  },
+  {
+    "screen": "Your Circles",
+    "scrollWidth": 360,
+    "width": 375
+  },
+  {
+    "screen": "Your plans",
+    "scrollWidth": 360,
+    "width": 375
+  },
+  {
+    "screen": "Your profile",
+    "scrollWidth": 360,
+    "width": 375
+  },
+  {
+    "screen": "Discover",
+    "scrollWidth": 375,
+    "width": 390
+  },
+  {
+    "screen": "Your Circles",
+    "scrollWidth": 375,
+    "width": 390
+  },
+  {
+    "screen": "Your plans",
+    "scrollWidth": 375,
+    "width": 390
+  },
+  {
+    "screen": "Your profile",
+    "scrollWidth": 375,
+    "width": 390
+  },
+  {
+    "screen": "Discover",
+    "scrollWidth": 415,
+    "width": 430
+  },
+  {
+    "screen": "Your Circles",
+    "scrollWidth": 415,
+    "width": 430
+  },
+  {
+    "screen": "Your plans",
+    "scrollWidth": 415,
+    "width": 430
+  },
+  {
+    "screen": "Your profile",
+    "scrollWidth": 415,
+    "width": 430
+  },
+  {
+    "screen": "Discover",
+    "scrollWidth": 753,
+    "width": 768
+  },
+  {
+    "screen": "Your Circles",
+    "scrollWidth": 753,
+    "width": 768
+  },
+  {
+    "screen": "Your plans",
+    "scrollWidth": 753,
+    "width": 768
+  },
+  {
+    "screen": "Your profile",
+    "scrollWidth": 753,
+    "width": 768
+  },
+  {
+    "screen": "Discover",
+    "scrollWidth": 1009,
+    "width": 1024
+  },
+  {
+    "screen": "Your Circles",
+    "scrollWidth": 1009,
+    "width": 1024
+  },
+  {
+    "screen": "Your plans",
+    "scrollWidth": 1009,
+    "width": 1024
+  },
+  {
+    "screen": "Your profile",
+    "scrollWidth": 1009,
+    "width": 1024
+  },
+  {
+    "screen": "Discover",
+    "scrollWidth": 1425,
+    "width": 1440
+  },
+  {
+    "screen": "Your Circles",
+    "scrollWidth": 1425,
+    "width": 1440
+  },
+  {
+    "screen": "Your plans",
+    "scrollWidth": 1425,
+    "width": 1440
+  },
+  {
+    "screen": "Your profile",
+    "scrollWidth": 1425,
+    "width": 1440
+  }
+]

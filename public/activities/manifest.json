@@ -1,0 +1,237 @@
+[
+  {
+    "name": "racket",
+    "source": "https://images.unsplash.com/photo-1554068865-24cecd4e34b8?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/racket.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "climbing",
+    "source": "https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/climbing.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "coffee",
+    "source": "https://images.unsplash.com/photo-1509042239860-f550ce710b93?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/coffee.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "arcade",
+    "source": "https://images.unsplash.com/photo-1511512578047-dfb367046420?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/arcade.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "hike",
+    "source": "https://images.unsplash.com/photo-1551632811-561732d1e306?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/hike.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "chess",
+    "source": "https://images.unsplash.com/photo-1586165368502-1bad197a6461?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/chess.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "food",
+    "source": "https://images.unsplash.com/photo-1555939594-58d7cb561ad1?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/food.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "music",
+    "source": "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/music.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "basketball",
+    "source": "https://images.unsplash.com/photo-1546519638-68e109498ffc?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/basketball.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "cinema",
+    "source": "https://images.unsplash.com/photo-1489599849927-2ee91cede3ba?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/cinema.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "art",
+    "source": "https://images.unsplash.com/photo-1460661419201-fd4cecdf8a8b?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/art.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "picnic",
+    "source": "https://images.unsplash.com/photo-1500534623283-312aade485b7?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/picnic.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "market",
+    "source": "https://images.unsplash.com/photo-1488459716781-31db52582fe9?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/market.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "running",
+    "source": "https://images.unsplash.com/photo-1552674605-db6ffd4facb5?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/running.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "soccer",
+    "source": "https://images.unsplash.com/photo-1574629810360-7efbbe195018?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "file": "public/activities/soccer.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "pickleball",
+    "source": "https://images.unsplash.com/photo-1778180883944-9b8403391d85?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "page": "https://unsplash.com/photos/outdoor-pickleball-courts-surrounded-by-trees-and-grass-cNuo2I6bznQ",
+    "file": "public/activities/pickleball.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "bouldering",
+    "source": "https://images.unsplash.com/photo-1754950917608-6595a0c28157?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "page": "https://unsplash.com/photos/man-climbing-an-indoor-rock-climbing-wall-m2s5M6bMxs0",
+    "file": "public/activities/bouldering.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "bowling",
+    "source": "https://images.unsplash.com/photo-1551500333-8cf5df31f457?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "page": "https://unsplash.com/photos/man-playing-bowling-rrHl2zGZ9E4",
+    "file": "public/activities/bowling.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "kayak",
+    "source": "https://images.unsplash.com/photo-1436162716854-dcb9157bfac1?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "page": "https://unsplash.com/photos/man-riding-kayak-on-water-taken-at-sunset-UFqV-RqPm8w",
+    "file": "public/activities/kayak.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "pool",
+    "source": "https://images.unsplash.com/photo-1545062080-a71640ea75a1?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "page": "https://unsplash.com/photos/pool-table-set-cRhNdY9-2Sc",
+    "file": "public/activities/pool.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "pingpong",
+    "source": "https://images.unsplash.com/photo-1708268418738-4863baa9cf72?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "page": "https://unsplash.com/photos/a-ping-pong-table-with-a-racket-and-ball-on-it-cGLfMt2T1BI",
+    "file": "public/activities/pingpong.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "badminton",
+    "source": "https://images.unsplash.com/photo-1708312604109-16c0be9326cd?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "page": "https://unsplash.com/photos/a-badminton-racket-and-two-shuttles-on-a-green-surface-VRqmHMYMq1c",
+    "file": "public/activities/badminton.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "kart",
+    "source": "https://images.unsplash.com/photo-1508550794981-ed0e94d56589?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "page": "https://unsplash.com/photos/person-riding-go-kart-racing-on-race-track-psCOesRN0J0",
+    "file": "public/activities/kart.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "skating",
+    "source": "https://images.unsplash.com/photo-1765057968893-93172a1f7002?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "page": "https://unsplash.com/photos/people-ice-skating-at-night-under-string-lights-UM9QeSUUU0o",
+    "file": "public/activities/skating.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  },
+  {
+    "name": "volleyball",
+    "source": "https://images.unsplash.com/photo-1593510873848-917479a29d6b?auto=format&fit=crop&w=1000&q=80&fm=webp",
+    "page": "https://unsplash.com/photos/people-playing-volleyball-under-blue-sky-during-daytime-0fEyWckHl2Y",
+    "file": "public/activities/volleyball.webp",
+    "license": "https://unsplash.com/license",
+    "captured": "2026-10-25",
+    "use": "Representative activity photograph, never a claimed venue",
+    "ok": true
+  }
+]
