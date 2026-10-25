@@ -155,7 +155,7 @@ test("physical pointer movement renders progressive feedback; incomplete drag sp
   await t.cleanup();
 });
 
-test("save is awaited before exit, publish follows exit, and rapid pointer/key/button requests cannot double-submit", async () => {
+test("exit starts during save, publication waits for both, and rapid input cannot double-submit", async () => {
   let calls = 0,
     published = false,
     resolveSave!: () => void;
@@ -176,6 +176,9 @@ test("save is awaited before exit, publish follows exit, and rapid pointer/key/b
   assert.equal(calls, 1);
   assert.equal(published, false);
   assert.equal(t.card.dataset.swipePhase, "saving");
+  await act(async () => pause(80));
+  assert.ok(Number(t.card.style.transform.match(/translateX\(([-\d.]+)px/)?.[1]) > 180, "card must continue moving while server save is unresolved");
+  assert.equal(published, false);
   await t.key("ArrowLeft");
   await t.pointer("pointerdown", 200, 200);
   await t.pointer("pointermove", 40, 200);
@@ -438,4 +441,22 @@ test("implicit touch capture transfer from a child must not cancel the card drag
  await act(async()=>{await pause(400);});
  assert.equal(votes,1);
  await t.cleanup();
+});
+
+ test("slow failed save restores an exited card and clears the full-screen tint", async () => {
+  let fail!: () => void;
+  const pending = new Promise<void>(resolve => { fail = resolve; });
+  const t = await mount(async () => { await pending; return false; });
+  await t.pointer("pointerdown", 100, 200);
+  await t.pointer("pointermove", 240, 200);
+  await t.pointer("pointerup", 240, 200);
+  await act(async () => pause(450));
+  assert.equal(t.card.dataset.swipePhase, "saving");
+  assert.ok(Number(t.card.style.transform.match(/translateX\(([-\d.]+)px/)?.[1]) > 1000);
+  await act(async () => { fail(); await pause(1000); });
+  assert.equal(t.card.dataset.swipePhase, "idle");
+  assert.equal(t.card.style.transform, "none");
+  assert.equal(document.querySelector(".swipe-screen-feedback"), null);
+  assert.match(t.card.textContent!, /wasn’t saved/);
+  await t.cleanup();
 });

@@ -17,6 +17,7 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
+import { createPortal } from "react-dom";
 import { WheelGesture, type WheelGate } from "@/lib/wheel-gesture";
 import { swipeDecision } from "@/lib/swipe-gesture";
 
@@ -85,11 +86,14 @@ export function SwipeSurface({
     [-400, 0, 400],
     reduced ? [0, 0, 0] : [-16, 0, 16],
   );
-  const yesOpacity = useTransform(x, [0, 18, 110], [0, 0.15, 1]);
-  const noOpacity = useTransform(x, [-110, -18, 0], [1, 0.15, 0]);
-  useMotionValueEvent(x, "change", (value) =>
-    progress?.set(Math.min(Math.abs(value) / 110, 1)),
-  );
+  const screenOpacity = useMotionValue(0);
+  const screenColor = useTransform(x, (value) => value >= 0 ? "#16b96b" : "#ed3650");
+  const yesOpacity = useTransform(x, [0, 12, 65], [0, 0.35, 1]);
+  const noOpacity = useTransform(x, [-65, -12, 0], [1, 0.35, 0]);
+  useMotionValueEvent(x, "change", (value) => {
+    progress?.set(Math.min(Math.abs(value) / 110, 1));
+    if (!locked.current) screenOpacity.set(reduced ? 0 : Math.min(Math.abs(value) / 110, 1) * 0.16);
+  });
   useLayoutEffect(() => {
     const card = element.current;
     if (focusHandoffRef?.current) {
@@ -126,6 +130,7 @@ export function SwipeSurface({
     };
   }, [progress, x]);
   async function snapBack() {
+    void animate(screenOpacity, 0, { duration: 0.15 });
     locked.current = true;
     if (mounted.current) setPhase("returning");
     await animate(
@@ -149,31 +154,26 @@ export function SwipeSurface({
     setPhase("saving");
     const sign = yes ? 1 : -1;
     x.stop();
-    // Buttons, keyboard and dragging all enter this same transaction.
-    if (!reduced)
-      animate(x, sign * Math.max(64, Math.abs(x.get())), {
-        type: "spring",
-        stiffness: 500,
-        damping: 35,
+    // Start visual release immediately; publishing the next card still requires
+    // BOTH the real server save and this exit. Network failure restores this card.
+    const target = sign * (window.innerWidth + (element.current?.clientWidth || 400));
+    const exit = new Promise<void>((resolve) => {
+      finishExit.current = resolve;
+      if (reduced) animate(opacity, 0, { duration: 0.1, onComplete: resolve });
+      else animate(x, target, {
+        duration: 0.3,
+        ease: [0.16, 1, 0.3, 1],
+        onComplete: resolve,
       });
+    });
+    if (!reduced) void animate(screenOpacity, [screenOpacity.get(), 0.24, 0], {
+      duration: 0.45, times: [0, 0.2, 1], ease: "easeOut",
+    });
     try {
       const saved = await onSwipe(yes, async () => {
         if (!mounted.current) return;
         setPhase("exiting");
-        x.stop();
-        await new Promise<void>((resolve) => {
-          finishExit.current = resolve;
-          const target =
-            sign * (window.innerWidth + (element.current?.clientWidth || 400));
-          if (reduced)
-            animate(opacity, 0, { duration: 0.1, onComplete: resolve });
-          else
-            animate(x, target, {
-              duration: 0.32,
-              ease: [0.32, 0.04, 0.68, 0.4],
-              onComplete: resolve,
-            });
-        });
+        await exit;
         finishExit.current = undefined;
       });
       if (saved) return; // Remain locked until the keyed card is replaced by committed server state.
@@ -181,6 +181,10 @@ export function SwipeSurface({
       /* The parent also exposes the actionable network/server error. */
     }
     if (mounted.current) {
+      x.stop();
+      opacity.stop();
+      finishExit.current?.();
+      finishExit.current = undefined;
       setFailure("Your vote wasn’t saved. Try again.");
       opacity.set(1);
       await snapBack();
@@ -263,6 +267,11 @@ export function SwipeSurface({
     void snapBack();
   }
   return (
+    <>
+    {phase !== "idle" && createPortal(
+      <motion.div aria-hidden="true" className="swipe-screen-feedback"
+        style={{ opacity: screenOpacity, backgroundColor: screenColor }} />, document.body
+    )}
     <motion.article
       ref={element}
       className={`swipe-surface ${className}`}
@@ -390,5 +399,6 @@ export function SwipeSurface({
         </span>
       )}
     </motion.article>
+    </>
   );
 }

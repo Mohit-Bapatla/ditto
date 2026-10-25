@@ -314,11 +314,11 @@
 }
 .swipe-feedback.positive {
   border-color: var(--vote-yes-edge);
-  background: linear-gradient(110deg, #16854d35, transparent 75%);
+  background: linear-gradient(110deg, #16b96b80, #16b96b18 85%);
 }
 .swipe-feedback.negative {
   border-color: var(--vote-no-edge);
-  background: linear-gradient(250deg, #c9383535, transparent 75%);
+  background: linear-gradient(250deg, #ed365080, #ed365018 85%);
 }
 .swipe-feedback span {
   position: absolute;
@@ -327,7 +327,7 @@
   border: 4px solid currentColor;
   border-radius: 7px;
   background: #ffffffeb;
-  font-size: 40px;
+  font-size: clamp(48px, 8vw, 68px);
   line-height: 1.1;
   font-weight: 850;
   letter-spacing: 0.06em;
@@ -430,4 +430,11 @@
 }
 .outing-details {
   flex-shrink: 0;
+}
+
+.swipe-screen-feedback {
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  pointer-events: none;
 }
