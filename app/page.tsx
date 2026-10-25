@@ -3,7 +3,11 @@ import "./discovery.css";
 import { CircleCoordinator } from "./circle-coordinator";
 import { PlanEditor } from "./plan-editor";
 import { GroupVoting } from "./group-voting";
-import { SwipeSurface } from "./swipe-surface";
+import {
+  SwipeSurface,
+  type SwipeHandle,
+  type SwipeCommit,
+} from "./swipe-surface";
 import { VenuePicker } from "./venue-picker";
 import {
   useState,
@@ -12,8 +16,16 @@ import {
   useRef,
   type FormEvent,
   type ReactNode,
+  type Ref,
 } from "react";
-import { motion, AnimatePresence, MotionConfig } from "motion/react";
+import {
+  motion,
+  AnimatePresence,
+  MotionConfig,
+  useMotionValue,
+  useTransform,
+  type MotionValue,
+} from "motion/react";
 import {
   Compass,
   Users,
@@ -174,21 +186,24 @@ function SwipeCard({
   onSwipe,
   onDetails,
   disabled,
+  controlRef,
+  progress,
+  focusHandoffRef,
+  preview = false,
 }: {
   activity: Activity;
-  onSwipe: (yes: boolean) => void;
+  onSwipe: SwipeCommit;
   onDetails: () => void;
   disabled: boolean;
+  controlRef?: Ref<SwipeHandle>;
+  progress?: MotionValue<number>;
+  focusHandoffRef?: { current: boolean };
+  preview?: boolean;
 }) {
   const [photoFailed, setPhotoFailed] = useState(false);
   const venuePhoto = Boolean(activity.venueData?.image);
-  return (
-    <SwipeSurface
-      className="outing-card"
-      disabled={disabled}
-      onSwipe={onSwipe}
-      label={`${activity.title}. Left arrow to pass, right arrow for interested.`}
-    >
+  const content = (
+    <>
       <div className={`outing-photo ${photoFailed ? "photo-unavailable" : ""}`}>
         {!photoFailed ? (
           <img
@@ -250,10 +265,30 @@ function SwipeCard({
           </button>
         </div>
       </div>
+    </>
+  );
+  return preview ? (
+    <div className="outing-card preview-card">{content}</div>
+  ) : (
+    <SwipeSurface
+      className="outing-card"
+      disabled={disabled}
+      onSwipe={onSwipe}
+      controlRef={controlRef}
+      progress={progress}
+      focusHandoffRef={focusHandoffRef}
+      label={`${activity.title}. Left arrow to pass, right arrow for Ditto.`}
+    >
+      {content}
     </SwipeSurface>
   );
 }
 export default function Home() {
+  const swipeControl = useRef<SwipeHandle>(null);
+  const swipeFocus = useRef(false);
+  const swipeProgress = useMotionValue(0);
+  const nextScale = useTransform(swipeProgress, [0, 1], [0.95, 1]);
+  const nextY = useTransform(swipeProgress, [0, 1], [12, 0]);
   const [data, setData] = useState<State>();
   const [page, setPage] = useState("Discover");
   const [selected, setSelected] = useState<string>();
@@ -315,7 +350,11 @@ export default function Home() {
       return () => clearTimeout(t);
     }
   }, [toast]);
-  const act = async (body: unknown, message?: string) => {
+  const act = async (
+    body: unknown,
+    message?: string,
+    beforePublish?: () => Promise<void>,
+  ) => {
     if (pending.current) return;
     pending.current = true;
     stateVersion.current++;
@@ -323,6 +362,7 @@ export default function Home() {
     setError("");
     try {
       const r = await request("/api/action", body);
+      if (beforePublish) await beforePublish();
       stateVersion.current++;
       setData(r.state);
       if (message) setToast(message);
@@ -360,16 +400,19 @@ export default function Home() {
         (!available || a.attending < a.capacity),
     ) || [];
   const top = deck[0];
-  const onSwipe = async (yes: boolean) => {
+  const onSwipe: SwipeCommit = async (yes, afterSave) => {
     if (top) {
       const r = await act(
         { type: "swipe", activity: top.id, direction: yes ? "yes" : "no" },
         yes
           ? "Saved to your interested list. Join when you’re ready."
           : undefined,
+        afterSave,
       );
       if (r) setLastPass(yes ? undefined : top.id);
+      return Boolean(r);
     }
+    return false;
   };
   async function submit(e: FormEvent<HTMLFormElement>, type: string) {
     e.preventDefault();
@@ -860,12 +903,31 @@ export default function Home() {
                       <span>Something worth going out for</span>
                       <small>{deck.length} to discover</small>
                     </div>
-                    <div className="deck-stack">
+                    <div className="deck-stack physical-stack">
+                      {deck[1] && (
+                        <motion.div
+                          className="next-card"
+                          aria-hidden="true"
+                          inert
+                          style={{ scale: nextScale, y: nextY }}
+                        >
+                          <SwipeCard
+                            activity={deck[1]}
+                            onSwipe={onSwipe}
+                            onDetails={() => {}}
+                            disabled
+                            preview
+                          />
+                        </motion.div>
+                      )}
                       <AnimatePresence mode="wait">
                         {top ? (
                           <SwipeCard
                             key={top.id}
                             activity={top}
+                            controlRef={swipeControl}
+                            focusHandoffRef={swipeFocus}
+                            progress={swipeProgress}
                             disabled={busy}
                             onSwipe={onSwipe}
                             onDetails={() => setDetail(top)}
@@ -911,7 +973,7 @@ export default function Home() {
                         className="swipe-action pass"
                         aria-label="Pass on activity"
                         disabled={!top || busy}
-                        onClick={() => onSwipe(false)}
+                        onClick={() => void swipeControl.current?.swipe(false)}
                       >
                         <X size={24} />
                         <small>Pass</small>
@@ -938,15 +1000,14 @@ export default function Home() {
                         className="swipe-action heart"
                         aria-label="Interested in activity"
                         disabled={!top || busy}
-                        onClick={() => onSwipe(true)}
+                        onClick={() => void swipeControl.current?.swipe(true)}
                       >
                         <Heart size={24} />
-                        <small>Interested</small>
+                        <small>Ditto</small>
                       </button>
                     </div>
                     <div className="swipe-hint">
-                      ← Pass <span>Drag a card or use the buttons</span>{" "}
-                      Interested →
+                      ← Pass <span>Drag a card or use the buttons</span> Ditto →
                     </div>
                   </section>
                   <aside className="discovery-aside">

@@ -9,6 +9,11 @@
   --accent-hover: #a93422;
   --tint: #fbece5;
   --lime: #e3eea1;
+  --vote-yes: #08753d;
+  --vote-yes-hover: #065d31;
+  --vote-yes-edge: #138650;
+  --vote-no: #bd2428;
+  --vote-no-edge: #c93835;
   --purple: var(--accent);
   --lavender: var(--tint);
   --r-sm: 10px;
