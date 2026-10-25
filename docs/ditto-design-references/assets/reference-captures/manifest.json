@@ -1,0 +1,245 @@
+[
+  {
+    "app": "tinder",
+    "screen": "official-gallery",
+    "sourceUrl": "https://www.tinderpressroom.com/app-images",
+    "capturedAt": "2026-10-25T03:47:51.325Z",
+    "insight": "Official product screenshots; actions and imagery dominate, utility navigation stays secondary.",
+    "filename": "tinder/official-gallery.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "tinder",
+    "screen": "chat",
+    "sourceUrl": "https://www.tinderpressroom.com/app-images#gallery_gallery_0:19579",
+    "capturedAt": "2026-10-25T03:48:03.718Z",
+    "insight": "Clear conversation hierarchy and restrained composer; actions distinct from message content.",
+    "filename": "tinder/chat.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "tinder",
+    "screen": "match",
+    "sourceUrl": "https://www.tinderpressroom.com/app-images#gallery_gallery_0:19580",
+    "capturedAt": "2026-10-25T03:48:08.266Z",
+    "insight": "A single emotional agreement moment with one next action.",
+    "filename": "tinder/match.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "tinder",
+    "screen": "interests",
+    "sourceUrl": "https://www.tinderpressroom.com/app-images#gallery_gallery_0:19581",
+    "capturedAt": "2026-10-25T03:48:13.702Z",
+    "insight": "Compact wrapping interest chips with explicit selection state.",
+    "filename": "tinder/interests.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "partiful",
+    "screen": "organizer",
+    "sourceUrl": "https://partiful.com/org-profiles",
+    "capturedAt": "2026-10-25T03:48:24.347Z",
+    "insight": "Real event page previews emphasize art, guest context and a clear RSVP.",
+    "filename": "partiful/organizer.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "partiful",
+    "screen": "explore",
+    "sourceUrl": "https://partiful.com/explore",
+    "capturedAt": "2026-10-25T03:48:30.912Z",
+    "insight": "Photo-forward discovery with compact day/time/city metadata.",
+    "filename": "partiful/explore.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "partiful",
+    "screen": "event-detail",
+    "sourceUrl": "https://partiful.com/e/6wF7VEPi1hGJsRfLldE4?source=discover",
+    "capturedAt": "2026-10-25T03:48:39.975Z",
+    "insight": "Large event art, explicit time-zone buttons, separate Interested and RSVP actions. Restricted guest details not accessed.",
+    "filename": "partiful/event-detail.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "doordash",
+    "screen": "entry",
+    "sourceUrl": "https://www.doordash.com/",
+    "capturedAt": "2026-10-25T03:48:46.153Z",
+    "insight": "Location-first entry; do not borrow promotional clutter.",
+    "filename": "doordash/entry.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "doordash",
+    "screen": "restaurants",
+    "sourceUrl": "https://www.doordash.com/restaurants-near-me/",
+    "capturedAt": "2026-10-25T03:48:53.866Z",
+    "insight": "Dense, consistently ordered rating/distance/time metadata below each photo.",
+    "filename": "doordash/restaurants.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "doordash",
+    "screen": "navigation",
+    "sourceUrl": "https://www.doordash.com/restaurants-near-me/",
+    "capturedAt": "2026-10-25T03:49:02.423Z",
+    "insight": "Compact utility navigation; store detail remained unavailable in current guest view.",
+    "filename": "doordash/navigation.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "luma",
+    "screen": "entry",
+    "sourceUrl": "https://luma.com/",
+    "capturedAt": "2026-10-25T03:49:13.630Z",
+    "insight": "Quiet framing; create and discover are the two obvious entry actions.",
+    "filename": "luma/entry.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "luma",
+    "screen": "discover",
+    "sourceUrl": "https://luma.com/discover",
+    "capturedAt": "2026-10-25T03:49:19.592Z",
+    "insight": "Consistent photo tiles with date first, then event and venue.",
+    "filename": "luma/discover.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "luma",
+    "screen": "event",
+    "sourceUrl": "https://luma.com/daq73jm5",
+    "capturedAt": "2026-10-25T03:49:25.856Z",
+    "insight": "Calendar date block, real location, host context and separate registration panel.",
+    "filename": "luma/event.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "bumble",
+    "screen": "plans-guide",
+    "sourceUrl": "https://bumble.com/the-buzz/bumble-for-friends-plans",
+    "capturedAt": "2026-10-25T03:49:37.002Z",
+    "insight": "Official public description of join/create plans; screenshots lazy-loaded below.",
+    "filename": "bumble/plans-guide.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "airbnb",
+    "screen": "discover",
+    "sourceUrl": "https://www.airbnb.com/",
+    "capturedAt": "2026-10-25T03:49:51.106Z",
+    "insight": "Photo-led tiles, restrained card chrome, consistent price and rating placement.",
+    "filename": "airbnb/discover.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "airbnb",
+    "screen": "date-picker",
+    "sourceUrl": "https://www.airbnb.com/",
+    "capturedAt": "2026-10-25T03:50:05.462Z",
+    "insight": "Attempted desktop filter interaction; capture may show closed state. Do not treat as verified open-filter evidence.",
+    "filename": "airbnb/date-picker.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "airbnb",
+    "screen": "guests",
+    "sourceUrl": "https://www.airbnb.com/",
+    "capturedAt": "2026-10-25T03:50:19.268Z",
+    "insight": "Attempted desktop filter interaction; capture may show closed state. Do not treat as verified open-filter evidence.",
+    "filename": "airbnb/guests.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "yc",
+    "screen": "222",
+    "sourceUrl": "https://www.ycombinator.com/companies/222",
+    "capturedAt": "2026-10-25T03:50:21.379Z",
+    "insight": "Positioning reference for real-world social connection; directory page, not app UI.",
+    "filename": "yc/222.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "yc",
+    "screen": "text-ai",
+    "sourceUrl": "https://www.ycombinator.com/companies/text-ai",
+    "capturedAt": "2026-10-25T03:50:59.770Z",
+    "insight": "Directory positioning: opt-in group coordination rather than pretending AI is a person.",
+    "filename": "yc/text-ai.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "yc",
+    "screen": "plura",
+    "sourceUrl": "https://www.ycombinator.com/companies/plura",
+    "capturedAt": "2026-10-25T03:51:01.297Z",
+    "insight": "Event-first social discovery positioning; directory evidence only.",
+    "filename": "yc/plura.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "partiful",
+    "screen": "event-mobile",
+    "sourceUrl": "https://partiful.com/e/6wF7VEPi1hGJsRfLldE4?source=discover",
+    "capturedAt": "2026-10-25T03:51:09.925Z",
+    "insight": "Mobile artwork, time and place grouped before RSVP; guest activity gated.",
+    "filename": "partiful/event-mobile.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "luma",
+    "screen": "event-mobile",
+    "sourceUrl": "https://luma.com/daq73jm5",
+    "capturedAt": "2026-10-25T03:51:25.385Z",
+    "insight": "Date/location rows remain readable below full-width cover art.",
+    "filename": "luma/event-mobile.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "doordash",
+    "screen": "restaurants-mobile",
+    "sourceUrl": "https://www.doordash.com/restaurants-near-me/",
+    "capturedAt": "2026-10-25T03:51:35.575Z",
+    "insight": "Mobile venue results preserve photo plus compact comparable facts.",
+    "filename": "doordash/restaurants-mobile.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "airbnb",
+    "screen": "discover-mobile",
+    "sourceUrl": "https://www.airbnb.com/",
+    "capturedAt": "2026-10-25T03:51:48.260Z",
+    "insight": "Mobile navigation and photography-led shelves.",
+    "filename": "airbnb/discover-mobile.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "airbnb",
+    "screen": "search-mobile",
+    "sourceUrl": "https://www.airbnb.com/",
+    "capturedAt": "2026-10-25T03:52:05.117Z",
+    "insight": "Verified mobile full-screen search: one expanded section, collapsed date/guest rows, fixed bottom action.",
+    "filename": "airbnb/search-mobile.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "tinder",
+    "screen": "match-desktop",
+    "sourceUrl": "https://www.tinderpressroom.com/app-images#gallery_gallery_0:19580",
+    "capturedAt": "2026-10-25T03:52:19.725Z",
+    "insight": "Official match screen: paired photos, large affirmation, message composer and quick reactions.",
+    "filename": "tinder/match-desktop.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  },
+  {
+    "app": "partiful",
+    "screen": "organizer-desktop",
+    "sourceUrl": "https://partiful.com/org-profiles",
+    "capturedAt": "2026-10-25T03:52:41.240Z",
+    "insight": "Desktop event presentation uses distinct visual art while keeping management actions simple.",
+    "filename": "partiful/organizer-desktop.png",
+    "usage": "Private design research only; never ship competitor assets in public/."
+  }
+]
