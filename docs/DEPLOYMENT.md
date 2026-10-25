@@ -2,7 +2,7 @@
 
 ## Decision: one Railway Node service with one persistent volume
 
-Keep SQLite, the existing authorization/session model, and five-second polling. This avoids changing the schema, synchronization semantics or judging flow before the deadline. Railway provides HTTPS and a persistent volume. Do **not** deploy this app on ephemeral/serverless storage, add replicas, or share the volume between independent app instances. A brief restart/redeploy interruption is expected; data must survive it.
+Keep SQLite, the existing authorization/session model, and five-second polling. This avoids a database migration to another provider or changes to synchronization semantics before the deadline; the coordination schema additions are additive. Railway provides HTTPS and a persistent volume. Do **not** deploy this app on ephemeral/serverless storage, add replicas, or share the volume between independent app instances. A brief restart/redeploy interruption is expected; data must survive it.
 
 The repository contains a two-stage Dockerfile using Node 24, Railway configuration, storage preflight/integrity checks, `/api/health`, backup tooling and restart-verification tests. No Supabase migration is needed.
 
@@ -12,9 +12,9 @@ Provider references: [Railway volumes](https://docs.railway.com/volumes/referenc
 
 Public URL: **https://ditto-production.up.railway.app**
 
-Railway project `ditto` (`bb53170f-6766-4dc5-92ef-6e9e3a290e47`), production service `ditto`, persistent volume `ditto-volume` mounted at `/data`. Latest verified deployment: `3d70b5f2-0a7e-406f-96f8-3bb97c7de5e4` (2026-10-25 UTC). One instance, sleeping disabled.
+Railway project `ditto` (`bb53170f-6766-4dc5-92ef-6e9e3a290e47`), production service `ditto`, persistent volume `ditto-volume` mounted at `/data`. Latest verified deployment: `8e578db6-75cb-4e9e-ab2a-408ce24abbec` (2026-10-25 UTC). One instance, sleeping disabled.
 
-Verified: production build, lint, typecheck, 12 unit tests, production-container integration tests, container replacement with the same volume, online SQLite backup integrity, public HTTPS integration tests with independent cookie sessions, and saved sessions/membership/votes/matches after public redeployment and restart. Public Discover and Circles were also opened in a browser. Public automated collaboration checks use independent HTTP cookie clients; a two-device visual polling walkthrough remains a recommended judging rehearsal.
+Verified: production build, lint, typecheck, 24 unit tests, production-container integration tests, container replacement with the same volume, online SQLite backup integrity, public HTTPS integration tests with independent cookie sessions, and saved sessions/membership/votes/matches after public redeployment and restart. Public Discover and Circles were also opened in a browser. The coordination release passed four independent public HTTP sessions through a real AI two-stop plan (8,090 ms), real route, four approvals, four RSVPs and calendar export. Original saved public sessions, membership, votes and matches survived this release. Startup logs confirmed the private pre-migration backup and successful database integrity/write checks. Four independent browser cookie jars also completed chat polling, live AI extraction, voting and planning against the isolated production build. A two-device public rehearsal remains recommended.
 
 Both provider secrets are configured privately on Railway. The former Meta billing blocker has been resolved and live local planning, extraction and discovery passed. See API_STATUS.md for counts and estimates. The coordination release explicitly activates live providers; the default in code remains off.
 

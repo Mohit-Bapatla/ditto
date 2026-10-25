@@ -16,6 +16,10 @@ Four independent host-scoped cookie jars: `127.0.0.1`, `jordan.localhost`, `maya
 
 Verified through the actual UI: fast name/city profile setup, invite joining, four member names, four authored messages, polling delivery without refresh, selecting messages and consenting, real Muse extraction, editable proposal review, explicit idea acceptance, four independent votes, unanimous reveal, real Meta/SerpApi plan, four independent approvals, confirmation only after fourth approval, four independent RSVPs, and grounded “Why this plan?” counts. Calendar content/download authorization also passed HTTP tests. Mobile width 390px had no horizontal page overflow; desktop and mobile screenshots are saved in this directory.
 
+## Public release acceptance
+
+Deployment `8e578db6-75cb-4e9e-ab2a-408ce24abbec` succeeded. Startup created the private migration backup and verified persistent database integrity/write access. Read-only persistence tests confirmed original public sessions, memberships, votes and matches. Four new fictional public sessions completed live AI planning with two real venues and one route in 8,090 ms, then four approvals, four RSVPs and calendar export. Public browser verification confirmed Discover, Circles, the Chat & AI entry point, and the period-free branding. Updated screenshot: `public-deployment.jpg`.
+
 ## Bugs found and fixed
 
 - Personality wording for avatars removed; optional interests no longer inherit fictional demo selections. Name/city suffice.
