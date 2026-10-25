@@ -1,4 +1,5 @@
 "use client";
+import "./discovery.css";
 import { CircleCoordinator } from "./circle-coordinator";
 import { PlanEditor } from "./plan-editor";
 import { GroupVoting } from "./group-voting";
@@ -89,8 +90,14 @@ async function request(url: string, body?: unknown) {
           body: JSON.stringify(body),
         }
       : { cache: "no-store" },
-  );
-  const data = await res.json();
+  ).catch(() => {
+    throw new Error(
+      "Couldn’t connect to Ditto. Check your connection and try again.",
+    );
+  });
+  const data = await res.json().catch(() => {
+    throw new Error("Ditto couldn’t finish that request. Please try again.");
+  });
   if (!res.ok) throw new Error(data.error || "Could not complete the request.");
   return data;
 }
@@ -173,70 +180,73 @@ function SwipeCard({
   onDetails: () => void;
   disabled: boolean;
 }) {
+  const [photoFailed, setPhotoFailed] = useState(false);
+  const venuePhoto = Boolean(activity.venueData?.image);
   return (
     <SwipeSurface
-      className="swipe-card"
+      className="outing-card"
       disabled={disabled}
       onSwipe={onSwipe}
       label={`${activity.title}. Left arrow to pass, right arrow for interested.`}
     >
-      <img
-        className="hero-photo"
-        src={activity.image}
-        alt={
-          activity.venueData?.image
-            ? activity.venueData.name
-            : `${activity.category} inspiration photo, not the venue`
-        }
-        draggable={false}
-      />
-      <div className="photo-shade" />
-      <div className="card-top">
-        <span className="pill white">
-          <span className="online-dot" />
+      <div className={`outing-photo ${photoFailed ? "photo-unavailable" : ""}`}>
+        {!photoFailed ? (
+          <img
+            src={activity.image}
+            alt={
+              venuePhoto
+                ? activity.venueData!.name
+                : `${activity.category} inspiration, not the venue`
+            }
+            draggable={false}
+            onError={() => setPhotoFailed(true)}
+          />
+        ) : (
+          <div className="photo-fallback">
+            <MapPin size={32} />
+            <span>{activity.venueData?.name || activity.category}</span>
+            <small>Photo unavailable</small>
+          </div>
+        )}
+        <span className="outing-category">
           {activity.category}
+          {activity.demo ? " · Demo" : " · Community"}
         </span>
-        <span className="pill translucent">
-          {activity.demo ? "Demo activity" : "Community activity"}
+        <span className="photo-credit">
+          {photoFailed
+            ? ""
+            : venuePhoto
+              ? "Venue photo · SerpApi"
+              : "Illustrative photo"}
         </span>
       </div>
-      <div className="card-caption">
-        <span className="eyebrow">
-          {activity.venueData?.image ? "VENUE PHOTO" : "INSPIRATION PHOTO"}
-        </span>
-        <h2>{activity.title}</h2>
-        <p>
-          <MapPin size={15} />
-          {activity.venue} <span>·</span> {activity.city}
-        </p>
-      </div>
-      <div className="card-details">
-        <div className="card-facts">
-          <span>
-            <CalendarDays size={16} />
-            {fmt(activity.start)}
-          </span>
+      <div className="outing-info">
+        <div className="outing-when">
+          <span>{fmt(activity.start)}</span>
           <strong>
             {activity.budget === 0 ? "Free" : `~$${activity.budget} / person`}
           </strong>
         </div>
-        <p>{activity.description}</p>
-        <div className="card-bottom">
-          <div>
-            <span className="tiny-avatar" aria-hidden="true">
-              {(activity.host || "D").slice(0, 1)}
-            </span>
-            <span>
-              {activity.attending} / {activity.capacity} going{" "}
-              <small>Hosted by {activity.host || "a community member"}</small>
-            </span>
-          </div>
+        <h2>{activity.title}</h2>
+        <p className="outing-place">
+          {activity.venueData?.name || activity.venue}
+        </p>
+        <div className="outing-people">
+          <span className="host-initial" aria-hidden="true">
+            {(activity.host || "D").slice(0, 1)}
+          </span>
+          <span>
+            With {activity.host || "your community"}
+            <small>
+              {activity.attending} of {activity.capacity} going
+            </small>
+          </span>
           <button
-            className="round-small"
+            className="outing-details"
             onClick={onDetails}
             aria-label="View activity details"
           >
-            <ArrowUpRight size={20} />
+            <ArrowUpRight size={22} />
           </button>
         </div>
       </div>
@@ -780,7 +790,10 @@ export default function Home() {
               </button>
             </div>
           </header>
-          <main className="main-content" id="main-content">
+          <main
+            className={`main-content ${page === "Discover" ? "discover-page" : ""}`}
+            id="main-content"
+          >
             {error && !modal && !detail && (
               <div role="alert" className="error-banner">
                 {error}
@@ -791,34 +804,31 @@ export default function Home() {
             )}
             {page === "Discover" && (
               <>
-                <div className="page-heading">
+                <div className="discover-toolbar">
                   <div>
-                    <div className="eyebrow purple">GO OUT. GET TOGETHER.</div>
-                    <h1>
-                      Find your next{" "}
-                      <span className="accent-text">good time.</span>
-                    </h1>
-                    <p>Save what you like. Make a plan with your people.</p>
+                    <h1>Discover</h1>
+                    <span>{city || data.user.city}</span>
                   </div>
-                  <button
-                    className="secondary create-btn"
-                    onClick={() => setModal("activity")}
-                  >
-                    <Plus size={17} />
-                    Create activity
-                  </button>
+                  <div className="discover-tools">
+                    <button
+                      className="icon-btn"
+                      aria-label={`Find real places in ${city || data.user.city}`}
+                      onClick={() => {
+                        setSearch("");
+                        setModal("search");
+                      }}
+                    >
+                      <Search size={21} />
+                    </button>
+                    <button
+                      className="icon-btn"
+                      aria-label="Create activity"
+                      onClick={() => setModal("activity")}
+                    >
+                      <Plus size={23} />
+                    </button>
+                  </div>
                 </div>
-                <button
-                  className="discover-search"
-                  onClick={() => {
-                    setSearch("");
-                    setModal("search");
-                  }}
-                >
-                  <Search size={19} />
-                  <span>Find real places in {city || data.user.city}</span>
-                  <ArrowUpRight size={18} />
-                </button>
                 <div className="filter-row">
                   <div className="category-list">
                     {categories.map((cat, i) => {
@@ -847,7 +857,7 @@ export default function Home() {
                 <div className="discover-grid">
                   <section className="deck-section">
                     <div className="section-meta">
-                      <span>ACTIVITIES NEAR YOU</span>
+                      <span>Something worth going out for</span>
                       <small>{deck.length} to discover</small>
                     </div>
                     <div className="deck-stack">
@@ -942,11 +952,7 @@ export default function Home() {
                   <aside className="discovery-aside">
                     <section className="circle-promo">
                       <span className="eyebrow">YOUR PEOPLE</span>
-                      <h2>
-                        Great plans start
-                        <br />
-                        with a shared yes.
-                      </h2>
+                      <h2>Better with your people</h2>
                       <p>
                         Bring your ideas. Let everyone vote. Turn the things you
                         agree on into a real outing.
@@ -1005,7 +1011,7 @@ export default function Home() {
                 </div>
                 <div className="demo-footnote">
                   {data.user.demo
-                    ? "You’re exploring fictional activities in your private demo sandbox. Photos are illustrative."
+                    ? "Demo activities are fictional and labeled. Community activities are user-created meetups."
                     : "Activities are community-created meetups. Venue availability is not verified."}
                 </div>
               </>
