@@ -48,3 +48,7 @@ Discovery comes first. Render the selected direction with actual stored activity
 - Long-title + missing-image test initially devoted too much space to an empty photo. `long-title-missing-photo-v2-375.png` reduces that area to 180px, preserves the complete title, and keeps decisions reachable.
 - Real mouse drag passed; undo restored the same venue; a predominantly vertical drag did not vote. A stopped local server did not advance the deck. The generic network exception was replaced with a connection/retry message.
 - Visual gate: sufficient to carry the composition into supporting screens, not a claim of parity with mature native apps. Remaining limitations: provider thumbnail quality varies, physical touch/iOS Safari are untested, and initial spring behavior is a short CSS settle rather than a native physics engine.
+
+## Physical swipe supersedes the initial gesture implementation
+
+The P0 pass replaces the short CSS settle with Motion values, spring snapback, awaited server transactions and actual next-card previews in both decks. See `../design-iterations/SWIPE_QA.md` and `../design-system/IMPECCABLE_AUDIT.md`. Affirmative decisions now use semantic green rather than the earlier vermilion proposal. The original screen audit remains open for supporting-screen recovery.
