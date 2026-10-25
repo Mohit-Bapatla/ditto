@@ -1,3 +1,4 @@
+import { normalizeProfilePhoto } from "@/lib/profile-photo";
 import { PublicError } from "@/lib/errors";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -24,10 +25,12 @@ const str = z.string().trim().min(1).max(200);
 const uuid = z.string().uuid();
 const schema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("switch"), user: uuid }),
+  z.object({ type: z.literal("profilePhoto"), photo: z.string().max(180000).nullable() }),
   z.object({
     type: z.literal("profile"),
     name: str,
-    avatar: z.string().max(10).default("🪻"),
+    avatar: z.string().max(10).default(""),
+    photo: z.string().max(180000).nullable().optional(),
     city: str,
     interests: z.array(str).max(12).default([]),
     budget: z.number().min(0).max(1000).default(40),
@@ -138,6 +141,8 @@ export async function POST(req: NextRequest) {
     rateLimit("action:" + s.owner, 120);
     const b = schema.parse(await req.json());
     let resultId: string | undefined;
+    const photo =
+      b.type === "profile" || b.type === "profilePhoto" ? await normalizeProfilePhoto(b.photo) : undefined;
     transaction(() => {
       switch (b.type) {
         case "chat": {
@@ -283,6 +288,11 @@ export async function POST(req: NextRequest) {
           s.user = b.user;
           break;
         }
+        case "profilePhoto": {
+          const p = person(s.user);
+          run("UPDATE profiles SET data=? WHERE id=?", JSON.stringify({...p,photo:photo || null}), p.id);
+          break;
+        }
         case "profile": {
           let p = person(s.user);
           if (p.demo) {
@@ -299,7 +309,8 @@ export async function POST(req: NextRequest) {
           const data = {
             ...p,
             name: b.name,
-            avatar: b.avatar,
+            avatar: b.avatar || b.name.slice(0, 1).toUpperCase(),
+            ...(photo !== undefined ? { photo: photo || null } : {}),
             city: b.city,
             interests: b.interests,
             budget: b.budget,

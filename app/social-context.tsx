@@ -6,6 +6,7 @@ import {
   type State,
 } from "@/lib/types";
 import { ActivityPhoto } from "./activity-photo";
+import { Avatar } from "./profile-photo";
 
 export function CirclePreview({
   circle,
@@ -153,7 +154,7 @@ export function DiscoverySocial({
               key={message.id}
               onClick={() => onChat(circle.id)}
             >
-              <span className="social-avatar">{message.avatar}</span>
+              <span className="social-avatar"><Avatar person={circle.members.find(member => member.id === message.user) || {name:message.name}}/></span>
               <span>
                 <strong>
                   {message.name} <small>in {circle.name}</small>

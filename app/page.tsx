@@ -1,6 +1,9 @@
 "use client";
 import "./discovery.css";
 import "./density.css";
+import "./mobile-finish.css";
+import { WeekAgenda } from "./week-agenda";
+import { Avatar, ProfilePhotoInput } from "./profile-photo";
 import {
   DiscoveryBrowse,
   DiscoverySocial,
@@ -69,6 +72,7 @@ import {
 } from "@/lib/types";
 const fmt = (s: string) =>
   new Date(s).toLocaleString("en-US", {
+    timeZone: "America/Chicago",
     weekday: "short",
     month: "short",
     day: "numeric",
@@ -117,13 +121,18 @@ function Logo() {
 function Avatars({
   members,
 }: {
-  members: { id: string; avatar: string; name: string }[];
+  members: {
+    id: string;
+    avatar: string;
+    name: string;
+    photo?: string | null;
+  }[];
 }) {
   return (
     <div className="avatars">
       {members.slice(0, 5).map((m) => (
         <span key={m.id} title={m.name}>
-          {m.name.slice(0, 1).toUpperCase()}
+          <Avatar person={m} />
         </span>
       ))}
     </div>
@@ -181,6 +190,7 @@ function SwipeCard({
   progress,
   focusHandoffRef,
   preview = false,
+  wheelGate,
 }: {
   activity: Activity;
   onSwipe: SwipeCommit;
@@ -190,6 +200,7 @@ function SwipeCard({
   progress?: MotionValue<number>;
   focusHandoffRef?: { current: boolean };
   preview?: boolean;
+  wheelGate?: { current: import("@/lib/wheel-gesture").WheelGate };
 }) {
   const [photoFailed, setPhotoFailed] = useState(false);
   const venuePhoto = Boolean(activity.venueData?.image);
@@ -264,6 +275,7 @@ function SwipeCard({
       className="outing-card"
       disabled={disabled}
       onSwipe={onSwipe}
+      wheelGate={wheelGate}
       controlRef={controlRef}
       progress={progress}
       focusHandoffRef={focusHandoffRef}
@@ -275,6 +287,7 @@ function SwipeCard({
 }
 export default function Home() {
   const swipeControl = useRef<SwipeHandle>(null);
+  const wheelGate = useRef({ lastEvent: -Infinity, quietUntil: 0 });
   const swipeFocus = useRef(false);
   const swipeProgress = useMotionValue(0);
   const nextScale = useTransform(swipeProgress, [0, 1], [0.98, 1]);
@@ -291,6 +304,7 @@ export default function Home() {
   const [city, setCity] = useState("");
   const [available, setAvailable] = useState(false);
   const [busy, setBusy] = useState(false);
+  const [photoBusy, setPhotoBusy] = useState(false);
   const [toast, setToast] = useState("");
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
@@ -435,7 +449,7 @@ export default function Home() {
       };
     const r = await act(
       body,
-      type === "profile" ? "Your profile is saved." : "All set!",
+      type === "profilePhoto" ? "Your picture is saved." : type === "profile" ? "Your profile is saved." : "All set!",
     );
     if (r) {
       close();
@@ -532,9 +546,6 @@ export default function Home() {
     setCircleTab("Ideas");
   };
   const allPlans = data.circles.flatMap((c) => c.plans);
-  const upcomingPlans = allPlans.filter(
-    (p) => p.status === "confirmed" && new Date(p.start).getTime() > now,
-  );
   const pendingPlans = allPlans.filter((p) => p.status !== "confirmed");
   const pastPlans = allPlans.filter(
     (p) => p.status === "confirmed" && new Date(p.start).getTime() <= now,
@@ -590,7 +601,7 @@ export default function Home() {
         <CalendarDays size={17} />
         {fmt(p.start)}{" "}
         <span className="small">
-          ({Intl.DateTimeFormat().resolvedOptions().timeZone})
+          (America/Chicago)
         </span>
       </p>
       <div className="itinerary">
@@ -806,7 +817,7 @@ export default function Home() {
                 aria-label="Open profile"
                 onClick={() => navigate("Profile")}
               >
-                {data.user.avatar}
+                <Avatar person={data.user} />
               </button>
             </div>
           </header>
@@ -902,6 +913,7 @@ export default function Home() {
                           <SwipeCard
                             key={top.id}
                             activity={top}
+                            wheelGate={wheelGate}
                             controlRef={swipeControl}
                             focusHandoffRef={swipeFocus}
                             progress={swipeProgress}
@@ -1124,7 +1136,10 @@ export default function Home() {
                             disabled={busy}
                             onClick={() => act({ type: "switch", user: p.id })}
                           >
-                            {p.avatar} {p.name}
+                            <span className="inline-avatar">
+                              <Avatar person={p} />
+                            </span>{" "}
+                            {p.name}
                           </button>
                         ))}
                     </div>
@@ -1432,58 +1447,17 @@ export default function Home() {
                     <p>Your group plans and activities you’re interested in.</p>
                   </div>
                 </div>
-                <section className="upcoming-section">
-                  <h2 className="section-title">
-                    Upcoming plans <span>{upcomingPlans.length}</span>
-                  </h2>
-                  {upcomingPlans.length ? (
-                    <div className="upcoming-grid">
-                      {upcomingPlans.map((p) => (
-                        <details className="upcoming-plan" key={p.id}>
-                          <summary>
-                            <div className="plan-cover">
-                              <ActivityPhoto
-                                src={
-                                  p.stops.find((stop) => stop.venue?.image)
-                                    ?.venue?.image ||
-                                  data.circles
-                                    .find((c) => c.id === p.circle)
-                                    ?.ideas.find((idea) =>
-                                      p.stops.some(
-                                        (stop) => stop.title === idea.title,
-                                      ),
-                                    )?.image ||
-                                  data.circles.find((c) => c.id === p.circle)
-                                    ?.ideas[0]?.image ||
-                                  ""
-                                }
-                                alt="Plan activity inspiration"
-                              />
-                            </div>
-                            <h3>{p.title}</h3>
-                            <p>
-                              {fmt(p.start)} · Review plan{" "}
-                              <ChevronDown size={16} />
-                            </p>
-                          </summary>
-                          {planView(p)}
-                        </details>
-                      ))}
-                    </div>
-                  ) : (
-                    <div className="compact-empty">
-                      <CalendarDays size={24} />
-                      <div>
-                        <strong>A plan starts with a little agreement.</strong>
-                        <p>
-                          Your group-approved plans will appear here. Interest
-                          alone isn’t an RSVP.
-                        </p>
-                      </div>
-                    </div>
-                  )}
-                </section>
-                <div className="plans-overview">
+                <WeekAgenda
+                  data={data}
+                  now={now}
+                  renderPlan={planView}
+                  onActivity={setDetail}
+                  onCreate={() => {
+                    navigate("Circles");
+                    setSelected(undefined);
+                  }}
+                />
+                <details className="all-date-plans"><summary>All saved activities & group decisions <ChevronDown size={18}/></summary><div className="plans-overview">
                   <section className="pending-section">
                     <h2 className="section-title">Awaiting group decisions</h2>
                     {pendingPlans.map((p) => (
@@ -1563,6 +1537,7 @@ export default function Home() {
                     )}
                   </section>
                 </div>
+                </details>
                 {pastPlans.length > 0 && (
                   <section>
                     <h2 className="section-title">Past plans</h2>
@@ -1596,7 +1571,7 @@ export default function Home() {
                   className={`profile-grid ${showSettings ? "show-settings" : ""}`}
                 >
                   <section className="profile-card">
-                    <span className="large-avatar">{data.user.avatar}</span>
+                    <button className="large-avatar profile-photo-button" aria-label="Change profile picture" onClick={() => setModal("profilePhoto")}><Avatar person={data.user} /></button>
                     <h2>{data.user.name}</h2>
                     <p className="profile-location muted">
                       <MapPin size={15} />
@@ -1638,12 +1613,7 @@ export default function Home() {
                       <h2>Explore your interests</h2>
                       <div className="interest-explore">
                         {data.user.interests.slice(0, 3).map((interest) => {
-                          const activity = data.activities.find(
-                            (a) =>
-                              a.category === interest &&
-                              !a.cancelled &&
-                              !a.expired,
-                          );
+
                           return (
                             <button
                               key={interest}
@@ -1652,12 +1622,7 @@ export default function Home() {
                                 navigate("Discover");
                               }}
                             >
-                              {activity && (
-                                <ActivityPhoto
-                                  src={activity.image}
-                                  alt={`${interest} inspiration`}
-                                />
-                              )}
+
                               <span>
                                 {interest} <ArrowUpRight size={15} />
                               </span>
@@ -1713,7 +1678,10 @@ export default function Home() {
                             key={p.id}
                             onClick={() => act({ type: "switch", user: p.id })}
                           >
-                            {p.avatar} {p.name}
+                            <span className="inline-avatar">
+                              <Avatar person={p} />
+                            </span>{" "}
+                            {p.name}
                             {p.id === data.user.id && <Check size={16} />}
                           </button>
                         ))}
@@ -1777,6 +1745,7 @@ export default function Home() {
                       round: "Let everyone have a say.",
                       plan: "From “we should” to “let’s go”.",
                       profile: "Make it your own",
+                      profilePhoto: "Your profile picture",
                       filters: "Filter activities",
                       search: "Find a real place",
                       join: "Join your people",
@@ -2054,20 +2023,18 @@ export default function Home() {
                 </button>
               </>
             )}
+            {modal === "profilePhoto" && <form onSubmit={e => submit(e,"profilePhoto")}><ProfilePhotoInput onBusy={setPhotoBusy} photo={data.user.photo} name={data.user.name}/><button className="primary full" disabled={busy || photoBusy}>Save picture</button></form>}
             {modal === "profile" && (
               <form onSubmit={(e) => submit(e, "profile")}>
-                {data.user.demo && (
-                  <img
-                    className="brand-art"
-                    src="/brand/invitations.webp"
-                    alt=""
-                    width={180}
-                    height={150}
-                  />
-                )}
+                <ProfilePhotoInput
+                  onBusy={setPhotoBusy}
+                  photo={data.user.photo}
+                  name={data.user.demo ? "" : data.user.name}
+                />
                 <p className="muted">
-                  Meet people through things you actually want to do. Your new
-                  personal profile is separate from the fictional demo crew.
+                  {data.user.demo
+                    ? "Create your personal profile to start planning with friends."
+                    : "Your picture, interests, and next good plan."}
                 </p>
                 <div className="field">
                   <label htmlFor="name">Your name</label>
@@ -2089,22 +2056,7 @@ export default function Home() {
                     defaultValue={data.user.city}
                   />
                 </div>
-                <details className="optional-profile">
-                  <summary>Add interests, avatar & budget (optional)</summary>
-                  <div className="field">
-                    <label htmlFor="avatar">Avatar (optional)</label>
-                    <select
-                      id="avatar"
-                      name="avatar"
-                      defaultValue={data.user.avatar}
-                    >
-                      {["🪻", "🍊", "🌻", "🌊", "🪩", "🍄", "🌵", "🦋"].map(
-                        (a) => (
-                          <option key={a}>{a}</option>
-                        ),
-                      )}
-                    </select>
-                  </div>
+                <div className="optional-profile">
                   <fieldset>
                     <legend>Interests (optional — skip for now)</legend>
                     <div className="interest-options">
@@ -2138,9 +2090,10 @@ export default function Home() {
                       }
                     />
                   </div>
-                </details>
-                <button className="primary full" disabled={busy}>
-                  Let’s go <ArrowRight size={17} />
+                </div>
+                <button className="primary full" disabled={busy || photoBusy}>
+                  {data.user.demo ? "Create profile" : "Save profile"}{" "}
+                  <ArrowRight size={17} />
                 </button>
               </form>
             )}

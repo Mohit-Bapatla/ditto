@@ -78,6 +78,7 @@ async function mount(
           disabled,
           onSwipe,
           controlRef: ref,
+          wheelGate: { current: { lastEvent: -Infinity, quietUntil: 0 } },
           children: null,
         },
         createElement("h2", null, "Test outing"),
@@ -337,4 +338,104 @@ test("failed activity imagery has a truthful readable fallback", async () => {
   );
   await act(async () => root.unmount());
   host.remove();
+});
+
+test("horizontal wheel moves the actual card, vertical wheel passes through, and one burst saves once", async () => {
+  let calls = 0;
+  const t = await mount(async (_yes, exit) => {
+    calls++;
+    await exit();
+    return true;
+  });
+  await act(async () => {
+    const vertical = new win.WheelEvent("wheel", {
+      deltaY: 80,
+      deltaX: 2,
+      bubbles: true,
+      cancelable: true,
+    });
+    t.card.dispatchEvent(vertical);
+    assert.equal(vertical.defaultPrevented, false);
+    t.card.dispatchEvent(
+      new win.WheelEvent("wheel", {
+        deltaX: 45,
+        deltaY: 1,
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+    await pause(25);
+  });
+  assert.equal(t.card.dataset.swipePhase, "dragging");
+  assert.match(t.card.style.transform, /translateX/);
+  assert.equal(calls, 0);
+  await act(async () => {
+    t.card.dispatchEvent(
+      new win.WheelEvent("wheel", {
+        deltaX: 60,
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+    await pause(600);
+  });
+  assert.equal(calls, 1);
+  await act(async () => {
+    t.card.dispatchEvent(
+      new win.WheelEvent("wheel", {
+        deltaX: 100,
+        bubbles: true,
+        cancelable: true,
+      }),
+    );
+    await pause(250);
+  });
+  assert.equal(calls, 1);
+  await t.cleanup();
+});
+
+
+test("wheel snapback does not swallow the next Details click", async () => {
+  const t = await mount(async () => { throw Error("Short gesture must not vote"); });
+  await act(async () => {
+    t.card.dispatchEvent(new win.WheelEvent("wheel", {deltaX:10,bubbles:true,cancelable:true}));
+    await pause(650);
+  });
+  const click = new win.MouseEvent("click", {bubbles:true,cancelable:true});
+  await act(async () => t.card.querySelector("button")!.dispatchEvent(click));
+  assert.equal(click.defaultPrevented,false);
+  assert.equal(t.card.dataset.swipePhase,"idle");
+  await t.cleanup();
+});
+
+
+test("a new tap on Details after pointer snapback is not swallowed", async () => {
+ const t=await mount(async () => {throw Error("Short drag must not vote");});
+ await t.pointer("pointerdown",180,240);
+ await t.pointer("pointermove",195,240);
+ await pause(150);
+ await t.pointer("pointerup",195,240);
+ const button=t.card.querySelector("button")!;
+ await t.pointer("pointerdown",195,240,button);
+ await t.pointer("pointerup",195,240,button);
+ const event=new win.MouseEvent("click",{bubbles:true,cancelable:true});
+ await act(async()=>button.dispatchEvent(event));
+ assert.equal(event.defaultPrevented,false);
+ await t.cleanup();
+});
+
+
+test("implicit touch capture transfer from a child must not cancel the card drag", async () => {
+ let votes=0;
+ const t=await mount(async (_yes,exit)=>{votes++;await exit();return true;});
+ const child=t.card.querySelector("h2")!;
+ await t.pointer("pointerdown",180,240,child);
+ await t.pointer("pointermove",220,240,child);
+ await t.pointer("lostpointercapture",220,240,child);
+ assert.equal(t.card.dataset.swipePhase,"dragging");
+ await t.pointer("pointermove",310,240);
+ await t.pointer("pointerup",310,240);
+ await act(async()=>{await pause(400);});
+ assert.equal(votes,1);
+ await t.cleanup();
 });

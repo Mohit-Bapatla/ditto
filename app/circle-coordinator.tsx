@@ -3,6 +3,7 @@ import { useState, useRef, useEffect } from "react";
 import type { Circle } from "@/lib/types";
 import { categories } from "@/lib/types";
 import { groupFacts } from "@/lib/coordination";
+import { Avatar } from "./profile-photo";
 type Proposal = {
   id: string;
   title: string;
@@ -116,7 +117,7 @@ export function CircleCoordinator({
             >
               <div className="between">
                 <strong>
-                  {m.avatar} {m.name}
+                  <span className="inline-avatar"><Avatar person={c.members.find(member => member.id === m.user) || {name:m.name}}/></span> {m.name}
                 </strong>
                 <time dateTime={m.createdAt}>
                   {new Date(m.createdAt).toLocaleTimeString([], {

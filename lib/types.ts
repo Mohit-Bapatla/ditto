@@ -2,6 +2,7 @@ export type Person = {
   id: string;
   name: string;
   avatar: string;
+  photo?: string | null;
   city: string;
   interests: string[];
   budget: number;

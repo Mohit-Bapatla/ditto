@@ -17,6 +17,7 @@ import {
   useTransform,
   type MotionValue,
 } from "motion/react";
+import { WheelGesture, type WheelGate } from "@/lib/wheel-gesture";
 import { swipeDecision } from "@/lib/swipe-gesture";
 
 export type SwipeHandle = { swipe: (yes: boolean) => Promise<void> };
@@ -36,6 +37,7 @@ export function SwipeSurface({
   controlRef,
   progress,
   focusHandoffRef,
+  wheelGate,
 }: {
   children: ReactNode;
   onSwipe: SwipeCommit;
@@ -45,6 +47,7 @@ export function SwipeSurface({
   controlRef?: Ref<SwipeHandle>;
   progress?: MotionValue<number>;
   focusHandoffRef?: { current: boolean };
+  wheelGate?: { current: WheelGate };
 }) {
   const element = useRef<HTMLElement>(null);
   const start = useRef<
@@ -60,6 +63,14 @@ export function SwipeSurface({
       }
     | undefined
   >(undefined);
+  const wheel = useRef<WheelGesture | undefined>(undefined);
+  const wheelCallbacks = useRef({
+    disabled,
+    commit: (yes: boolean) => {
+      void yes;
+    },
+    snap: () => {},
+  });
   const locked = useRef(false);
   const mounted = useRef(true);
   const suppressClick = useRef(false);
@@ -131,6 +142,7 @@ export function SwipeSurface({
   }
   async function commit(yes: boolean) {
     if (disabled || locked.current) return;
+    wheel.current?.discard(performance.now());
     locked.current = true;
     start.current = undefined;
     setFailure("");
@@ -174,6 +186,76 @@ export function SwipeSurface({
       await snapBack();
     }
   }
+  useLayoutEffect(() => {
+    wheelCallbacks.current = {
+      disabled,
+      commit: (yes) => {
+        void commit(yes);
+      },
+      snap: () => {
+        void snapBack();
+      },
+    };
+  });
+  useEffect(() => {
+    const card = element.current;
+    if (!wheelGate || !card) return;
+    let timer: ReturnType<typeof setTimeout> | undefined;
+    const controller = new WheelGesture(
+      wheelGate.current,
+      () => card.clientWidth,
+      (value) => {
+        x.stop();
+        x.set(value);
+        setFailure("");
+        setPhase("dragging");
+      },
+      (vote) => {
+        if (vote === undefined || wheelCallbacks.current.disabled) wheelCallbacks.current.snap();
+        else wheelCallbacks.current.commit(vote);
+      },
+    );
+    wheel.current = controller;
+    const cancel = () => {
+      clearTimeout(timer);
+      controller.cancel(performance.now());
+    };
+    const hidden = () => {
+      if (document.hidden) cancel();
+    };
+    const onWheel = (event: WheelEvent) => {
+      if (
+        event.ctrlKey ||
+        event.metaKey ||
+        start.current ||
+        (event.target as HTMLElement).closest("button,a,input,select,textarea")
+      )
+        return;
+      if (
+        controller.input(
+          event.deltaX,
+          event.deltaY,
+          event.deltaMode,
+          performance.now(),
+          !wheelCallbacks.current.disabled && !locked.current,
+        )
+      ) {
+        if (event.cancelable) event.preventDefault();
+        clearTimeout(timer);
+        timer = setTimeout(() => controller.end(performance.now()), 180);
+      }
+    };
+    card.addEventListener("wheel", onWheel, { passive: false });
+    window.addEventListener("blur", cancel);
+    document.addEventListener("visibilitychange", hidden);
+    return () => {
+      clearTimeout(timer);
+      card.removeEventListener("wheel", onWheel);
+      window.removeEventListener("blur", cancel);
+      document.removeEventListener("visibilitychange", hidden);
+      wheel.current = undefined;
+    };
+  }, [wheelGate, x]);
   useImperativeHandle(controlRef, () => ({ swipe: commit }));
   function cancelPointer() {
     if (!start.current) return;
@@ -196,16 +278,18 @@ export function SwipeSurface({
         transformOrigin: "50% 85%",
       }}
       onPointerDown={(e) => {
+        // A new tap is independent of the click synthesized by the previous drag.
+        suppressClick.current = false;
         if (
           disabled ||
           locked.current ||
+          wheel.current?.dragging ||
           !e.isPrimary ||
           e.button !== 0 ||
           (e.target as HTMLElement).closest("button,a,input,select,textarea")
         )
           return;
         x.stop();
-        suppressClick.current = false;
         setFailure("");
         start.current = {
           x: e.clientX - x.get(),
@@ -259,7 +343,12 @@ export function SwipeSurface({
         else void commit(vote);
       }}
       onPointerCancel={cancelPointer}
-      onLostPointerCapture={cancelPointer}
+      onLostPointerCapture={(e) => {
+        // Touch starts with implicit capture on the tapped child (often the image).
+        // Its bubbled loss when we capture the card is a transfer, not a canceled drag.
+        if (e.target === e.currentTarget && start.current?.id === e.pointerId)
+          cancelPointer();
+      }}
       onClickCapture={(e) => {
         if (suppressClick.current) {
           e.preventDefault();
