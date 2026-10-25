@@ -8,6 +8,14 @@ export type Person = {
   demo: boolean;
 };
 export type Activity = {
+  fixture?: {
+    version: string;
+    index: number;
+    area: string;
+    schedule: string;
+    cost: string;
+    image: string;
+  };
   id: string;
   creator: string;
   host?: string;

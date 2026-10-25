@@ -1,3 +1,9 @@
+import {
+  presentationActivities,
+  presentationCircles,
+  presentationEnabled,
+  presentationVersion,
+} from "./presentation-fixtures";
 import { liveProvidersEnabled } from "./provider-policy";
 import { PublicError } from "./errors";
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
@@ -57,6 +63,8 @@ export function person(user: string): Person {
 }
 export function createSession(): Session {
   return transaction(() => {
+    if (presentationEnabled(process.env, path))
+      return createPresentationSession();
     const owner = id(),
       token = id();
     const users = ["Alex", "Jordan", "Maya", "Sam"].map((name, i) => ({
@@ -155,6 +163,147 @@ export function createSession(): Session {
     });
     return s;
   });
+}
+/** Each browser gets its own owner namespace; fixture values are stable, auth IDs are not. */
+function createPresentationSession(): Session {
+  const owner = id();
+  const users: Person[] = ["Mohit", "Edwin", "Paxton"].map((name, i) => ({
+    id: id(),
+    name,
+    avatar: ["M", "E", "P"][i],
+    city: "Austin, TX",
+    interests: [
+      ["Sports", "Food", "Games"],
+      ["Fitness", "Games", "Food"],
+      ["Outdoors", "Arts", "Music"],
+    ][i],
+    budget: [25, 30, 20][i],
+    demo: true,
+  }));
+  users.forEach((p) =>
+    run("INSERT INTO profiles VALUES(?,?,?)", p.id, owner, JSON.stringify(p)),
+  );
+  const s = { id: id(), user: users[0].id, owner };
+  run(
+    "INSERT INTO sessions(id,user_id,owner) VALUES(?,?,?)",
+    s.id,
+    s.user,
+    owner,
+  );
+  const anchor = new Date();
+  anchor.setUTCHours(23, 0, 0, 0);
+  const activities = presentationActivities.map(
+    ([title, category, area, budget, capacity, image, description], i) => {
+      const activity = {
+        id: id(),
+        creator: users[i % 3].id,
+        title,
+        category,
+        venue: `${area} · choose a venue together`,
+        city: "Austin, TX",
+        budget,
+        capacity,
+        image: `/activities/${image}.webp`,
+        description,
+        start: new Date(+anchor + ((i % 12) + 1) * 86400000).toISOString(),
+        tags: ["All levels welcome", "Choose a time together"],
+        demo: true,
+        fixture: {
+          version: presentationVersion,
+          index: i,
+          area,
+          schedule: "illustrative",
+          cost: "planning allowance",
+          image: "representative",
+        },
+      };
+      run(
+        "INSERT INTO activities VALUES(?,?,?,?)",
+        activity.id,
+        owner,
+        activity.creator,
+        JSON.stringify(activity),
+      );
+      return activity;
+    },
+  );
+  // Seed saved interests only, never attendance, approval or RSVP.
+  [2, 5, 14, 18].forEach((i) => swipe(s, activities[i].id, "yes"));
+  presentationCircles.forEach((fixture, ci) => {
+    const cid = createCircle(
+      s,
+      fixture.name,
+      fixture.description,
+      "Austin, TX",
+      30,
+      true,
+    );
+    users
+      .slice(1)
+      .forEach((p) => run("INSERT INTO members VALUES(?,?)", cid, p.id));
+    fixture.picks.forEach((ai, ii) => {
+      const a = activities[ai];
+      const idea = {
+        id: id(),
+        title: a.title,
+        category: a.category,
+        image: a.image,
+        creator: users[ii % 3].id,
+      };
+      run(
+        "INSERT INTO ideas VALUES(?,?,?)",
+        idea.id,
+        cid,
+        JSON.stringify(idea),
+      );
+    });
+    startRound(s, cid, "everyone");
+    const ideas = circleState(s, cid).ideas;
+    // One completed sample perspective; everyone else's votes stay private.
+    ideas.forEach((idea, i) =>
+      vote({ ...s, user: users[1].id }, cid, idea.id, i !== 3),
+    );
+    const text = [
+      "Pickleball or tacos? Add your vote and let’s choose together.",
+      "Chess and coffee sounds like a good project break.",
+      "Karaoke or bowling? I’m adding both so we can vote.",
+      "Anyone up for a low-key hike? Let’s compare ideas.",
+    ][ci];
+    run(
+      "INSERT INTO messages(id,circle_id,user_id,text,created_at,nonce) VALUES(?,?,?,?,?,?)",
+      id(),
+      cid,
+      users[(ci % 2) + 1].id,
+      text,
+      new Date(+anchor - (ci + 1) * 3600000 - 86400000).toISOString(),
+      id(),
+    );
+    if (ci === 1) {
+      const pid = id();
+      const plan: Plan = {
+        id: pid,
+        circle: cid,
+        title: "Coffee, chess, and a proper break",
+        explanation:
+          "A sample proposal to review together. Timing and venues are illustrative; review the details before approving.",
+        start: activities[2].start,
+        stops: [
+          {
+            title: "Chess and coffee",
+            duration: 90,
+            note: "Choose a café together; illustrative $10 allowance.",
+          },
+        ],
+        source: "demo",
+        status: "proposed",
+        approvals: [],
+        eligible: users.map((p) => p.id),
+        rsvps: [],
+      };
+      run("INSERT INTO plans VALUES(?,?,?)", pid, cid, JSON.stringify(plan));
+    }
+  });
+  return s;
 }
 export function requireMember(s: Session, circle: string) {
   if (

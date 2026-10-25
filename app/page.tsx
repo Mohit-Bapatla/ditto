@@ -1,5 +1,12 @@
 "use client";
 import "./discovery.css";
+import "./density.css";
+import {
+  DiscoveryBrowse,
+  DiscoverySocial,
+  CirclePreview,
+} from "./social-context";
+import { ActivityPhoto } from "./activity-photo";
 import { CircleCoordinator } from "./circle-coordinator";
 import { PlanEditor } from "./plan-editor";
 import { GroupVoting } from "./group-voting";
@@ -209,7 +216,7 @@ function SwipeCard({
         )}
         <span className="outing-category">
           {activity.category}
-          {activity.demo ? " · Demo" : " · Community"}
+          {activity.fixture ? "" : activity.demo ? " · Demo" : " · Community"}
         </span>
         <span className="photo-credit">
           {photoFailed
@@ -223,7 +230,11 @@ function SwipeCard({
         className={`outing-info ${activity.title.length > 70 ? "long-title" : ""}`}
       >
         <div className="outing-when">
-          <span>{fmt(activity.start)}</span>
+          <span>
+            {activity.fixture
+              ? `${activity.fixture.area} · ${activity.budget ? `$${activity.budget} allowance` : "Free idea"}`
+              : fmt(activity.start)}
+          </span>
         </div>
         <h2>{activity.title}</h2>
         <p className="outing-place">
@@ -269,7 +280,9 @@ export default function Home() {
   const nextScale = useTransform(swipeProgress, [0, 1], [0.98, 1]);
   const nextY = useTransform(swipeProgress, [0, 1], [5, 0]);
   const [data, setData] = useState<State>();
+  const [now, setNow] = useState(() => Date.now());
   const [page, setPage] = useState("Discover");
+  const [showSettings, setShowSettings] = useState(false);
   const [selected, setSelected] = useState<string>();
   const [modal, setModal] = useState<string>();
   const [detail, setDetail] = useState<Activity>();
@@ -301,7 +314,10 @@ export default function Home() {
     try {
       const version = stateVersion.current;
       const next = await request("/api/state");
-      if (version === stateVersion.current) setData(next);
+      if (version === stateVersion.current) {
+        setData(next);
+        setNow(Date.now());
+      }
     } catch (e) {
       setError((e as Error).message);
     }
@@ -510,7 +526,20 @@ export default function Home() {
         {error && <button onClick={refresh}>Try again</button>}
       </main>
     );
+  const openCircle = (id: string) => {
+    setPage("Circles");
+    setSelected(id);
+    setCircleTab("Ideas");
+  };
   const allPlans = data.circles.flatMap((c) => c.plans);
+  const upcomingPlans = allPlans.filter(
+    (p) => p.status === "confirmed" && new Date(p.start).getTime() > now,
+  );
+  const pendingPlans = allPlans.filter((p) => p.status !== "confirmed");
+  const pastPlans = allPlans.filter(
+    (p) => p.status === "confirmed" && new Date(p.start).getTime() <= now,
+  );
+  const presentation = data.activities.some((a) => a.fixture);
   const interested = data.activities.filter(
     (a) => a.status === "interested" || a.status === "attending",
   );
@@ -785,6 +814,12 @@ export default function Home() {
             className={`main-content ${page === "Discover" ? "discover-page" : ""}`}
             id="main-content"
           >
+            {presentation && (
+              <div className="sandbox-note">
+                Sample sandbox{" "}
+                <span>Fictional people · illustrative plans</span>
+              </div>
+            )}
             {error && !modal && !detail && (
               <div role="alert" className="error-banner">
                 {error}
@@ -835,6 +870,14 @@ export default function Home() {
                   </div>
                 </div>
                 <div className="discover-grid">
+                  <DiscoveryBrowse
+                    data={data}
+                    category={category}
+                    onCategory={setCategory}
+                    onFilters={() => setModal("filters")}
+                    onCircle={openCircle}
+                    onActivity={setDetail}
+                  />
                   <section className="deck-section">
                     <div className="deck-stack physical-stack">
                       {deck[1] && (
@@ -950,11 +993,23 @@ export default function Home() {
                       Swipe to decide. Ditto saves interest, not an RSVP.
                     </div>
                   </section>
+                  <DiscoverySocial
+                    now={now}
+                    data={data}
+                    onCircle={openCircle}
+                    onChat={(id) => {
+                      openCircle(id);
+                      setCircleTab("Chat & AI");
+                    }}
+                    onPlans={() => navigate("Plans")}
+                  />
                 </div>
                 <div className="demo-footnote">
-                  {data.user.demo
-                    ? "Demo activities are fictional and labeled. Community activities are user-created meetups."
-                    : "Activities are community-created meetups. Venue availability is not verified."}
+                  {presentation
+                    ? "Sample sandbox · fictional people and plans. Dates and budgets are illustrative; photos are representative."
+                    : data.user.demo
+                      ? "Demo activities are fictional and labeled. Community activities are user-created meetups."
+                      : "Activities are community-created meetups. Venue availability is not verified."}
                 </div>
               </>
             )}
@@ -976,6 +1031,17 @@ export default function Home() {
                     Create a Circle
                   </button>
                 </div>
+                <div className="collection-tools">
+                  <span>
+                    {data.circles.length} Circles · shared ideas, real decisions
+                  </span>
+                  <button
+                    className="text-link"
+                    onClick={() => setModal("join")}
+                  >
+                    Join with an invite <ArrowRight size={16} />
+                  </button>
+                </div>
                 <div className="circle-grid">
                   {data.circles.map((circle) => (
                     <button
@@ -987,7 +1053,11 @@ export default function Home() {
                       }}
                     >
                       <div className="tile-art">
-                        <span>{circle.name.slice(0, 2).toUpperCase()}</span>
+                        <ActivityPhoto
+                          key={circle.ideas[0]?.image}
+                          src={circle.ideas[0]?.image || ""}
+                          alt={`${circle.name} activity inspiration`}
+                        />
                         <small>
                           {circle.plans.some((p) => p.status === "confirmed")
                             ? "Plan confirmed"
@@ -1013,17 +1083,6 @@ export default function Home() {
                       </div>
                     </button>
                   ))}
-                  <button
-                    className="circle-tile join-tile"
-                    onClick={() => setModal("join")}
-                  >
-                    <Users size={35} />
-                    <h2>Got an invite?</h2>
-                    <p>Good company is one link away.</p>
-                    <span className="text-link">
-                      Join a Circle <ArrowRight size={16} />
-                    </span>
-                  </button>
                 </div>
               </>
             )}
@@ -1373,56 +1432,142 @@ export default function Home() {
                     <p>Your group plans and activities you’re interested in.</p>
                   </div>
                 </div>
-                {allPlans.length > 0 && (
-                  <div className="plans-list">{allPlans.map(planView)}</div>
-                )}
-                <h2 className="section-title">
-                  Your activity shortlist <span>{interested.length}</span>
-                </h2>
-                <div className="shortlist">
-                  {interested.map((a) => (
-                    <article key={a.id}>
-                      <img src={a.image} alt="Activity inspiration" />
+                <section className="upcoming-section">
+                  <h2 className="section-title">
+                    Upcoming plans <span>{upcomingPlans.length}</span>
+                  </h2>
+                  {upcomingPlans.length ? (
+                    <div className="upcoming-grid">
+                      {upcomingPlans.map((p) => (
+                        <details className="upcoming-plan" key={p.id}>
+                          <summary>
+                            <div className="plan-cover">
+                              <ActivityPhoto
+                                src={
+                                  p.stops.find((stop) => stop.venue?.image)
+                                    ?.venue?.image ||
+                                  data.circles
+                                    .find((c) => c.id === p.circle)
+                                    ?.ideas.find((idea) =>
+                                      p.stops.some(
+                                        (stop) => stop.title === idea.title,
+                                      ),
+                                    )?.image ||
+                                  data.circles.find((c) => c.id === p.circle)
+                                    ?.ideas[0]?.image ||
+                                  ""
+                                }
+                                alt="Plan activity inspiration"
+                              />
+                            </div>
+                            <h3>{p.title}</h3>
+                            <p>
+                              {fmt(p.start)} · Review plan{" "}
+                              <ChevronDown size={16} />
+                            </p>
+                          </summary>
+                          {planView(p)}
+                        </details>
+                      ))}
+                    </div>
+                  ) : (
+                    <div className="compact-empty">
+                      <CalendarDays size={24} />
                       <div>
-                        <span className="eyebrow purple">
-                          {a.status === "attending"
-                            ? "YOU’RE GOING"
-                            : "INTERESTED"}
-                        </span>
-                        <h3>{a.title}</h3>
-                        <p className="small muted">
-                          {fmt(a.start)} · {a.attending}/{a.capacity} going
+                        <strong>A plan starts with a little agreement.</strong>
+                        <p>
+                          Your group-approved plans will appear here. Interest
+                          alone isn’t an RSVP.
                         </p>
                       </div>
-                      <button
-                        className="secondary"
-                        onClick={() => setDetail(a)}
-                      >
-                        View <ArrowUpRight size={15} />
-                      </button>
-                    </article>
-                  ))}
+                    </div>
+                  )}
+                </section>
+                <div className="plans-overview">
+                  <section className="pending-section">
+                    <h2 className="section-title">Awaiting group decisions</h2>
+                    {pendingPlans.map((p) => (
+                      <details className="pending-plan" key={p.id}>
+                        <summary>
+                          <span>
+                            <strong>{p.title}</strong>
+                            <small>
+                              {p.approvals.length} of {p.eligible.length}{" "}
+                              approved · Review proposal
+                            </small>
+                          </span>
+                          <ChevronDown size={18} />
+                        </summary>
+                        {planView(p)}
+                      </details>
+                    ))}
+                    {data.circles
+                      .filter((c) => c.round && !c.round.complete)
+                      .map((circle) => (
+                        <CirclePreview
+                          key={circle.id}
+                          circle={circle}
+                          onOpen={openCircle}
+                        />
+                      ))}
+                    {!pendingPlans.length &&
+                      !data.circles.some(
+                        (c) => c.round && !c.round.complete,
+                      ) && (
+                        <p className="muted">
+                          No pending decisions. Suggest an idea in a Circle.
+                        </p>
+                      )}
+                  </section>
+                  <section>
+                    <h2 className="section-title">
+                      Activities you’re interested in{" "}
+                      <span>{interested.length}</span>
+                    </h2>
+                    <div className="shortlist">
+                      {interested.map((a) => (
+                        <article key={a.id}>
+                          <img src={a.image} alt="Activity inspiration" />
+                          <div>
+                            <span className="eyebrow purple">
+                              {a.status === "attending"
+                                ? "YOU’RE GOING"
+                                : "INTERESTED"}
+                            </span>
+                            <h3>{a.title}</h3>
+                            <p className="small muted">
+                              {a.fixture
+                                ? `${a.fixture.area} · ${a.budget ? `$${a.budget} allowance` : "Free idea"}`
+                                : `${fmt(a.start)} · ${a.attending}/${a.capacity} going`}
+                            </p>
+                          </div>
+                          <button
+                            className="secondary"
+                            onClick={() => setDetail(a)}
+                          >
+                            View <ArrowUpRight size={15} />
+                          </button>
+                        </article>
+                      ))}
+                    </div>
+                    {!interested.length && (
+                      <div className="compact-empty">
+                        <p>Save something that catches your eye.</p>
+                        <button
+                          className="text-link"
+                          onClick={() => navigate("Discover")}
+                        >
+                          Explore activities <ArrowRight size={16} />
+                        </button>
+                      </div>
+                    )}
+                  </section>
                 </div>
-                {!interested.length && !allPlans.length && (
-                  <div className="empty-state">
-                    <img
-                      className="brand-art"
-                      src="/brand/invitations.webp"
-                      alt=""
-                      width={180}
-                      height={150}
-                    />
-                    <h2>Your next plan starts here</h2>
-                    <p>
-                      Save an activity or match with your Circle to get started.
-                    </p>
-                    <button
-                      className="primary"
-                      onClick={() => navigate("Discover")}
-                    >
-                      Explore activities
-                    </button>
-                  </div>
+                {pastPlans.length > 0 && (
+                  <section>
+                    <h2 className="section-title">Past plans</h2>
+                    {pastPlans.map(planView)}
+                  </section>
                 )}
               </>
             )}
@@ -1430,11 +1575,26 @@ export default function Home() {
               <>
                 <div className="page-heading">
                   <div>
-                    <h1>Your profile</h1>
-                    <p>Make the next outing feel like you.</p>
+                    <h1>{showSettings ? "Settings" : "Your profile"}</h1>
+                    <p>
+                      {showSettings
+                        ? "Your browser session and connected services."
+                        : "Make the next outing feel like you."}
+                    </p>
                   </div>
                 </div>
-                <div className="profile-grid">
+                <button
+                  className="text-link settings-toggle"
+                  onClick={() => setShowSettings(!showSettings)}
+                >
+                  {showSettings
+                    ? "Back to profile"
+                    : "Settings & demo controls"}{" "}
+                  <ArrowRight size={16} />
+                </button>
+                <div
+                  className={`profile-grid ${showSettings ? "show-settings" : ""}`}
+                >
                   <section className="profile-card">
                     <span className="large-avatar">{data.user.avatar}</span>
                     <h2>{data.user.name}</h2>
@@ -1460,58 +1620,134 @@ export default function Home() {
                       <ArrowRight size={16} />
                     </button>
                   </section>
-                  <section className="settings-card">
-                    <h2>Your session</h2>
-                    <p>
-                      Personal profiles use a persistent session in this
-                      browser. No passwords, no complicated sign-up.
-                    </p>
-                    <h3>Explore the demo</h3>
-                    <p className="small muted">
-                      These fictional identities belong only to your sandbox.
-                      They cannot access someone else’s private Circle.
-                    </p>
-                    <div className="profile-switch-list">
-                      {data.demoUsers.map((p) => (
+                  {!showSettings && (
+                    <section className="profile-social">
+                      <h2>Your people</h2>
+                      <p className="muted">
+                        A different Circle for every kind of plan.
+                      </p>
+                      <div className="membership-grid">
+                        {data.circles.map((circle) => (
+                          <CirclePreview
+                            key={circle.id}
+                            circle={circle}
+                            onOpen={openCircle}
+                          />
+                        ))}
+                      </div>
+                      <h2>Explore your interests</h2>
+                      <div className="interest-explore">
+                        {data.user.interests.slice(0, 3).map((interest) => {
+                          const activity = data.activities.find(
+                            (a) =>
+                              a.category === interest &&
+                              !a.cancelled &&
+                              !a.expired,
+                          );
+                          return (
+                            <button
+                              key={interest}
+                              onClick={() => {
+                                setCategory(interest);
+                                navigate("Discover");
+                              }}
+                            >
+                              {activity && (
+                                <ActivityPhoto
+                                  src={activity.image}
+                                  alt={`${interest} inspiration`}
+                                />
+                              )}
+                              <span>
+                                {interest} <ArrowUpRight size={15} />
+                              </span>
+                            </button>
+                          );
+                        })}
+                      </div>
+                      <h2>On your radar</h2>
+                      {interested.slice(0, 3).map((a) => (
                         <button
-                          className={p.id === data.user.id ? "selected" : ""}
-                          key={p.id}
-                          onClick={() => act({ type: "switch", user: p.id })}
+                          className="context-row"
+                          key={a.id}
+                          onClick={() => setDetail(a)}
                         >
-                          {p.avatar} {p.name}
-                          {p.id === data.user.id && <Check size={16} />}
+                          <span className="context-thumb">
+                            <ActivityPhoto
+                              src={a.image}
+                              alt="Activity inspiration"
+                            />
+                          </span>
+                          <span>
+                            <strong>{a.title}</strong>
+                            <small>
+                              {a.category} · {a.fixture?.area || a.city}
+                            </small>
+                          </span>
+                          <ArrowUpRight size={16} />
                         </button>
                       ))}
-                    </div>
-                    <details className="capability-details">
-                      <summary>Connected services</summary>
-                      <div className="status-row">
-                        <span>Meta Muse Spark</span>
-                        <span className="pill lavender">
-                          {data.integrations.meta
-                            ? data.integrations.live
-                              ? "Enabled · key configured"
-                              : "Paused · key configured"
-                            : "API key needed"}
-                        </span>
-                      </div>
-                      <div className="status-row">
-                        <span>SerpApi places</span>
-                        <span className="pill lavender">
-                          {data.integrations.serpapi
-                            ? data.integrations.live
-                              ? "Enabled · key configured"
-                              : "Paused · key configured"
-                            : "API key needed"}
-                        </span>
-                      </div>
-                      <p className="small muted">
-                        Keys stay on the server. Live calls are never replaced
-                        with simulated results. Demo plans are explicitly
-                        labeled.
+                      {!interested.length && (
+                        <p className="muted">
+                          Your saved activities will appear here.
+                        </p>
+                      )}
+                    </section>
+                  )}
+                  {showSettings && (
+                    <section className="settings-card">
+                      <h2>Your session</h2>
+                      <p>
+                        Personal profiles use a persistent session in this
+                        browser. No passwords, no complicated sign-up.
                       </p>
-                    </details>
-                  </section>
+                      <h3>Explore the demo</h3>
+                      <p className="small muted">
+                        These fictional identities belong only to your sandbox.
+                        They cannot access someone else’s private Circle.
+                      </p>
+                      <div className="profile-switch-list">
+                        {data.demoUsers.map((p) => (
+                          <button
+                            className={p.id === data.user.id ? "selected" : ""}
+                            key={p.id}
+                            onClick={() => act({ type: "switch", user: p.id })}
+                          >
+                            {p.avatar} {p.name}
+                            {p.id === data.user.id && <Check size={16} />}
+                          </button>
+                        ))}
+                      </div>
+                      <details className="capability-details">
+                        <summary>Connected services</summary>
+                        <div className="status-row">
+                          <span>Meta Muse Spark</span>
+                          <span className="pill lavender">
+                            {data.integrations.meta
+                              ? data.integrations.live
+                                ? "Enabled · key configured"
+                                : "Paused · key configured"
+                              : "API key needed"}
+                          </span>
+                        </div>
+                        <div className="status-row">
+                          <span>SerpApi places</span>
+                          <span className="pill lavender">
+                            {data.integrations.serpapi
+                              ? data.integrations.live
+                                ? "Enabled · key configured"
+                                : "Paused · key configured"
+                              : "API key needed"}
+                          </span>
+                        </div>
+                        <p className="small muted">
+                          Keys stay on the server. Live calls are never replaced
+                          with simulated results. Demo plans are explicitly
+                          labeled.
+                        </p>
+                      </details>
+                    </section>
+                  )}
                 </div>
               </>
             )}
