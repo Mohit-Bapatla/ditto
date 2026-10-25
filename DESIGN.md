@@ -128,11 +128,11 @@ Body text follows the frontmatter body role. Supporting card labels use the labe
 
 ## Layout
 
-Desktop uses a centered horizontal navigation shell (1120px maximum, 72px high), a general content container (1060px maximum), and 32px side padding. Discovery remains a compact centered invitation rather than stretching photography across the full desktop width: maximum 580px at widths from 761px.
+Desktop uses a centered horizontal navigation shell (1120px maximum, 72px high), a general content container (1060px maximum), and 32px side padding. Discover uses three purposeful regions at 1280px and above: categories/Circles, a dominant invitation up to 520px wide, and shared conversation/decisions. Between 900 and 1279px it uses a 220px browse rail and the invitation. Narrower screens show one invitation; supporting content remains available through navigation. The overall desktop discovery container is up to 1420px.
 
-At widths through 760px, navigation moves to a fixed bottom bar (70px plus bottom safe area). The workspace reserves the same space. The top bar is at least 64px and respects the top safe area; general content uses 20px side padding and Discover uses 12px. Four persistent destinations remain Discover, Circles, Plans and Profile. Profile uses columns on desktop and a single flow on mobile. Circles are separated people-and-decision rows; Plans form a chronological list.
+At widths through 760px, navigation moves to a fixed bottom bar (70px plus bottom safe area). The workspace reserves the same space. The top bar is at least 64px and respects the top safe area; general content uses 20px side padding and Discover uses 12px. Four persistent destinations remain Discover, Circles, Plans and Profile. Profile uses columns on desktop and a single flow on mobile. Circles form a two-column photographic collection on desktop and one scannable column on mobile. Plans separates upcoming, pending decisions, interests and supported past plans; compact expandable proposals preserve all review controls. Profile prioritizes identity, memberships and interests; technical controls are a separate Settings view.
 
-The spacing basis is 8px, with purpose-specific 12px, 20px and 24px component padding. Invitation height uses viewport-relative clamps: mobile `clamp(380px, calc(100svh - 286px - env(safe-area-inset-top) - env(safe-area-inset-bottom)), 620px)`; desktop `clamp(350px, calc(100svh - 250px), 640px)`. Short windows may scroll. These formulas are not a guarantee that long content or enlarged text fits: retain explicit overflow and 200% text-size checks.
+The spacing basis is 8px, with purpose-specific 12px, 20px and 24px component padding. Invitation height uses viewport-relative clamps: mobile `clamp(380px, calc(100svh - 326px - env(safe-area-inset-top) - env(safe-area-inset-bottom)), 620px)`; desktop `clamp(350px, calc(100svh - 250px), 640px)`. Short windows may scroll. These formulas are not a guarantee that long content or enlarged text fits: retain explicit overflow and 200% text-size checks.
 
 ## Elevation & Depth
 
@@ -185,3 +185,11 @@ Use native dialog modality, Escape, a named close button and scrollable content.
 - **Don't** promise dark theme support or physical-device verification from this light-theme source documentation.
 
 Implementation notes: `ActivityPhoto` preserves media bounds and displays an explicit photo-unavailable fallback for failed group imagery. Activity titles over 70 characters use a smaller caption type size so metadata remains visible; this was checked with a 102-character title at 375px. This changes presentation only, never the stored title.
+
+## Social density refinement
+
+The final overrides live in app/density.css. Context text uses #60545e; desktop rail gaps are 28px. Rail headings use Manrope 17px, row titles 14px and supporting metadata 12–13px. Category controls are 44px minimum. Circle covers use 16px corners; compact thumbnails use 10px. Group collections remain flat below photography. Rose is reserved for identity and meaningful action, not large empty panels.
+
+Only data already authorized in State feeds social context. Private decisions are never exposed: messages and round completion are shared; individual votes remain private until the existing reveal rules allow aggregate results. Popularity appears only when actual attendance exists; otherwise the neutral “Worth a look” heading is used. Fixture and live content are separated in persistence and explicitly identified in the first viewport.
+
+Mobile cards reserve an additional 40px for the sample context and swipe explanation. Pending decisions precede saved interests in DOM and visual order. Profile identity becomes a compact two-column avatar/name group on phones; exploratory interest tiles avoid repeating profile facts.

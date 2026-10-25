@@ -1,0 +1,49 @@
+## UI Pro Max Search Results
+**Domain:** product | **Query:** social dating events entertainment
+**Source:** products.csv | **Found:** 5 results
+
+### Result 1
+- **Product Type:** Social Media App
+- **Keywords:** app, community, content, entertainment, media, network, sharing, social, streaming, users, video
+- **Primary Style Recommendation:** Vibrant & Block-based + Motion-Driven
+- **Secondary Styles:** Aurora UI , Micro-interactions
+- **Landing Page Pattern:** Feature-Rich Showcase
+- **Dashboard Style (if applicable):** User Behavior Analytics
+- **Color Palette Focus:** Vibrant + engagement colors
+
+### Result 2
+- **Product Type:** Dating App
+- **Keywords:** app, dating
+- **Primary Style Recommendation:** Vibrant & Block-based + Motion-Driven
+- **Secondary Styles:** Aurora UI , Glassmorphism
+- **Landing Page Pattern:** Social Proof-Focused
+- **Dashboard Style (if applicable):** User Behavior Analytics
+- **Color Palette Focus:** Warm + Romantic (Pink/Red gradients)
+
+### Result 3
+- **Product Type:** Local Events & Discovery
+- **Keywords:** local, events, discovery, meetup, nearby, social, city, activities, calendar, community, explore
+- **Primary Style Recommendation:** Vibrant & Block-based + Motion-Driven
+- **Secondary Styles:** Glassmorphism , Flat Design
+- **Landing Page Pattern:** Hero-Centric Design + Feature-Rich
+- **Dashboard Style (if applicable):** Event Analytics
+- **Color Palette Focus:** City vibrant + event category colors + map accent + date highlight
+
+### Result 4
+- **Product Type:** Gaming
+- **Keywords:** entertainment, esports, game, gaming, play
+- **Primary Style Recommendation:** 3D & Hyperrealism + Retro-Futurism
+- **Secondary Styles:** Motion-Driven , Vibrant & Block-based
+- **Landing Page Pattern:** Feature-Rich Showcase
+- **Dashboard Style (if applicable):** N/A - Game focused
+- **Color Palette Focus:** Vibrant + neon + immersive colors
+
+### Result 5
+- **Product Type:** Calendar & Scheduling App
+- **Keywords:** calendar, scheduling, planner, agenda, events, reminder, appointment, organize, date, sync
+- **Primary Style Recommendation:** Flat Design + Micro-interactions
+- **Secondary Styles:** Minimalism & Swiss Style , Soft UI Evolution
+- **Landing Page Pattern:** Feature-Rich Showcase + Demo
+- **Dashboard Style (if applicable):** N/A - Calendar focused
+- **Color Palette Focus:** Clean blue + event category accent colors + success green
+

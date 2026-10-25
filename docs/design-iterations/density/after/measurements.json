@@ -1,0 +1,494 @@
+[
+  {
+    "requested": 375,
+    "page": "Discover",
+    "broken": 0,
+    "client": 360,
+    "hint": {
+      "bottom": 811,
+      "height": 16.5,
+      "left": 12,
+      "right": 348,
+      "top": 794.5,
+      "width": 336,
+      "x": 12,
+      "y": 794.5
+    },
+    "nav": {
+      "bottom": 900,
+      "height": 70,
+      "left": 0,
+      "right": 360,
+      "top": 830,
+      "width": 360,
+      "x": 0,
+      "y": 830
+    },
+    "scroll": 360,
+    "width": 375
+  },
+  {
+    "requested": 375,
+    "page": "Circles",
+    "broken": 0,
+    "client": 360,
+    "nav": {
+      "bottom": 900,
+      "height": 70,
+      "left": 0,
+      "right": 360,
+      "top": 830,
+      "width": 360,
+      "x": 0,
+      "y": 830
+    },
+    "scroll": 360,
+    "width": 375
+  },
+  {
+    "requested": 375,
+    "page": "Plans",
+    "broken": 0,
+    "client": 360,
+    "nav": {
+      "bottom": 900,
+      "height": 70,
+      "left": 0,
+      "right": 360,
+      "top": 830,
+      "width": 360,
+      "x": 0,
+      "y": 830
+    },
+    "scroll": 360,
+    "width": 375
+  },
+  {
+    "requested": 375,
+    "page": "Profile",
+    "broken": 0,
+    "client": 360,
+    "nav": {
+      "bottom": 900,
+      "height": 70,
+      "left": 0,
+      "right": 360,
+      "top": 830,
+      "width": 360,
+      "x": 0,
+      "y": 830
+    },
+    "scroll": 360,
+    "width": 375
+  },
+  {
+    "requested": 390,
+    "page": "Discover",
+    "broken": 0,
+    "client": 375,
+    "hint": {
+      "bottom": 811,
+      "height": 16.5,
+      "left": 12,
+      "right": 363,
+      "top": 794.5,
+      "width": 351,
+      "x": 12,
+      "y": 794.5
+    },
+    "nav": {
+      "bottom": 900,
+      "height": 70,
+      "left": 0,
+      "right": 375,
+      "top": 830,
+      "width": 375,
+      "x": 0,
+      "y": 830
+    },
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "requested": 390,
+    "page": "Circles",
+    "broken": 0,
+    "client": 375,
+    "nav": {
+      "bottom": 900,
+      "height": 70,
+      "left": 0,
+      "right": 375,
+      "top": 830,
+      "width": 375,
+      "x": 0,
+      "y": 830
+    },
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "requested": 390,
+    "page": "Plans",
+    "broken": 0,
+    "client": 375,
+    "nav": {
+      "bottom": 900,
+      "height": 70,
+      "left": 0,
+      "right": 375,
+      "top": 830,
+      "width": 375,
+      "x": 0,
+      "y": 830
+    },
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "requested": 390,
+    "page": "Profile",
+    "broken": 0,
+    "client": 375,
+    "nav": {
+      "bottom": 900,
+      "height": 70,
+      "left": 0,
+      "right": 375,
+      "top": 830,
+      "width": 375,
+      "x": 0,
+      "y": 830
+    },
+    "scroll": 375,
+    "width": 390
+  },
+  {
+    "requested": 430,
+    "page": "Discover",
+    "broken": 0,
+    "client": 415,
+    "hint": {
+      "bottom": 811,
+      "height": 16.5,
+      "left": 12,
+      "right": 403,
+      "top": 794.5,
+      "width": 391,
+      "x": 12,
+      "y": 794.5
+    },
+    "nav": {
+      "bottom": 900,
+      "height": 70,
+      "left": 0,
+      "right": 415,
+      "top": 830,
+      "width": 415,
+      "x": 0,
+      "y": 830
+    },
+    "scroll": 415,
+    "width": 430
+  },
+  {
+    "requested": 430,
+    "page": "Circles",
+    "broken": 0,
+    "client": 415,
+    "nav": {
+      "bottom": 900,
+      "height": 70,
+      "left": 0,
+      "right": 415,
+      "top": 830,
+      "width": 415,
+      "x": 0,
+      "y": 830
+    },
+    "scroll": 415,
+    "width": 430
+  },
+  {
+    "requested": 430,
+    "page": "Plans",
+    "broken": 0,
+    "client": 415,
+    "nav": {
+      "bottom": 900,
+      "height": 70,
+      "left": 0,
+      "right": 415,
+      "top": 830,
+      "width": 415,
+      "x": 0,
+      "y": 830
+    },
+    "scroll": 415,
+    "width": 430
+  },
+  {
+    "requested": 430,
+    "page": "Profile",
+    "broken": 0,
+    "client": 415,
+    "nav": {
+      "bottom": 900,
+      "height": 70,
+      "left": 0,
+      "right": 415,
+      "top": 830,
+      "width": 415,
+      "x": 0,
+      "y": 830
+    },
+    "scroll": 415,
+    "width": 430
+  },
+  {
+    "requested": 768,
+    "page": "Discover",
+    "broken": 0,
+    "client": 753,
+    "hint": {
+      "bottom": 912.5,
+      "height": 16.5,
+      "left": 86.5,
+      "right": 666.5,
+      "top": 896,
+      "width": 580,
+      "x": 86.5,
+      "y": 896
+    },
+    "nav": {
+      "bottom": 72,
+      "height": 72,
+      "left": 0,
+      "right": 753,
+      "top": 0,
+      "width": 753,
+      "x": 0,
+      "y": 0
+    },
+    "scroll": 753,
+    "width": 768
+  },
+  {
+    "requested": 768,
+    "page": "Circles",
+    "broken": 0,
+    "client": 753,
+    "nav": {
+      "bottom": 72,
+      "height": 72,
+      "left": 0,
+      "right": 753,
+      "top": 0,
+      "width": 753,
+      "x": 0,
+      "y": 0
+    },
+    "scroll": 753,
+    "width": 768
+  },
+  {
+    "requested": 768,
+    "page": "Plans",
+    "broken": 0,
+    "client": 753,
+    "nav": {
+      "bottom": 72,
+      "height": 72,
+      "left": 0,
+      "right": 753,
+      "top": 0,
+      "width": 753,
+      "x": 0,
+      "y": 0
+    },
+    "scroll": 753,
+    "width": 768
+  },
+  {
+    "requested": 768,
+    "page": "Profile",
+    "broken": 0,
+    "client": 753,
+    "nav": {
+      "bottom": 72,
+      "height": 72,
+      "left": 0,
+      "right": 753,
+      "top": 0,
+      "width": 753,
+      "x": 0,
+      "y": 0
+    },
+    "scroll": 753,
+    "width": 768
+  },
+  {
+    "requested": 1024,
+    "page": "Discover",
+    "broken": 0,
+    "client": 1009,
+    "hint": {
+      "bottom": 912.5,
+      "height": 16.5,
+      "left": 366.5,
+      "right": 886.5,
+      "top": 896,
+      "width": 520,
+      "x": 366.5,
+      "y": 896
+    },
+    "nav": {
+      "bottom": 72,
+      "height": 72,
+      "left": 0,
+      "right": 1009,
+      "top": 0,
+      "width": 1009,
+      "x": 0,
+      "y": 0
+    },
+    "scroll": 1009,
+    "width": 1024
+  },
+  {
+    "requested": 1024,
+    "page": "Circles",
+    "broken": 0,
+    "client": 1009,
+    "nav": {
+      "bottom": 72,
+      "height": 72,
+      "left": 0,
+      "right": 1009,
+      "top": 0,
+      "width": 1009,
+      "x": 0,
+      "y": 0
+    },
+    "scroll": 1009,
+    "width": 1024
+  },
+  {
+    "requested": 1024,
+    "page": "Plans",
+    "broken": 0,
+    "client": 1009,
+    "nav": {
+      "bottom": 72,
+      "height": 72,
+      "left": 0,
+      "right": 1009,
+      "top": 0,
+      "width": 1009,
+      "x": 0,
+      "y": 0
+    },
+    "scroll": 1009,
+    "width": 1024
+  },
+  {
+    "requested": 1024,
+    "page": "Profile",
+    "broken": 0,
+    "client": 1009,
+    "nav": {
+      "bottom": 72,
+      "height": 72,
+      "left": 0,
+      "right": 1009,
+      "top": 0,
+      "width": 1009,
+      "x": 0,
+      "y": 0
+    },
+    "scroll": 1009,
+    "width": 1024
+  },
+  {
+    "requested": 1440,
+    "page": "Discover",
+    "broken": 0,
+    "client": 1425,
+    "hint": {
+      "bottom": 918.5,
+      "height": 16.5,
+      "left": 452.5,
+      "right": 972.5,
+      "top": 902,
+      "width": 520,
+      "x": 452.5,
+      "y": 902
+    },
+    "nav": {
+      "bottom": 72,
+      "height": 72,
+      "left": 152.5,
+      "right": 1272.5,
+      "top": 0,
+      "width": 1120,
+      "x": 152.5,
+      "y": 0
+    },
+    "scroll": 1425,
+    "width": 1440
+  },
+  {
+    "requested": 1440,
+    "page": "Circles",
+    "broken": 0,
+    "client": 1425,
+    "nav": {
+      "bottom": 72,
+      "height": 72,
+      "left": 152.5,
+      "right": 1272.5,
+      "top": 0,
+      "width": 1120,
+      "x": 152.5,
+      "y": 0
+    },
+    "scroll": 1425,
+    "width": 1440
+  },
+  {
+    "requested": 1440,
+    "page": "Plans",
+    "broken": 0,
+    "client": 1425,
+    "nav": {
+      "bottom": 72,
+      "height": 72,
+      "left": 152.5,
+      "right": 1272.5,
+      "top": 0,
+      "width": 1120,
+      "x": 152.5,
+      "y": 0
+    },
+    "scroll": 1425,
+    "width": 1440
+  },
+  {
+    "requested": 1440,
+    "page": "Profile",
+    "broken": 0,
+    "client": 1425,
+    "nav": {
+      "bottom": 72,
+      "height": 72,
+      "left": 152.5,
+      "right": 1272.5,
+      "top": 0,
+      "width": 1120,
+      "x": 152.5,
+      "y": 0
+    },
+    "scroll": 1425,
+    "width": 1440
+  }
+]

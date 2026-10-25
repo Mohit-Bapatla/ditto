@@ -1,0 +1,59 @@
+## UI Pro Max Search Results
+**Domain:** web | **Query:** navigation touch spacing
+**Source:** app-interface.csv | **Found:** 5 results
+
+### Result 1
+- **Category:** Touch
+- **Issue:** Touch Spacing
+- **Platform:** iOS/Android/React Native
+- **Description:** Adjacent touch targets need enough spacing
+- **Do:** Keep at least 8dp spacing between touchables
+- **Don't:** Cluster many buttons with no gap
+- **Code Example Good:** <View style={{ gap: 8 }}><Button ... /><Button ... /></View>
+- **Code Example Bad:** <View><Button ... /><Button ... /></View>
+- **Severity:** Medium
+
+### Result 2
+- **Category:** Navigation
+- **Issue:** Back Behavior
+- **Platform:** iOS/Android/React Native
+- **Description:** Back navigation should be predictable and preserve state
+- **Do:** Use navigation.goBack and keep screen state
+- **Don't:** Reset stack or exit app unexpectedly
+- **Code Example Good:** onPress={() => navigation.goBack()}
+- **Code Example Bad:** BackHandler.exitApp() on first press
+- **Severity:** Critical
+
+### Result 3
+- **Category:** Touch
+- **Issue:** Touch Target Size
+- **Platform:** iOS/Android/React Native
+- **Description:** Native targets use 44pt on iOS and 48dp on Android; web WCAG 2.2 has a separate 24 by 24 CSS px minimum with exceptions
+- **Do:** Select 44pt for iOS and 48dp for Android at runtime; evaluate web targets separately against WCAG 2.5.8 and its exceptions
+- **Don't:** Collapse iOS 44pt, Android 48dp, and web 24 CSS px into one cross-platform number
+- **Code Example Good:** Platform.select({ ios: 44, android: 48 }); // web: evaluate 24 CSS px + WCAG exceptions
+- **Code Example Bad:** <Pressable><Icon size={16} /></Pressable>
+- **Severity:** Critical
+
+### Result 4
+- **Category:** Touch
+- **Issue:** Gesture Conflicts
+- **Platform:** iOS/Android/React Native
+- **Description:** Custom gestures must not break system scroll/back
+- **Do:** Reserve horizontal swipes for carousels
+- **Don't:** Full-screen custom swipe conflicting with back
+- **Code Example Good:** HorizontalPager inside vertical ScrollView
+- **Code Example Bad:** PanResponder on full screen blocking back
+- **Severity:** High
+
+### Result 5
+- **Category:** Navigation
+- **Issue:** Modal Escape
+- **Platform:** iOS/Android/React Native
+- **Description:** Modals/sheets must have clear close actions
+- **Do:** Provide close button and swipe-down where platform expects
+- **Don't:** Trapping users in modal with no obvious exit
+- **Code Example Good:** <Modal><Button title="Close" onPress={onClose} /></Modal>
+- **Code Example Bad:** <Modal><View>{children}</View></Modal>
+- **Severity:** High
+
