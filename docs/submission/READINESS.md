@@ -38,3 +38,13 @@ The [official rules](https://hacktx26.devpost.com/rules) require event-created w
 2. Rehearse using [the exact three-person sequence and recording checklist](REHEARSAL.md). Keep three separate browser identities. The protected populated showcase disables live AI; use the isolated live rehearsal or public app for actual Muse Spark calls.
 3. Review captured raw clips, record narration and any missing participant/device shots, upload the final video publicly, and submit the Devpost entry before the deadline. No upload or submission is claimed here.
 4. Keep a local showcase and a previously recorded real AI clip as the honest network-failure backup. Do not present a sample planner as live AI or a proposal as an approved plan.
+
+## Observed public release results
+
+Railway deployment `74fe92a7-95dc-45bb-a2ed-3f9b349821e9` successfully served `2791ba4` after the build fix. A complete public three-session acceptance run passed with 12 real venues, real Muse extraction/planning, saved votes, all approvals/RSVPs and calendar export. One earlier attempt encountered HTTP 502 during a deployment switch; the repeat after the deployment completed passed. Browser right-drag and Undo were also verified on the public URL.
+
+After deployment, production SQLite quick-check passed. Comparing all original rows in profiles, Circles, activities, votes, plans and RSVPs against the pre-release backup found **zero prior rows missing or changed**. New private QA records account for increased totals. The protected local showcase independently passed quick-check and still has 3 profiles with stored photos, 4 Circles, 36 activities and 4 plans.
+
+Raw actual-UI recordings are stored privately in `test-results/submission/footage/`. They include a real Muse extraction call/result, discovery, left/right drags, consensus, approval and calendar views. Some desktop captures are cropped by the browser capture surface; they are rehearsal evidence, not a finished submission movie. Record the final narrated take using the shot checklist. The saved approval/consensus views originate from real API transactions; the clips do not claim that all three people were filmed voting simultaneously.
+
+The latest attempt to control iPhone Mirroring returned no available input window despite displaying a cached screen. Production finger-swipe acceptance must therefore be distinguished from the earlier physical-device pass of the same swipe code. Do not label current production physical-device QA complete without the participant's confirmation.

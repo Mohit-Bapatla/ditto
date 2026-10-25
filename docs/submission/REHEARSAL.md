@@ -51,3 +51,9 @@ Stop the managed showcase with Ctrl-C. Run `npm run showcase:reset`, then `npm r
 ## Before approaching judges
 
 Verify the public URL in a fresh browser, all three sessions, invite membership, one small live provider request, future date, audio/screen recording, battery and backup clip. Close private windows and debugging panes unrelated to the demonstration. Keep the pitch factual: no Supabase, no automatic reservations, no fabricated consensus, no guaranteed venue availability.
+
+## Captured rehearsal evidence
+
+Private local folder: `test-results/submission/footage/` (MP4 files with per-clip frame manifests). These are actual rendered interactions and responses. The named QA Circle is isolated from the permanent showcase and production. Clips include the real Muse Spark request, saved group agreement, approval revision and calendar. Review framing: some desktop clips are cropped, and these raw clips are not a polished final video. Use the mobile captures or re-record a deliberate full-frame take; add narration and the three participant viewpoints before publishing.
+
+The API runner uses `TZ=America/Chicago` when invoked for Austin so its next-day 6 PM schedule matches the discussion. For example: `TZ=America/Chicago RUN_LIVE_SMOKE=true TEST_BASE_URL=https://ditto-production.up.railway.app node scripts/submission-smoke.mjs`.
