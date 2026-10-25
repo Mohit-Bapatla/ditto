@@ -1,3 +1,5 @@
+> Historical planning notes. For current test results, official rules and the final rehearsal, use `docs/submission/READINESS.md` and `docs/submission/REHEARSAL.md`. Numeric sponsor rubric weights below came from supplied material and are not independently confirmed by the current public event page.
+
 # Meta judging preparation
 
 **Social platforms help people connect online. Ditto helps them actually spend time together.**
