@@ -338,12 +338,12 @@ for (const invalid of [
   { start: "2020-01-01T00:00:00Z" },
   { title: "" },
   { description: "x".repeat(1001) },
-  { venue: "" },
+  { venue: "x".repeat(201) },
 ])
   await a.act({ ...event, nonce: randomUUID(), ...invalid }, 400);
 await a.refresh();
 assert.equal(a.state.activities.find((a) => a.id === ev.id).cancelled, true);
-// Undo is intentionally pass-only and cannot remove saved interest or attendance.
+// The legacy pass-only endpoint is constrained; the new operation-based undo handles either direction.
 const undoActivity = (
   await a.act({ ...event, nonce: randomUUID(), title: "Undo acceptance" })
 ).id;

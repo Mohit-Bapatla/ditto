@@ -7,11 +7,13 @@ export function Avatar({
 }: {
   person: { name: string; photo?: string | null };
 }) {
-  return person.photo ? (
+  const [failed, setFailed] = useState<string>();
+  return person.photo && failed !== person.photo ? (
     <img
       className="person-photo"
       src={person.photo}
       alt={`${person.name}'s profile`}
+      onError={() => setFailed(person.photo || undefined)}
     />
   ) : (
     <>{person.name.trim().slice(0, 1).toUpperCase() || "D"}</>
@@ -21,10 +23,14 @@ export function ProfilePhotoInput({
   photo,
   name,
   onBusy,
+  fieldName = "photo",
+  label = "Profile picture",
 }: {
   photo?: string | null;
   name: string;
   onBusy: (busy: boolean) => void;
+  fieldName?: string;
+  label?: string;
 }) {
   const [value, setValue] = useState(photo || "");
   const [error, setError] = useState("");
@@ -37,14 +43,15 @@ export function ProfilePhotoInput({
   const [canCrop, setCanCrop] = useState(false);
   function renderCrop(image: HTMLImageElement, next: typeof crop) {
     const canvas = document.createElement("canvas");
-    canvas.width = canvas.height = 256;
+    const size = fieldName === "image" ? 512 : 256;
+    canvas.width = canvas.height = size;
     const ctx = canvas.getContext("2d");
     if (!ctx) throw Error("Photo editing is unavailable. Try another browser.");
     const side = Math.min(image.naturalWidth, image.naturalHeight) / next.zoom;
     ctx.drawImage(image, (image.naturalWidth - side) * next.horizontal / 100,
       (image.naturalHeight - side) * next.vertical / 100,
-      side, side, 0, 0, 256, 256);
-    setValue(canvas.toDataURL("image/jpeg", 0.85));
+      side, side, 0, 0, size, size);
+    setValue(canvas.toDataURL("image/jpeg", fieldName === "image" ? 0.7 : 0.85));
     setCrop(next);
   }
   useEffect(
@@ -90,7 +97,7 @@ export function ProfilePhotoInput({
   }
   return (
     <fieldset className="profile-photo-editor">
-      <legend>Profile picture</legend>
+      <legend>{label}</legend>
       <div className="photo-editor-row">
         <span className="photo-preview">
           <Avatar person={{ name, photo: value }} />
@@ -120,7 +127,7 @@ export function ProfilePhotoInput({
         ref={upload}
         type="file"
         accept="image/*"
-        aria-label="Upload profile picture"
+        aria-label={`Upload ${label.toLowerCase()}`}
         hidden
         onChange={(e) => {
           void select(e.target.files?.[0]);
@@ -132,7 +139,7 @@ export function ProfilePhotoInput({
         type="file"
         accept="image/*"
         capture="user"
-        aria-label="Take profile picture"
+        aria-label={`Take ${label.toLowerCase()}`}
         hidden
         onChange={(e) => {
           void select(e.target.files?.[0]);
@@ -144,7 +151,7 @@ export function ProfilePhotoInput({
         <label>Horizontal position<input aria-label="Photo horizontal position" type="range" min="0" max="100" step="1" value={crop.horizontal} onChange={e => source.current && renderCrop(source.current, { ...crop, horizontal: Number(e.target.value) })}/></label>
         <label>Vertical position<input aria-label="Photo vertical position" type="range" min="0" max="100" step="1" value={crop.vertical} onChange={e => source.current && renderCrop(source.current, { ...crop, vertical: Number(e.target.value) })}/></label>
       </div>}
-      <input type="hidden" name="photo" value={value} />
+      <input type="hidden" name={fieldName} value={value} />
       {loading && <p role="status">Preparing your picture…</p>}
       {value && (
         <button
@@ -164,8 +171,7 @@ export function ProfilePhotoInput({
         </button>
       )}
       <p className="small muted">
-        Saved with your profile. Visible to people in your Circles. Location
-        metadata is removed.
+        {fieldName === "photo" ? "Saved with your profile. Visible to people in your Circles." : "Use your own image. Visible wherever you share this activity."} Location metadata is removed.
       </p>
       {error && (
         <p role="alert" className="photo-error">

@@ -3,6 +3,7 @@ import { z } from "zod";
 import { auth, failure, rateLimit, sameOrigin } from "@/lib/http";
 import { modelJSON, venues } from "@/lib/providers";
 import { intentSchema } from "@/lib/domain";
+import { newVenues } from "@/lib/discovery-results";
 import { person, run } from "@/lib/db";
 export async function POST(req: NextRequest) {
   try {
@@ -14,6 +15,7 @@ export async function POST(req: NextRequest) {
         query: z.string().min(2).max(300),
         city: z.string().min(2).max(100),
         natural: z.boolean().optional(),
+        excludeIds: z.array(z.string().max(300)).max(500).default([]),
       })
       .parse(await req.json());
     let queries = [b.query],
@@ -46,7 +48,7 @@ export async function POST(req: NextRequest) {
         Date.now() + 1800000,
       );
     return NextResponse.json({
-      venues: [...new Map(results.map((v) => [v.id, v])).values()],
+      venues: newVenues(results, b.excludeIds),
       explanation,
       source: "SerpApi",
     });

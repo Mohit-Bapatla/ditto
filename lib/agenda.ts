@@ -1,5 +1,6 @@
 export const agendaTimeZone = "America/Chicago";
 export function dayKey(value: string | number | Date) {
+  if (!value || !Number.isFinite(new Date(value).getTime())) return "";
   return new Intl.DateTimeFormat("en-CA", {
     timeZone: agendaTimeZone,
     year: "numeric",
@@ -18,6 +19,7 @@ export function weekDays(selected: string) {
   return Array.from({ length: 7 }, (_, i) => shiftDay(monday, i));
 }
 export function agendaTime(start: string) {
+  if (!start) return "Date to decide";
   return new Intl.DateTimeFormat("en-US", {
     timeZone: agendaTimeZone,
     hour: "numeric",

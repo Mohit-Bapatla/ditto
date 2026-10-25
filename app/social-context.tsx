@@ -104,7 +104,7 @@ export function DiscoveryBrowse({
               <strong>{a.title}</strong>
               <small>
                 {a.attending > 0 ? `${a.attending} going · ` : ""}
-                {a.budget === 0
+                {a.budgetKnown === false ? "Budget to decide" : a.budget === 0
                   ? "No activity budget"
                   : `$${a.budget} ${a.fixture ? "allowance" : "budget"}`}
               </small>
@@ -154,7 +154,7 @@ export function DiscoverySocial({
               key={message.id}
               onClick={() => onChat(circle.id)}
             >
-              <span className="social-avatar"><Avatar person={circle.members.find(member => member.id === message.user) || {name:message.name}}/></span>
+              <span className="social-avatar"><Avatar person={circle.members.find(member => member.id === message.user) || {name:message.name,photo:message.photo}}/></span>
               <span>
                 <strong>
                   {message.name} <small>in {circle.name}</small>

@@ -88,3 +88,59 @@ test("actual capacity check rejects overflow, repeated join and withdrawal are s
   d.transaction(() => d.attend(s, a.id, true));
   assert.equal(d.state(s).activities[0].attending, 1);
 });
+
+test("durable undo reverses either direction, supports opposite choices and idempotent retries", () => {
+  const s = d.createSession(), aid = d.state(s).activities[0].id;
+  assert.equal(d.state(s).undoSwipe, undefined);
+  for (const direction of ["yes", "no", "yes"]) {
+    const op = d.id();
+    d.transaction(() => d.swipe(s, aid, direction, op));
+    assert.equal(d.state(d.session(s.id)!).undoSwipe?.id, op);
+    d.transaction(() => d.undoDecision(s, op));
+    d.transaction(() => d.undoDecision(s, op));
+    d.transaction(() => d.swipe(s, aid, direction, op)); // delayed original request
+    const a = d.state(s).activities.find(a => a.id === aid)!;
+    assert.equal(a.swipe, undefined);
+    assert.equal(a.status, undefined);
+  }
+});
+test("undo restores previous decision, enforces LIFO and protects changed attendance", () => {
+  const s = d.createSession(), [a,b] = d.state(s).activities;
+  d.transaction(() => d.swipe(s,a.id,"no"));
+  const first = d.state(s).undoSwipe!;
+  d.transaction(() => d.swipe(s,b.id,"yes"));
+  const second = d.state(s).undoSwipe!;
+  assert.throws(() => d.transaction(() => d.undoDecision(s,first.id)), /most recent/);
+  const outsider = d.createSession();
+  assert.throws(() => d.transaction(() => d.undoDecision(outsider,second.id)), /no longer available/);
+  d.transaction(() => d.undoDecision(s,second.id));
+  d.transaction(() => d.swipe(s,a.id,"yes"));
+  d.transaction(() => d.undoDecision(s,d.state(s).undoSwipe!.id));
+  assert.equal(d.state(s).activities.find(x=>x.id===a.id)?.swipe,"no");
+  d.transaction(() => d.undoDecision(s,first.id));
+  d.transaction(() => d.swipe(s,a.id,"yes"));
+  const last = d.state(s).undoSwipe!;
+  d.transaction(() => d.attend(s,a.id));
+  assert.equal(d.state(s).undoSwipe,undefined);
+  assert.throws(() => d.transaction(() => d.undoDecision(s,last.id)), /changed/);
+  assert.equal(d.state(s).activities.find(x=>x.id===a.id)?.status,"attending");
+});
+test("history is bounded and finalized Circle decisions cannot be reversed", () => {
+  const s = d.createSession(), a = d.state(s).activities[0];
+  for(let i=0;i<45;i++) d.transaction(()=>d.swipe(s,a.id,i%2?"yes":"no"));
+  assert.equal(d.all("SELECT * FROM decision_history WHERE user_id=?",s.user).length,40);
+  const c = d.state(s).circles[0];
+  d.transaction(()=>d.startRound(s,c.id,"everyone"));
+  for(const m of c.members) for(const idea of c.ideas) d.transaction(()=>d.vote({...s,user:m.id},c.id,idea.id,true));
+  assert.equal(d.circleState(s,c.id).round?.complete,true);
+  const last=d.circleState(s,c.id).undoVote!;
+  d.transaction(()=>d.undoDecision(s,last.id));
+  assert.equal(d.circleState(s,c.id).round?.complete,false);
+  assert.equal(d.circleState(s,c.id).ideas[0].matched,undefined);
+  d.transaction(()=>d.vote(s,c.id,last.activity,false));
+  const current=d.circleState(s,c.id), target=current.undoVote!;
+  const plan={id:d.id(),circle:c.id,round:current.round!.id,status:"confirmed",eligible:c.members.map(m=>m.id),stops:[],start:new Date(Date.now()+86400000).toISOString()};
+  d.run("INSERT INTO plans VALUES(?,?,?)",plan.id,c.id,JSON.stringify(plan));
+  assert.throws(()=>d.transaction(()=>d.undoDecision(s,target.id)),/already has a plan/);
+  assert.equal(d.circleState(s,c.id).undoVoteBlocked,true);
+});

@@ -1,7 +1,8 @@
 "use client";
-import { CheckCheck, Heart, X } from "lucide-react";
+import { CheckCheck, Heart, X, Undo2 } from "lucide-react";
 import type { Circle } from "@/lib/types";
 import { useRef } from "react";
+import { Avatar } from "./profile-photo";
 import { ActivityPhoto } from "./activity-photo";
 import { motion, useMotionValue, useTransform } from "motion/react";
 import {
@@ -99,9 +100,9 @@ export function GroupVoting({
           <ActivityPhoto
             key={idea.id}
             src={idea.image}
-            alt={`${idea.category} inspiration, not a verified venue`}
+            alt={idea.imageKind ? idea.title : `${idea.category} inspiration, not a verified venue`}
           />
-          <span className="group-photo-note">Illustrative photo</span>
+          <span className="group-photo-note">{idea.imageKind === "upload" ? "Activity photo" : idea.imageKind === "venue" ? "Venue photo" : "Illustrative photo"}</span>
           <div
             className={`group-caption ${idea.title.length > 70 ? "long-title" : ""}`}
           >
@@ -109,13 +110,14 @@ export function GroupVoting({
             <h2>{idea.title}</h2>
             <p>{idea.notes || "Would you be up for this?"}</p>
             <span className="small">
-              Suggested by{" "}
+              <span className="inline-avatar"><Avatar person={c.members.find(m => m.id === idea.creator) || {name:"Member"}}/></span> Suggested by{" "}
               {c.members.find((m) => m.id === idea.creator)?.name || "a member"}
             </span>
           </div>
         </SwipeSurface>
       </div>
       <div className="vote-buttons">
+        <button className="group-undo-button" aria-label="Undo last swipe" title="Undo last swipe" disabled={busy || !c.undoVote || c.undoVoteBlocked} onClick={() => c.undoVote && act({type: "undoSwipe", operation: c.undoVote.id}, "Vote undone. Choose again.")}><Undo2 size={18}/><span>Undo</span></button>
         <button
           disabled={busy}
           onClick={() => void control.current?.swipe(false)}

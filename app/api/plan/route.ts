@@ -3,7 +3,7 @@ import { PublicError } from "@/lib/errors";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth, failure, rateLimit, sameOrigin } from "@/lib/http";
-import { circleState, id, run, requireMember } from "@/lib/db";
+import { circleState, id, run, requireMember, transaction, all } from "@/lib/db";
 import { modelJSON, venues, directions } from "@/lib/providers";
 import { livePlan } from "@/lib/planning";
 import type { Plan, Stop } from "@/lib/types";
@@ -28,6 +28,9 @@ export async function POST(req: NextRequest) {
     const c = circleState(s, b.circle);
     if (!c.round?.complete)
       throw new PublicError("Finish the group round before planning.");
+    const roundId = c.round.id;
+    const voteSnapshot = () => JSON.stringify(all("SELECT idea_id,user_id,vote FROM votes WHERE round_id=? ORDER BY idea_id,user_id", roundId));
+    const beforeVotes = voteSnapshot();
     const matches = b.ideaIds
       ? b.ideaIds
           .map((id) => c.ideas.find((i) => i.id === id && (i.yes || 0) > 0))
@@ -90,6 +93,7 @@ export async function POST(req: NextRequest) {
     requireMember(s, c.id);
     const p: Plan = {
       id: id(),
+      round: c.round.id,
       circle: c.id,
       title,
       explanation,
@@ -104,7 +108,12 @@ export async function POST(req: NextRequest) {
       eligible: c.members.map((m) => m.id),
       rsvps: [],
     };
-    run("INSERT INTO plans VALUES(?,?,?)", p.id, c.id, JSON.stringify(p));
+    transaction(() => {
+      const current = circleState(s, c.id);
+      if (current.round?.id !== roundId || !current.round.complete || voteSnapshot() !== beforeVotes)
+        throw new PublicError("The group’s votes changed while planning. Review the round and try again.");
+      run("INSERT INTO plans VALUES(?,?,?)", p.id, c.id, JSON.stringify(p));
+    });
     return NextResponse.json({ plan: p });
   } catch (e) {
     return failure(e);

@@ -57,7 +57,7 @@ import {
   ArrowLeft,
   ExternalLink,
   LoaderCircle,
-  RotateCcw,
+  Undo2,
   Search,
   CheckCheck,
   Navigation,
@@ -72,7 +72,7 @@ import {
   type Venue,
 } from "@/lib/types";
 const fmt = (s: string) =>
-  new Date(s).toLocaleString("en-US", {
+  !s ? "Date to decide" : new Date(s).toLocaleString("en-US", {
     timeZone: "America/Chicago",
     weekday: "short",
     month: "short",
@@ -182,6 +182,7 @@ function SwipeCard({
   focusHandoffRef,
   preview = false,
   wheelGate,
+  returnFrom,
 }: {
   activity: Activity;
   onSwipe: SwipeCommit;
@@ -191,6 +192,7 @@ function SwipeCard({
   progress?: MotionValue<number>;
   focusHandoffRef?: { current: boolean };
   preview?: boolean;
+  returnFrom?: string;
   wheelGate?: { current: import("@/lib/wheel-gesture").WheelGate };
 }) {
   const [photoFailed, setPhotoFailed] = useState(false);
@@ -202,7 +204,7 @@ function SwipeCard({
           <img
             src={activity.image}
             alt={
-              venuePhoto
+              activity.customImage ? activity.title : venuePhoto
                 ? activity.venueData!.name
                 : `${activity.category} inspiration, not the venue`
             }
@@ -264,6 +266,7 @@ function SwipeCard({
       className="outing-card"
       disabled={disabled}
       onSwipe={onSwipe}
+      returnFrom={returnFrom}
       wheelGate={wheelGate}
       controlRef={controlRef}
       progress={progress}
@@ -306,7 +309,9 @@ export default function Home() {
   const [planStart, setPlanStart] = useState(tomorrow());
   const [origin, setOrigin] = useState("UT Austin");
   const [drive, setDrive] = useState("");
-  const [lastPass, setLastPass] = useState<string>();
+  const [restored, setRestored] = useState<{ id: string; direction: string }>();
+  const swipeAttempt = useRef<{ activity: string; direction: string; nonce: string } | undefined>(undefined);
+  const seenVenues = useRef(new Set<string>());
   const [selectedVenue, setSelectedVenue] = useState<Venue>();
   const [activityCity, setActivityCity] = useState("");
   const [afterProfile, setAfterProfile] = useState<string>();
@@ -390,29 +395,47 @@ export default function Home() {
   const deck =
     data?.activities.filter(
       (a) =>
-        !a.swipe &&
+        (!a.swipe || a.id === restored?.id) &&
         !a.cancelled &&
         !a.expired &&
-        (category === "All vibes" || a.category === category) &&
+        (a.id === restored?.id || ((category === "All vibes" || a.category === category) &&
         a.budget <= budget &&
         (!city || a.city.toLowerCase().includes(city.toLowerCase())) &&
-        (!available || a.attending < a.capacity),
+        (!available || a.attending < a.capacity))),
     ) || [];
+  const restoredIndex = deck.findIndex(a => a.id === restored?.id);
+  if (restoredIndex > 0) deck.unshift(...deck.splice(restoredIndex, 1));
   const top = deck[0];
   const onSwipe: SwipeCommit = async (yes, afterSave) => {
     if (top) {
+      const direction = yes ? "yes" : "no";
+      if (swipeAttempt.current?.activity !== top.id || swipeAttempt.current?.direction !== direction) swipeAttempt.current = {activity: top.id, direction, nonce: crypto.randomUUID()};
       const r = await act(
-        { type: "swipe", activity: top.id, direction: yes ? "yes" : "no" },
+        { type: "swipe", ...swipeAttempt.current },
         yes
           ? "Saved to your interested list. Join when you’re ready."
           : undefined,
         afterSave,
       );
-      if (r) setLastPass(yes ? undefined : top.id);
+      if (r) { setRestored(undefined); swipeAttempt.current = undefined; }
       return Boolean(r);
     }
     return false;
   };
+  function openActivity() {
+    if (data?.user.demo) { setAfterProfile("activity"); setModal("profile"); }
+    else setModal("activity");
+  }
+  async function undoLastSwipe() {
+    const last = data?.undoSwipe;
+    if (!last || pending.current || !data) return;
+    const previous = data;
+    setRestored({id: last.activity, direction: last.direction});
+    setData({...data, activities: data.activities.map(a => a.id === last.activity ? {...a, swipe: undefined} : a)});
+    const result = await act({type: "undoSwipe", operation: last.id}, "Swipe undone. Choose again.");
+    if (!result) { setData(previous); setRestored(undefined); await refresh(); }
+    swipeAttempt.current = undefined;
+  }
   async function submit(e: FormEvent<HTMLFormElement>, type: string) {
     e.preventDefault();
     const form = new FormData(e.currentTarget);
@@ -421,13 +444,15 @@ export default function Home() {
     if (type === "activity")
       body = {
         ...body,
-        budget: Number(values.budget),
+        budget: values.budget === "" ? undefined : Number(values.budget),
         nonce:
           activityNonce.current ||
           (activityNonce.current = crypto.randomUUID()),
         ...(selectedVenue ? { venueId: selectedVenue.id } : {}),
         capacity: Number(values.capacity),
-        start: new Date(String(values.start)).toISOString(),
+        start: values.start ? new Date(String(values.start)).toISOString() : "",
+        circle: values.circle || undefined,
+        visibility: values.circle ? "circle" : "saved",
       };
     if (type === "circle") body = { ...body, budget: Number(values.budget) };
     if (type === "idea") body = { ...body, circle: selected };
@@ -448,6 +473,10 @@ export default function Home() {
         else if (afterProfile) setModal(afterProfile);
         setAfterProfile(undefined);
       }
+      if (type === "activity") {
+        if (values.circle) { setPage("Circles"); setSelected(String(values.circle)); setCircleTab("Ideas"); }
+        else { setPage("Plans"); setSelected(undefined); }
+      }
       if (type === "circle") {
         setSelected(r.id);
         setPage("Circles");
@@ -459,27 +488,37 @@ export default function Home() {
       }
     }
   }
-  async function findPlaces(natural = false) {
-    if (!search.trim()) return;
+  async function findPlaces(natural = false, query = search, fresh = false) {
+    if (!query.trim() || pending.current) return;
+    pending.current = true;
     setBusy(true);
     setError("");
     setFound([]);
+    setSearchNote("");
     try {
       const r = await request("/api/places", {
-        query: search,
+        query,
+        excludeIds: fresh ? [...new Set([...seenVenues.current, ...(data?.activities.map(a => a.venueData?.id).filter((id): id is string => !!id) || [])])].slice(-500) : [],
         city: city || data?.user.city || "Austin, TX",
         natural,
       });
       setFound(r.venues);
+      for (const v of r.venues) seenVenues.current.add(v.id);
       setSearchNote(
         r.explanation +
-          (r.venues.length ? "" : " No venues found. Try a broader search."),
+          (r.venues.length ? "" : " No new places this time. Try another category or city, or create your own activity."),
       );
     } catch (e) {
       setError((e as Error).message);
     } finally {
       setBusy(false);
+      pending.current = false;
     }
+  }
+  function findMore() {
+    const query = category === "All vibes" ? "things to do" : category.toLowerCase();
+    setSearch(query); setModal("search");
+    void findPlaces(false, query, true);
   }
   async function generate(demo: boolean) {
     if (!c) return;
@@ -858,7 +897,7 @@ export default function Home() {
                     <button
                       className="icon-btn"
                       aria-label="Create activity"
-                      onClick={() => setModal("activity")}
+                      onClick={openActivity}
                     >
                       <Plus size={23} />
                     </button>
@@ -897,6 +936,7 @@ export default function Home() {
                           <SwipeCard
                             key={top.id}
                             activity={top}
+                            returnFrom={restored?.id === top.id ? restored.direction : undefined}
                             wheelGate={wheelGate}
                             controlRef={swipeControl}
                             focusHandoffRef={swipeFocus}
@@ -912,42 +952,20 @@ export default function Home() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                           >
-                            <img
-                              className="brand-art"
-                              src="/brand/invitations.webp"
-                              alt=""
-                              width={180}
-                              height={150}
-                            />
-                            <h2>You’re all caught up</h2>
-                            <p>
-                              No more activities match these filters. Change
-                              your filters, revisit the deck, or create
-                              something new.
-                            </p>
-                            <button
-                              className="secondary"
-                              onClick={() => setModal("filters")}
-                            >
-                              Change filters
-                            </button>
-                            <button
-                              className="primary"
-                              onClick={() =>
-                                act(
-                                  { type: "resetDeck" },
-                                  "Your deck is ready for another look.",
-                                )
-                              }
-                            >
-                              <RotateCcw size={16} />
-                              Revisit activities
-                            </button>
+                            <BrandLogo symbol />
+                            <h2>{data.activities.some(a => !a.swipe && !a.cancelled && !a.expired) ? "Nothing fits these filters yet." : "You’ve seen everything for now."}</h2>
+                            <p>Got something else in mind? Make your own plan or discover more.</p>
+                            <div className="deck-next-actions">
+                              <button className="primary" disabled={busy} onClick={openActivity}><Plus size={18}/>Create an activity</button>
+                              <button className="secondary" disabled={busy} onClick={findMore}><Search size={18}/>Find more activities</button>
+                            </div>
+                            <button className="text-link" onClick={() => navigate("Plans")}>Review interested activities <ArrowRight size={15}/></button>
+                            <button className="text-link" onClick={() => setModal("filters")}>Change filters</button>
                           </motion.div>
                         )}
                       </AnimatePresence>
                     </div>
-                    <div className="swipe-controls">
+                    <div className={`swipe-controls ${!top ? "deck-finished" : ""}`}>
                       <button
                         className="swipe-action pass"
                         aria-label="Pass on activity"
@@ -959,21 +977,13 @@ export default function Home() {
                       </button>
                       <button
                         className="undo-action"
-                        disabled={!lastPass || busy}
-                        aria-label="Undo last pass"
-                        onClick={async () => {
-                          if (
-                            lastPass &&
-                            (await act(
-                              { type: "undoPass", activity: lastPass },
-                              "Pass undone. Take another look.",
-                            ))
-                          )
-                            setLastPass(undefined);
-                        }}
+                        disabled={!data.undoSwipe || busy}
+                        aria-label="Undo last swipe"
+                        title="Undo last swipe"
+                        onClick={() => void undoLastSwipe()}
                       >
-                        <RotateCcw size={19} />
-                        <small>Undo pass</small>
+                        <Undo2 size={19} />
+                        <small>Undo</small>
                       </button>
                       <button
                         className="swipe-action heart"
@@ -985,9 +995,7 @@ export default function Home() {
                         <small>Ditto</small>
                       </button>
                     </div>
-                    <div className="swipe-hint">
-                      Find your next yes.
-                    </div>
+                    {top && <div className="swipe-hint">Find your next yes.</div>}
                   </section>
                   <DiscoverySocial
                     now={now}
@@ -1192,6 +1200,10 @@ export default function Home() {
                         />
                       </div>
                     )}
+                    {c.undoVote && !c.ideas.some(idea => c.round?.ideaIds.includes(idea.id) && idea.vote === undefined) && <div className="group-undo-row">
+                      <button className="secondary" disabled={busy || c.undoVoteBlocked} title={c.undoVoteBlocked ? "This round already has a plan. Start a new round to change the decision." : "Undo last swipe"} onClick={() => act({type: "undoSwipe", operation: c.undoVote!.id}, "Vote undone. Your Circle’s matches will update.")}><Undo2 size={18}/>Undo last swipe</button>
+                      {c.undoVoteBlocked && <p className="small muted">This round has a plan. Start a new round to make a different decision.</p>}
+                    </div>}
                     {c.round && !c.round.complete && (
                       <GroupVoting
                         circle={c}
@@ -1215,7 +1227,7 @@ export default function Home() {
                           <article className="idea-card" key={idea.id}>
                             <img
                               src={idea.image}
-                              alt={`${idea.category} inspiration`}
+                              alt={idea.imageKind ? idea.title : `${idea.category} inspiration`}
                             />
                             <div className="idea-content">
                               <span className="eyebrow purple">
@@ -1225,7 +1237,7 @@ export default function Home() {
                               {idea.notes && (
                                 <p className="small muted">{idea.notes}</p>
                               )}
-                              <p className="small muted">
+                              <p className="small muted idea-author"><span className="inline-avatar"><Avatar person={c.members.find(m => m.id === idea.creator) || {name:"Member"}}/></span>
                                 From{" "}
                                 {c.members.find((m) => m.id === idea.creator)
                                   ?.name || "a member"}
@@ -1780,13 +1792,13 @@ export default function Home() {
                           name="start"
                           type="datetime-local"
                           required
-                          defaultValue={new Date(
+                          defaultValue={detail.start ? new Date(
                             new Date(detail.start).getTime() -
                               new Date(detail.start).getTimezoneOffset() *
                                 60000,
                           )
                             .toISOString()
-                            .slice(0, 16)}
+                            .slice(0, 16) : ""}
                         />
                       </label>
                       <label>
@@ -1835,7 +1847,7 @@ export default function Home() {
                 <p>
                   {data.activities.find((a) => a.id === detail.id)?.attending} /{" "}
                   {detail.capacity} going ·{" "}
-                  {detail.budget ? `Estimated $${detail.budget}` : "Free"}
+                  {detail.budgetKnown === false ? "Budget to decide" : detail.budget ? `Estimated $${detail.budget}` : "Free"}
                 </p>
                 <div className="field">
                   <label htmlFor="origin">Starting location (optional)</label>
@@ -1889,7 +1901,7 @@ export default function Home() {
                     busy ||
                     (data.activities.find((a) => a.id === detail.id)?.status !==
                       "attending" &&
-                      (!!detail.cancelled ||
+                      (!detail.start || !!detail.cancelled ||
                         !!detail.expired ||
                         (data.activities.find((a) => a.id === detail.id)
                           ?.attending || 0) >= detail.capacity))
@@ -1910,7 +1922,7 @@ export default function Home() {
                   {data.activities.find((a) => a.id === detail.id)?.status ===
                   "attending"
                     ? "Withdraw attendance"
-                    : detail.cancelled
+                    : !detail.start ? "Choose a date before joining" : detail.cancelled
                       ? "Activity cancelled"
                       : detail.expired
                         ? "Activity ended"
@@ -2116,8 +2128,9 @@ export default function Home() {
                         type="number"
                         min="0"
                         max="1000"
-                        defaultValue={20}
-                        required
+                        defaultValue={modal === "activity" ? "" : 20}
+                        placeholder="To decide"
+                        required={modal !== "activity"}
                       />
                     </div>
                   </>
@@ -2141,8 +2154,7 @@ export default function Home() {
                             : ""
                         }
                         readOnly={!!selectedVenue}
-                        required
-                        placeholder="Enter a public meeting place, or select above"
+                        placeholder="Optional — choose with your friends"
                       />
                     </div>
                     <p className="small muted">
@@ -2152,13 +2164,12 @@ export default function Home() {
                     </p>
                     <div className="field-row">
                       <div className="field">
-                        <label htmlFor="start">When (your local time)</label>
+                        <label htmlFor="start">Date & time (optional)</label>
                         <input
                           id="start"
                           name="start"
                           type="datetime-local"
-                          required
-                          defaultValue={tomorrow()}
+                          defaultValue=""
                         />
                       </div>
                       <div className="field">
@@ -2174,22 +2185,18 @@ export default function Home() {
                         />
                       </div>
                     </div>
-                    <p className="small muted">
-                      {data.user.demo
-                        ? "Visible to your current group."
-                        : "Public activity with automatic joining."}{" "}
-                      {selectedVenue?.image
-                        ? "The selected venue photo will be used."
-                        : "A category inspiration photo will be used."}
-                    </p>
+                    <label htmlFor="activity-circle">Share with a Circle (optional)</label>
+                      <select id="activity-circle" name="circle" defaultValue=""><option value="">Just save it for me</option>{data.circles.map(circle => <option value={circle.id} key={circle.id}>{circle.name}</option>)}</select>
+                    <details className="activity-image-options"><summary>Add an activity image (optional)</summary><ProfilePhotoInput name="Activity" label="Activity image" fieldName="image" onBusy={setPhotoBusy}/></details>
+                    <p className="small muted">Saved privately unless you select a Circle. Shared ideas use your Circle’s voting and approval flow. No time, venue availability or reservation is confirmed.</p>
                   </>
                 )}
-                <button className="primary full" disabled={busy}>
+                <button className="primary full" disabled={busy || photoBusy}>
                   {modal === "circle"
                     ? "Create Circle"
                     : modal === "idea"
                       ? "Add to the deck"
-                      : "Publish activity"}
+                      : "Save activity"}
                   <Plus size={17} />
                 </button>
               </form>
@@ -2424,6 +2431,7 @@ export default function Home() {
                     aria-label="Searching places"
                   />
                 )}
+                {!busy && !found.length && <button className="text-link" onClick={openActivity}>Create your own activity <Plus size={16}/></button>}
                 <div className="venue-results">
                   {found.map((v) => (
                     <article key={v.id}>
@@ -2456,7 +2464,7 @@ export default function Home() {
                         onClick={() => {
                           setSelectedVenue(v);
                           setActivityCity(city || data.user.city);
-                          setModal("activity");
+                          openActivity();
                         }}
                       >
                         Plan something here <ArrowRight size={14} />

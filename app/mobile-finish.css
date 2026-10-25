@@ -311,3 +311,56 @@
 
 .agenda-plan>summary{align-items:flex-start}.agenda-plan>summary>svg{align-self:center;flex-shrink:0}.agenda-plan .agenda-photo{height:132px;width:96px}.agenda-heading h2{white-space:nowrap}.agenda-legend{gap:10px}.agenda-day-heading{margin-top:20px}.agenda-description .agenda-context{display:-webkit-box;-webkit-line-clamp:2;-webkit-box-orient:vertical;overflow:hidden}
 @media(max-width:370px){.agenda-heading h2{font-size:18px}.agenda-plan .agenda-photo{width:80px;height:120px}}
+
+/* A completed deck is a handoff into making plans, never a vote reset. */
+.discover-page .deck-empty { min-height: 380px; padding: 36px 24px; display: flex; flex-direction: column; align-items: flex-start; justify-content: center; text-align: left; gap: 16px; background: var(--bg, #fff9fa); }
+.discover-page .deck-empty .ditto-symbol { width: 102px; height: 68px; object-fit: contain; margin-bottom: 8px; }
+.discover-page .deck-empty h2 { font-size: clamp(26px, 5vw, 34px); line-height: 1.12; max-width: 14ch; margin: 0; }
+.discover-page .deck-empty p { margin: 0; max-width: 34ch; }
+.deck-next-actions { display: grid; gap: 10px; width: 100%; margin-top: 6px; }
+.deck-next-actions button { min-height: 48px; justify-content: center; }
+.discover-page .undo-action { min-width: 56px; min-height: 56px; flex-direction: column; gap: 3px; }
+.discover-page .undo-action small { display: block; position: static; font-size: 11px; line-height: 1; color: inherit; }
+.group-undo-row { margin: 16px 0; }
+.activity-image-options { margin: 20px 0; }
+.activity-image-options summary { cursor: pointer; padding: 12px 0; }
+.unscheduled-ideas { margin-top: 32px; }
+.unscheduled-idea { width: 100%; display: flex; align-items: center; gap: 14px; text-align: left; padding: 16px 0; border: 0; border-bottom: 1px solid var(--border, #e5dfe1); background: transparent; }
+.unscheduled-idea img { width: 64px; height: 64px; object-fit: cover; border-radius: 12px; }
+.unscheduled-idea span { flex: 1; min-width: 0; }
+.unscheduled-idea strong,.unscheduled-idea small { display: block; overflow-wrap: anywhere; }
+.unscheduled-idea small { margin-top: 5px; color: var(--muted, #6f656a); }
+/* Completion is a compact next step, not three disabled voting controls. */
+.discover-page .deck-empty { padding: 24px; gap: 12px; min-height: 380px; }
+.discover-page .deck-empty > .ditto-symbol { width: 84px; height: 56px; margin-bottom: 4px; }
+.discover-page .deck-empty button { margin: 0; }
+.discover-page .deck-empty .deck-next-actions { margin-top: 8px; }
+.discover-page .deck-finished .swipe-action { display: none; }
+.discover-page .deck-finished { justify-content: flex-start; padding-left: 24px; }
+.idea-author { display: flex; align-items: center; gap: 6px; }
+@media (max-width: 600px) {
+  .discover-page .deck-empty { padding: 16px 24px; gap: 8px; }
+  .discover-page .deck-empty > .ditto-symbol { width: 72px; height: 48px; }
+  .discover-page .deck-empty .text-link { min-height: 40px; }
+  .discover-page .deck-finished { margin-top: 0; }
+}
+/* WebKit date controls must not impose their intrinsic width on a grid track. */
+.field-row { grid-template-columns: minmax(0, 1.3fr) minmax(0, 1fr); }
+.field-row .field { min-width: 0; }
+input[type="datetime-local"] { min-width: 0; max-width: 100%; width: 100%; }
+input[type="datetime-local"]::-webkit-date-and-time-value { text-align: left; }
+.group-deck .vote-buttons .group-undo-button { flex: 0 0 56px; flex-direction: column; gap: 2px; padding: 6px; font-size: 11px; }
+@media (max-width: 760px) {
+  .field-row { grid-template-columns: minmax(0, 1fr); }
+  .group-swipe { height: clamp(240px, calc(100svh - 420px), 420px); }
+}
+input[type="datetime-local"] {
+  -webkit-appearance: none;
+  appearance: none;
+  display: block;
+  inline-size: 100%;
+  min-inline-size: 0;
+  box-sizing: border-box;
+  min-height: 48px;
+}
+input[type="datetime-local"]::-webkit-datetime-edit { padding: 0; min-width: 0; }

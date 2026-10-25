@@ -460,3 +460,17 @@ test("implicit touch capture transfer from a child must not cancel the card drag
   assert.match(t.card.textContent!, /wasn’t saved/);
   await t.cleanup();
 });
+
+test("avatar renders stored photos, falls back only on error, and retries a replacement", async () => {
+  const { Avatar } = await import("../app/profile-photo");
+  const host=win.document.createElement("div"), root=createRoot(host);
+  await act(async()=>root.render(createElement(Avatar,{person:{name:"Alex",photo:"/assigned-fixture.jpg"}})));
+  assert.equal(host.querySelector("img")?.getAttribute("src"),"/assigned-fixture.jpg");
+  await act(async()=>host.querySelector("img")!.dispatchEvent(new win.Event("error")));
+  assert.equal(host.textContent,"A");
+  await act(async()=>root.render(createElement(Avatar,{person:{name:"Alex",photo:"/replacement.jpg"}})));
+  assert.equal(host.querySelector("img")?.getAttribute("src"),"/replacement.jpg");
+  await act(async()=>root.render(createElement(Avatar,{person:{name:"Jordan"}})));
+  assert.equal(host.textContent,"J");
+  await act(async()=>root.unmount());
+});

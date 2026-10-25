@@ -117,7 +117,7 @@ export function CircleCoordinator({
             >
               <div className="between">
                 <strong>
-                  <span className="inline-avatar"><Avatar person={c.members.find(member => member.id === m.user) || {name:m.name}}/></span> {m.name}
+                  <span className="inline-avatar"><Avatar person={c.members.find(member => member.id === m.user) || {name:m.name,photo:m.photo}}/></span> {m.name}
                 </strong>
                 <time dateTime={m.createdAt}>
                   {new Date(m.createdAt).toLocaleTimeString([], {

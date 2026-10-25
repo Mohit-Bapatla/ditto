@@ -9,6 +9,10 @@ export type Person = {
   demo: boolean;
 };
 export type Activity = {
+  visibility?: "public" | "saved" | "circle";
+  circle?: string;
+  budgetKnown?: boolean;
+  customImage?: boolean;
   fixture?: {
     version: string;
     index: number;
@@ -40,6 +44,8 @@ export type Activity = {
   expired?: boolean;
 };
 export type Idea = {
+  activityId?: string;
+  imageKind?: "upload" | "venue";
   id: string;
   title: string;
   category: string;
@@ -52,7 +58,10 @@ export type Idea = {
   unanimous?: boolean;
   matched?: boolean;
 };
+export type UndoDecision = { id: string; activity: string; direction: string };
 export type Circle = {
+  undoVote?: UndoDecision;
+  undoVoteBlocked?: boolean;
   id: string;
   name: string;
   description: string;
@@ -96,6 +105,7 @@ export type Stop = {
   note: string;
 };
 export type Plan = {
+  round?: string;
   id: string;
   circle: string;
   title: string;
@@ -112,6 +122,7 @@ export type Plan = {
   rsvps: string[];
 };
 export type State = {
+  undoSwipe?: UndoDecision;
   user: Person;
   demoUsers: Person[];
   activities: Activity[];
@@ -144,6 +155,7 @@ export const photos: Record<string, string> = {
 };
 
 export type ChatMessage = {
+  photo?: string | null;
   id: string;
   sequence: number;
   user: string;

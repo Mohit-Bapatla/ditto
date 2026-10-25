@@ -39,6 +39,7 @@ export function SwipeSurface({
   progress,
   focusHandoffRef,
   wheelGate,
+  returnFrom,
 }: {
   children: ReactNode;
   onSwipe: SwipeCommit;
@@ -49,6 +50,7 @@ export function SwipeSurface({
   progress?: MotionValue<number>;
   focusHandoffRef?: { current: boolean };
   wheelGate?: { current: WheelGate };
+  returnFrom?: string;
 }) {
   const element = useRef<HTMLElement>(null);
   const start = useRef<
@@ -81,6 +83,14 @@ export function SwipeSurface({
   const reduced = useReducedMotion();
   const x = useMotionValue(0);
   const opacity = useMotionValue(1);
+  const entered = useRef(false);
+  useLayoutEffect(() => {
+    if (entered.current || !returnFrom || reduced) return;
+    entered.current = true;
+    x.set(returnFrom === "yes" ? 110 : -110);
+    const animation = animate(x, 0, {type: "spring", stiffness: 280, damping: 30});
+    return () => animation.stop();
+  }, [returnFrom, reduced, x]);
   const rotate = useTransform(
     x,
     [-400, 0, 400],

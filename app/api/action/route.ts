@@ -15,6 +15,8 @@ import {
   startRound,
   vote,
   swipe,
+  undoDecision,
+  latestDecision,
   attend,
   requireMember,
   planState,
@@ -64,6 +66,7 @@ const schema = z.discriminatedUnion("type", [
     type: z.literal("swipe"),
     activity: uuid,
     direction: z.enum(["yes", "no"]),
+    nonce: uuid.optional(),
   }),
   z.object({
     type: z.literal("attend"),
@@ -76,12 +79,15 @@ const schema = z.discriminatedUnion("type", [
     title: str,
     description: z.string().trim().min(1).max(1000),
     category: str,
-    venue: str,
+    venue: z.string().trim().max(200).default(""),
+    visibility: z.enum(["public", "saved", "circle"]).default("public"),
+    circle: uuid.optional(),
+    image: z.string().max(180000).optional(),
     venueId: z.string().max(300).optional(),
     city: str,
-    start: z.iso.datetime(),
-    capacity: z.number().int().min(2).max(100),
-    budget: z.number().min(0).max(1000),
+    start: z.union([z.iso.datetime(), z.literal("")]).default(""),
+    capacity: z.number().int().min(2).max(100).default(8),
+    budget: z.number().min(0).max(1000).optional(),
   }),
   z.object({ type: z.literal("approve"), plan: uuid }),
   z.object({ type: z.literal("rsvp"), plan: uuid, going: z.boolean() }),
@@ -133,6 +139,7 @@ const schema = z.discriminatedUnion("type", [
   z.object({ type: z.literal("unapprove"), plan: uuid }),
   z.object({ type: z.literal("resetDeck") }),
   z.object({ type: z.literal("undoPass"), activity: uuid }),
+  z.object({ type: z.literal("undoSwipe"), operation: uuid }),
 ]);
 export async function POST(req: NextRequest) {
   try {
@@ -143,6 +150,7 @@ export async function POST(req: NextRequest) {
     let resultId: string | undefined;
     const photo =
       b.type === "profile" || b.type === "profilePhoto" ? await normalizeProfilePhoto(b.photo) : undefined;
+    const activityImage = b.type === "activity" ? await normalizeProfilePhoto(b.image, 640) : undefined;
     transaction(() => {
       switch (b.type) {
         case "chat": {
@@ -354,25 +362,16 @@ export async function POST(req: NextRequest) {
           vote(s, b.circle, b.idea, b.vote);
           break;
         case "undoPass": {
-          accessibleActivity(s, b.activity);
-          const saved = one(
-            "SELECT direction FROM swipes WHERE activity_id=? AND user_id=?",
-            b.activity,
-            s.user,
-          );
-          if (saved?.direction !== "no")
-            throw new PublicError(
-              "Only a passed activity can be undone. Your attendance is unchanged.",
-            );
-          run(
-            "DELETE FROM swipes WHERE activity_id=? AND user_id=? AND direction='no'",
-            b.activity,
-            s.user,
-          );
+          const last = latestDecision(s);
+          if (!last || last.activity !== b.activity || last.direction !== "no") throw new PublicError("Only your latest swipe can be undone.");
+          undoDecision(s, last.id);
           break;
         }
+        case "undoSwipe":
+          undoDecision(s, b.operation);
+          break;
         case "swipe":
-          swipe(s, b.activity, b.direction);
+          swipe(s, b.activity, b.direction, b.nonce);
           break;
         case "attend":
           attend(s, b.activity, b.withdraw);
@@ -390,7 +389,9 @@ export async function POST(req: NextRequest) {
             }
           }
 
-          if (new Date(b.start).getTime() < Date.now())
+          if (b.circle) requireMember(s, b.circle);
+          if (b.visibility === "circle" && !b.circle) throw new PublicError("Choose a Circle to share with.");
+          if (b.start && new Date(b.start).getTime() < Date.now())
             throw new PublicError("Choose a future date.");
           let selectedVenue: Venue | undefined;
           if (b.venueId) {
@@ -418,8 +419,12 @@ export async function POST(req: NextRequest) {
               : {}),
             id: id(),
             creator: s.user,
+            venue: selectedVenue ? `${selectedVenue.name}, ${selectedVenue.address || ""}` : b.venue || "Venue to be decided",
+            budget: b.budget ?? 0,
+            budgetKnown: b.budget !== undefined,
+            customImage: !!activityImage,
             image:
-              selectedVenue?.image || photos[b.category] || photos.Outdoors,
+              activityImage || selectedVenue?.image || photos[b.category] || photos.Outdoors,
             tags: ["New friends welcome"],
             demo: person(s.user).demo,
           };
@@ -430,6 +435,13 @@ export async function POST(req: NextRequest) {
             s.user,
             JSON.stringify(a),
           );
+          if (b.visibility !== "public") run("INSERT INTO participation VALUES(?,?,'interested')", a.id, s.user);
+          if (b.circle) {
+            const ideaId = addIdea(s, b.circle, a.title, a.category);
+            const row = one("SELECT data FROM ideas WHERE id=?", ideaId)!;
+            const idea = JSON.parse(String(row.data));
+            run("UPDATE ideas SET data=? WHERE id=?", JSON.stringify({ ...idea, image: a.image, activityId: a.id, imageKind: activityImage ? "upload" : selectedVenue?.image ? "venue" : undefined, notes: `${a.description} · ${a.venue} · ${a.start || "Date to decide"} · ${a.budgetKnown ? `Estimated $${a.budget}` : "Budget to decide"}` }), ideaId);
+          }
           if (b.nonce)
             run("INSERT INTO submissions VALUES(?,?,?)", s.user, b.nonce, a.id);
           resultId = a.id;
@@ -468,8 +480,7 @@ export async function POST(req: NextRequest) {
           break;
         }
         case "resetDeck":
-          run("DELETE FROM swipes WHERE user_id=?", s.user);
-          break;
+          throw new PublicError("Your choices are saved. Use Undo for your last swipe, or find more activities.");
       }
     });
     return NextResponse.json({ state: state(s), id: resultId });

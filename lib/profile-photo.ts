@@ -2,7 +2,7 @@ import sharp from "sharp";
 import { PublicError } from "./errors";
 
 /** Decode and re-encode raster uploads: strip location/EXIF and reject SVG or arbitrary URLs. */
-export async function normalizeProfilePhoto(value: string | null | undefined) {
+export async function normalizeProfilePhoto(value: string | null | undefined, size = 256) {
   if (!value) return value;
   if (
     value.length > 180000 ||
@@ -22,7 +22,7 @@ export async function normalizeProfilePhoto(value: string | null | undefined) {
       throw new Error("Unsupported image");
     const output = await image
       .rotate()
-      .resize(256, 256, { fit: "cover" })
+      .resize(size, size, { fit: "cover" })
       .jpeg({ quality: 82 })
       .toBuffer();
     return `data:image/jpeg;base64,${output.toString("base64")}`;

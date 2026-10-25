@@ -416,34 +416,83 @@ export function vote(s: Session, circle: string, idea: string, value: boolean) {
     s.user,
     value ? 1 : 0,
   );
+  recordDecision(s, "vote", idea, c.round.id, { vote: null }, { direction: value ? "yes" : "no" });
 }
 export function accessibleActivity(s: Session, aid: string) {
   const r = one("SELECT * FROM activities WHERE id=?", aid);
   if (!r) throw new PublicError("Activity not found.");
   const a = parse<Activity>(r);
-  if (a.demo && r.owner !== s.owner)
+  if ((a.visibility === "saved" && a.creator !== s.user) || (a.visibility === "circle" && !one("SELECT 1 FROM members WHERE circle_id=? AND user_id=?", a.circle || "", s.user)) || (a.demo && r.owner !== s.owner))
     throw new PublicError("Activity not found.");
   return a;
 }
-export function swipe(s: Session, aid: string, direction: string) {
+export function latestDecision(s: Session, kind = "activity", context = "") {
+  const h = one("SELECT * FROM decision_history WHERE user_id=? AND kind=? AND context_id=? AND undone=0 ORDER BY sequence DESC LIMIT 1", s.user, kind, context);
+  return h ? { id: String(h.id), activity: String(h.target_id), direction: JSON.parse(String(h.applied)).direction as string } : undefined;
+}
+function recordDecision(s: Session, kind: string, target: string, context: string, previous: unknown, applied: unknown, operation: string = id()) {
+  run("INSERT INTO decision_history(id,user_id,kind,target_id,context_id,previous,applied) VALUES(?,?,?,?,?,?,?)", operation, s.user, kind, target, context, JSON.stringify(previous), JSON.stringify(applied));
+  run("DELETE FROM decision_history WHERE user_id=? AND sequence NOT IN (SELECT sequence FROM decision_history WHERE user_id=? ORDER BY sequence DESC LIMIT 40)", s.user, s.user);
+}
+export function swipe(s: Session, aid: string, direction: string, operation: string = id()) {
   accessibleActivity(s, aid);
-  run(
-    "INSERT INTO swipes VALUES(?,?,?) ON CONFLICT(activity_id,user_id) DO UPDATE SET direction=excluded.direction",
-    aid,
-    s.user,
-    direction,
-  );
-  if (direction === "yes")
-    run(
-      "INSERT INTO participation VALUES(?,?,'interested') ON CONFLICT(activity_id,user_id) DO UPDATE SET status=CASE WHEN status='attending' THEN status ELSE 'interested' END",
-      aid,
-      s.user,
-    );
+  if (one("SELECT 1 FROM decision_history WHERE id=? AND user_id=?", operation, s.user)) return;
+  const previous = {
+    direction: one("SELECT direction FROM swipes WHERE activity_id=? AND user_id=?", aid, s.user)?.direction ?? null,
+    status: one("SELECT status FROM participation WHERE activity_id=? AND user_id=?", aid, s.user)?.status ?? null,
+  };
+  if (previous.direction === direction) return;
+  const status = previous.status === "attending" ? "attending" : direction === "yes" ? "interested" : previous.status === "interested" ? null : previous.status;
+  run("INSERT INTO swipes VALUES(?,?,?) ON CONFLICT(activity_id,user_id) DO UPDATE SET direction=excluded.direction", aid, s.user, direction);
+  if (status) run("INSERT INTO participation VALUES(?,?,?) ON CONFLICT(activity_id,user_id) DO UPDATE SET status=excluded.status", aid, s.user, status);
+  else run("DELETE FROM participation WHERE activity_id=? AND user_id=?", aid, s.user);
+  recordDecision(s, "activity", aid, "", previous, { direction, status }, operation);
+}
+export function undoDecision(s: Session, operation: string) {
+  const h = one("SELECT * FROM decision_history WHERE id=? AND user_id=?", operation, s.user);
+  if (!h) throw new PublicError("This swipe is no longer available to undo.");
+  if (h.undone) return; // A repeated/interrupted request must never undo another card.
+  if (latestDecision(s, String(h.kind), String(h.context_id))?.id !== operation)
+    throw new PublicError("Undo your most recent swipe first.");
+  const previous = JSON.parse(String(h.previous)), applied = JSON.parse(String(h.applied));
+  if (h.kind === "vote") {
+    const round = one("SELECT circle_id FROM rounds WHERE id=?", h.context_id);
+    if (!round) throw new PublicError("This round is no longer available.");
+    const c = circleState(s, String(round.circle_id));
+    if (c.round?.id !== h.context_id) throw new PublicError("A new round has started. This vote cannot be undone.");
+    if (c.plans.some(p => !p.round || p.round === h.context_id))
+      throw new PublicError("This round already has a plan. Keep that decision intact and start a new round instead.");
+    run("DELETE FROM votes WHERE round_id=? AND idea_id=? AND user_id=?", h.context_id, h.target_id, s.user);
+  } else {
+    const a = accessibleActivity(s, String(h.target_id));
+    if (a.cancelled || (a.start && new Date(a.start).getTime() <= Date.now())) throw new PublicError("This activity is no longer available.");
+    const status = one("SELECT status FROM participation WHERE activity_id=? AND user_id=?", h.target_id, s.user)?.status ?? null;
+    const direction = one("SELECT direction FROM swipes WHERE activity_id=? AND user_id=?", h.target_id, s.user)?.direction ?? null;
+    if (status !== applied.status || direction !== applied.direction) throw new PublicError("Your activity changed since that swipe. Refresh before trying again.");
+    if (previous.direction) run("UPDATE swipes SET direction=? WHERE activity_id=? AND user_id=?", previous.direction, h.target_id, s.user);
+    else run("DELETE FROM swipes WHERE activity_id=? AND user_id=?", h.target_id, s.user);
+    if (previous.status) run("INSERT INTO participation VALUES(?,?,?) ON CONFLICT(activity_id,user_id) DO UPDATE SET status=excluded.status", h.target_id, s.user, previous.status);
+    else run("DELETE FROM participation WHERE activity_id=? AND user_id=?", h.target_id, s.user);
+  }
+  run("UPDATE decision_history SET undone=1 WHERE id=?", operation);
+}
+export function eligibleUndo(s: Session) {
+  const last = latestDecision(s);
+  if (!last) return undefined;
+  try {
+    const a = accessibleActivity(s, last.activity);
+    if (a.cancelled || (a.start && new Date(a.start).getTime() <= Date.now())) return undefined;
+    const row = one("SELECT applied FROM decision_history WHERE id=?", last.id)!;
+    const applied = JSON.parse(String(row.applied));
+    const status = one("SELECT status FROM participation WHERE activity_id=? AND user_id=?", last.activity, s.user)?.status ?? null;
+    const direction = one("SELECT direction FROM swipes WHERE activity_id=? AND user_id=?", last.activity, s.user)?.direction ?? null;
+    return status === applied.status && direction === applied.direction ? last : undefined;
+  } catch { return undefined; }
 }
 export function attend(s: Session, aid: string, withdraw = false) {
   const a = accessibleActivity(s, aid);
-  if (!withdraw && (a.cancelled || new Date(a.start).getTime() <= Date.now()))
-    throw new PublicError("This activity is cancelled or has already started.");
+  if (!withdraw && (!a.start || a.cancelled || new Date(a.start).getTime() <= Date.now()))
+    throw new PublicError("Choose a date first; cancelled or past activities cannot be joined.");
   const count = Number(
     one(
       "SELECT count(*) n FROM participation WHERE activity_id=? AND status='attending'",
@@ -497,6 +546,7 @@ export function circleState(s: Session, cid: string): Circle {
     user: String(r.user_id),
     name: person(String(r.user_id)).name,
     avatar: person(String(r.user_id)).avatar,
+    photo: person(String(r.user_id)).photo,
     text: String(r.text),
     createdAt: String(r.created_at),
   }));
@@ -524,6 +574,8 @@ export function circleState(s: Session, cid: string): Circle {
         votes.filter((v) => v.user_id === m.user_id).length === ideaIds.length,
     ).length;
     const complete = completed === members.length;
+    c.undoVote = latestDecision(s, "vote", String(r.id));
+    c.undoVoteBlocked = c.plans.some(p => !p.round || p.round === r.id);
     c.round = {
       id: String(r.id),
       threshold: String(r.threshold),
@@ -580,6 +632,7 @@ export function state(s: Session): State {
   seedPresentationPlans(s);
   return {
     user: person(s.user),
+    undoSwipe: eligibleUndo(s),
     demoUsers: all("SELECT data FROM profiles WHERE owner=?", s.owner).map(
       (r) => parse<Person>(r),
     ),
@@ -587,7 +640,7 @@ export function state(s: Session): State {
       (r) => circleState(s, String(r.circle_id)),
     ),
     activities: all("SELECT * FROM activities ORDER BY rowid DESC")
-      .filter((r) => !parse<Activity>(r).demo || r.owner === s.owner)
+      .filter((r) => { try { accessibleActivity(s, String(r.id)); return true; } catch { return false; } })
       .map((r) => {
         const a = parse<Activity>(r);
         return {

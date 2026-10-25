@@ -239,6 +239,7 @@ export function WeekAgenda({
           </div>
         )}
       </div>
+      {activities.some(a => !a.start && !a.cancelled) && <div className="unscheduled-ideas"><h3>Date to decide</h3><p className="small muted">Saved ideas, ready when you are.</p>{activities.filter(a => !a.start && !a.cancelled).map(a => <button className="unscheduled-idea" key={a.id} onClick={() => onActivity(a)}><ActivityPhoto src={a.image} alt={a.title}/><span><strong>{a.title}</strong><small>{a.venue || "Venue to decide"}</small></span><ArrowRight size={18}/></button>)}</div>}
     </section>
   );
 }

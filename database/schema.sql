@@ -26,3 +26,7 @@ CREATE TABLE IF NOT EXISTS proposals(id TEXT PRIMARY KEY, circle_id TEXT NOT NUL
 CREATE TABLE IF NOT EXISTS submissions(user_id TEXT REFERENCES profiles(id), nonce TEXT NOT NULL, activity_id TEXT NOT NULL REFERENCES activities(id), PRIMARY KEY(user_id,nonce));
 
 CREATE TABLE IF NOT EXISTS venue_selections(user_id TEXT NOT NULL REFERENCES profiles(id), venue_id TEXT NOT NULL, data TEXT NOT NULL, expires_at INTEGER NOT NULL, PRIMARY KEY(user_id,venue_id));
+
+-- Bounded, durable undo journal. Each operation ID makes retries safe.
+CREATE TABLE IF NOT EXISTS decision_history(sequence INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT UNIQUE NOT NULL, user_id TEXT NOT NULL REFERENCES profiles(id), kind TEXT NOT NULL, target_id TEXT NOT NULL, context_id TEXT NOT NULL DEFAULT '', previous TEXT NOT NULL, applied TEXT NOT NULL, undone INTEGER NOT NULL DEFAULT 0);
+CREATE INDEX IF NOT EXISTS decision_history_user ON decision_history(user_id,kind,context_id,sequence);
