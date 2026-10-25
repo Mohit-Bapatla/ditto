@@ -1,4 +1,5 @@
 "use client";
+import { apiPath } from "@/lib/api-path";
 import { useState } from "react";
 import { Search, MapPin, Check, ExternalLink } from "lucide-react";
 import type { Venue } from "@/lib/types";
@@ -21,7 +22,7 @@ export function VenuePicker({
     setBusy(true);
     setError("");
     try {
-      const r = await fetch("/api/places", {
+      const r = await fetch(apiPath("/api/places"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({ query, city }),

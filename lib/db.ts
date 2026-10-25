@@ -195,7 +195,7 @@ export function createSession(): Session {
   });
 }
 /** Each browser gets its own owner namespace; fixture values are stable, auth IDs are not. */
-function createPresentationSession(): Session {
+export function createPresentationSession(): Session {
   const owner = id();
   const users: Person[] = ["Mohit", "Edwin", "Paxton"].map((name, i) => ({
     id: id(),
@@ -335,6 +335,9 @@ function createPresentationSession(): Session {
   });
   return s;
 }
+export function isPublicDemo(s: Session) {
+  return !!one("SELECT 1 FROM demo_sandboxes WHERE owner=?", s.owner);
+}
 export function requireMember(s: Session, circle: string) {
   if (
     !one(
@@ -345,7 +348,7 @@ export function requireMember(s: Session, circle: string) {
   )
     throw new PublicError("Circle not found or membership required.");
   const c = one("SELECT * FROM circles WHERE id=?", circle)!;
-  if (parse<{ demo: boolean }>(c).demo && c.owner !== s.owner)
+  if ((isPublicDemo(s) || one("SELECT 1 FROM demo_sandboxes WHERE owner=?", c.owner) || parse<{ demo: boolean }>(c).demo) && c.owner !== s.owner)
     throw new PublicError("Demo Circle is private to its sandbox.");
   return c;
 }
@@ -439,6 +442,7 @@ export function accessibleActivity(s: Session, aid: string) {
   const r = one("SELECT * FROM activities WHERE id=?", aid);
   if (!r) throw new PublicError("Activity not found.");
   const a = parse<Activity>(r);
+  if ((isPublicDemo(s) || one("SELECT 1 FROM demo_sandboxes WHERE owner=?", r.owner)) && r.owner !== s.owner) throw new PublicError("Activity not found.");
   if ((a.visibility === "saved" && a.creator !== s.user) || (a.visibility === "circle" && !one("SELECT 1 FROM members WHERE circle_id=? AND user_id=?", a.circle || "", s.user)) || (a.demo && r.owner !== s.owner))
     throw new PublicError("Activity not found.");
   return a;
@@ -618,9 +622,9 @@ export function circleState(s: Session, cid: string): Circle {
   return c;
 }
 // Persistent, isolated presentation plans. Never runs against a deployed/live database.
-function seedPresentationPlans(s: Session) {
+export function seedPresentationPlans(s: Session, publicDemo = false) {
   if (showcaseActive()) return;
-  if (!presentationEnabled(process.env, path)) return;
+  if (!publicDemo && !presentationEnabled(process.env, path)) return;
   const circles = all("SELECT * FROM circles WHERE owner=? ORDER BY rowid", s.owner);
   if (!circles.length || one("SELECT 1 FROM plans p JOIN circles c ON c.id=p.circle_id WHERE c.owner=? AND json_extract(p.data, '$.template')='presentation-polish-v1'", s.owner)) return;
   const activities = all("SELECT data FROM activities WHERE owner=?", s.owner).map(r => parse<Activity>(r));
@@ -650,6 +654,7 @@ export function state(s: Session): State {
   seedPresentationPlans(s);
   return {
     showcase: showcaseActive(),
+    publicDemo: isPublicDemo(s),
     user: person(s.user),
     undoSwipe: eligibleUndo(s),
     demoUsers: all("SELECT data FROM profiles WHERE owner=?", s.owner).map(
@@ -658,7 +663,7 @@ export function state(s: Session): State {
     circles: all("SELECT circle_id FROM members WHERE user_id=?", s.user).map(
       (r) => circleState(s, String(r.circle_id)),
     ),
-    activities: all("SELECT * FROM activities ORDER BY rowid DESC")
+    activities: (isPublicDemo(s) ? all("SELECT * FROM activities WHERE owner=? ORDER BY rowid DESC", s.owner) : all("SELECT * FROM activities WHERE owner NOT IN (SELECT owner FROM demo_sandboxes) ORDER BY rowid DESC"))
       .filter((r) => { try { accessibleActivity(s, String(r.id)); return true; } catch { return false; } })
       .map((r) => {
         const a = parse<Activity>(r);
@@ -687,7 +692,7 @@ export function state(s: Session): State {
       })
       .reverse(),
     integrations: {
-      live: liveProvidersEnabled(),
+      live: liveProvidersEnabled() && (!isPublicDemo(s) || process.env.PUBLIC_DEMO_LIVE !== "false"),
       meta: !!process.env.MODEL_API_KEY,
       serpapi: !!process.env.SERPAPI_API_KEY,
     },

@@ -12,3 +12,5 @@ test-results/
 backups/
 *.sqlite*
 *.db*
+
+.next-demo/

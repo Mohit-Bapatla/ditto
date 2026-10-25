@@ -1,3 +1,4 @@
+import { chargeDemoProvider } from "./public-demo";
 import { appendFileSync } from "node:fs";
 import { requireLiveProviders } from "./provider-policy";
 import { PublicError } from "./errors";
@@ -52,6 +53,7 @@ function metric(kind: string, values: Record<string, unknown> = {}) {
     );
 }
 async function providerFetch(url: string, init: RequestInit, label: string) {
+  chargeDemoProvider();
   try {
     return await fetch(url, init);
   } catch {

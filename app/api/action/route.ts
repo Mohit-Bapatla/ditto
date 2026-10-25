@@ -5,6 +5,7 @@ import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
 import { auth, sameOrigin, failure, rateLimit } from "@/lib/http";
 import {
+  isPublicDemo,
   one,
   run,
   id,
@@ -148,6 +149,11 @@ export async function POST(req: NextRequest) {
     const s = await auth();
     rateLimit("action:" + s.owner, 120);
     const b = schema.parse(await req.json());
+    const publicDemo = isPublicDemo(s);
+    if (publicDemo && (b.type === "join" || b.type === "profile" || b.type === "profilePhoto")) throw new PublicError("Use the three sample people here. Exit the demo to create your own profile or join a real Circle.");
+    if (publicDemo && b.type === "activity" && b.image) throw new PublicError("Photo uploads are disabled in the public demo. Use a sample or venue photo.");
+    if (publicDemo && b.type === "activity" && Number(one("SELECT count(*) n FROM activities WHERE owner=?", s.owner)!.n) >= 48) throw new PublicError("Your demo has reached its activity limit. Reset your demo to start again.");
+    if (publicDemo && b.type === "circle" && Number(one("SELECT count(*) n FROM circles WHERE owner=?", s.owner)!.n) >= 8) throw new PublicError("Your demo has reached its Circle limit. Reset your demo to start again.");
     let resultId: string | undefined;
     const photo =
       b.type === "profile" || b.type === "profilePhoto" ? await normalizeProfilePhoto(b.photo) : undefined;
@@ -334,15 +340,15 @@ export async function POST(req: NextRequest) {
           break;
         }
         case "circle": {
-          if (person(s.user).demo)
+          if (person(s.user).demo && !publicDemo)
             throw new PublicError(
               "Save your personal profile first to create a shared Circle.",
             );
-          resultId = createCircle(s, b.name, b.description, b.city, b.budget);
+          resultId = createCircle(s, b.name, b.description, b.city, b.budget, publicDemo);
           break;
         }
         case "join": {
-          if (person(s.user).demo)
+          if (person(s.user).demo && !publicDemo)
             throw new PublicError(
               "Save your personal profile before joining a shared Circle.",
             );

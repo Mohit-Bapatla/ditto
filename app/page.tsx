@@ -1,4 +1,6 @@
 "use client";
+import { apiPath } from "@/lib/api-path";
+import { DemoControls } from "./demo-controls";
 import "./discovery.css";
 import "./density.css";
 import "./mobile-finish.css";
@@ -91,7 +93,7 @@ const tomorrow = () => {
 };
 async function request(url: string, body?: unknown) {
   const res = await fetch(
-    url,
+    apiPath(url),
     body
       ? {
           method: "POST",
@@ -419,7 +421,7 @@ export default function Home() {
     return false;
   };
   function openActivity() {
-    if (data?.user.demo && !data.showcase) { setAfterProfile("activity"); setModal("profile"); }
+    if (data?.user.demo && !data.showcase && !data.publicDemo) { setAfterProfile("activity"); setModal("profile"); }
     else setModal("activity");
   }
   async function undoLastSwipe() {
@@ -546,6 +548,7 @@ export default function Home() {
   }
   async function copy(text: string) {
     try {
+      if (data?.publicDemo) { setToast("Invitations stay inside your demo. Switch sample people using Demo controls."); return; }
       await navigator.clipboard.writeText(text);
       setToast("Copied. Share it when you’re ready.");
     } catch {
@@ -747,7 +750,7 @@ export default function Home() {
           </button>
         ) : (
           <>
-            <a className="primary" href={`/api/calendar?id=${p.id}`}>
+            <a className="primary" aria-disabled={data.publicDemo} onClick={e => { if (data.publicDemo) { e.preventDefault(); setToast("Calendar export is disabled in the demo."); } }} href={data.publicDemo ? undefined : apiPath(`/api/calendar?id=${p.id}`)}>
               <CalendarDays size={17} />
               Add to Calendar
             </a>
@@ -828,7 +831,9 @@ export default function Home() {
             </div>
 
             <div className="top-actions">
+              {data.publicDemo && <DemoControls data={data} busy={busy} onSwitch={user => { void act({type:"switch",user}); }} />}
               <button
+                style={data.publicDemo ? {display:"none"} : undefined}
                 className="location-button"
                 onClick={() => setModal("filters")}
               >
@@ -850,6 +855,7 @@ export default function Home() {
             className={`main-content ${page === "Discover" ? "discover-page" : ""}`}
             id="main-content"
           >
+            {!data.publicDemo && !data.showcase && data.user.demo && data.circles.length === 0 && <a className="demo-entry-link" href="/demo">Try Demo · explore with sample friends <ArrowUpRight size={16} aria-hidden="true" /></a>}
             {error && !modal && !detail && (
               <div role="alert" className="error-banner">
                 {error}
@@ -1017,8 +1023,8 @@ export default function Home() {
                   <button
                     className="primary"
                     onClick={() => {
-                      if (data.user.demo) setAfterProfile("circle");
-                      setModal(data.user.demo ? "profile" : "circle");
+                      if (data.user.demo && !data.publicDemo) setAfterProfile("circle");
+                      setModal(data.user.demo && !data.publicDemo ? "profile" : "circle");
                     }}
                   >
                     <Plus size={17} />
@@ -1534,7 +1540,7 @@ export default function Home() {
                   className={`profile-grid ${showSettings ? "show-settings" : ""}`}
                 >
                   <section className="profile-card">
-                    <button className="large-avatar profile-photo-button" aria-label="Change profile picture" onClick={() => setModal("profilePhoto")}><Avatar person={data.user} /></button>
+                    <button disabled={data.publicDemo} className="large-avatar profile-photo-button" aria-label="Change profile picture" onClick={() => setModal("profilePhoto")}><Avatar person={data.user} /></button>
                     <h2>{data.user.name}</h2>
                     <p className="profile-location muted">
                       <MapPin size={15} />
@@ -1550,9 +1556,9 @@ export default function Home() {
                     </p>
                     <button
                       className="primary"
-                      onClick={() => setModal("profile")}
+                      onClick={() => data.publicDemo ? setShowSettings(true) : setModal("profile")}
                     >
-                      {data.user.demo
+                      {data.publicDemo ? "Switch sample person in Demo controls" : data.user.demo
                         ? "Create your personal profile"
                         : "Edit profile"}
                       <ArrowRight size={16} />
@@ -1625,6 +1631,7 @@ export default function Home() {
                   {showSettings && (
                     <section className="settings-card">
                       <h2>Your session</h2>
+                      {!data.publicDemo && <a className="demo-entry-link" href="/demo">Try Demo</a>}
                       <p>
                         Personal profiles use a persistent session in this
                         browser. No passwords, no complicated sign-up.
@@ -2213,7 +2220,7 @@ export default function Home() {
                     <button
                       className="text-link"
                       type="button"
-                      onClick={() => setModal("profile")}
+                      onClick={() => data.publicDemo ? setShowSettings(true) : setModal("profile")}
                     >
                       Create profile <ArrowRight size={14} />
                     </button>

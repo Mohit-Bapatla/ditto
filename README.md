@@ -40,6 +40,10 @@ The showcase contains Mohit, Edwin and Paxton, four Circles, 36 activities, conv
 
 **The repeatable showcase deliberately disables live providers.** Its labeled sample planning must never be presented as live AI. Use the public app with three fresh personal sessions for the live Muse Spark demonstration, or an isolated rehearsal instance configured for live providers. Do not enable production flags on the protected showcase database.
 
+## Public judging demo
+
+A visitor-isolated `/demo` entry is prepared for deployment approval. It generates the familiar sample people, four Circles and 36 activities with fresh IDs, separate cookies, own-demo reset and persistent AI usage caps. It never copies real users or sessions. See [public demo setup, limits and judging flow](docs/PUBLIC_DEMO.md).
+
 ## Provider configuration
 
 Keep credentials in `.env.local` or private Railway variables, never Git or client code.

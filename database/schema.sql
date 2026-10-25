@@ -30,3 +30,7 @@ CREATE TABLE IF NOT EXISTS venue_selections(user_id TEXT NOT NULL REFERENCES pro
 -- Bounded, durable undo journal. Each operation ID makes retries safe.
 CREATE TABLE IF NOT EXISTS decision_history(sequence INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT UNIQUE NOT NULL, user_id TEXT NOT NULL REFERENCES profiles(id), kind TEXT NOT NULL, target_id TEXT NOT NULL, context_id TEXT NOT NULL DEFAULT '', previous TEXT NOT NULL, applied TEXT NOT NULL, undone INTEGER NOT NULL DEFAULT 0);
 CREATE INDEX IF NOT EXISTS decision_history_user ON decision_history(user_id,kind,context_id,sequence);
+
+-- Public demo namespaces are distinct from normal accounts and local showcase data.
+CREATE TABLE IF NOT EXISTS demo_sandboxes(id TEXT PRIMARY KEY, owner TEXT UNIQUE NOT NULL, expires_at INTEGER NOT NULL);
+CREATE TABLE IF NOT EXISTS demo_usage(key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires_at INTEGER NOT NULL);

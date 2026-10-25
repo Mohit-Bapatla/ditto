@@ -122,6 +122,7 @@ export type Plan = {
   rsvps: string[];
 };
 export type State = {
+  publicDemo?: boolean;
   showcase?: boolean;
   undoSwipe?: UndoDecision;
   user: Person;

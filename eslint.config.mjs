@@ -5,5 +5,5 @@ export default defineConfig([
   ...nextVitals,
   ...nextTs,
   { rules: { "@next/next/no-img-element": "off" } },
-  globalIgnores([".next/**", "next-env.d.ts", ".agents/**"]),
+  globalIgnores([".next/**", ".next-demo/**", "next-env.d.ts", ".agents/**"]),
 ]);

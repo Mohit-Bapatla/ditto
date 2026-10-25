@@ -1,12 +1,12 @@
 import { secureCookie } from "@/lib/security";
 import { cookies } from "next/headers";
 import { NextResponse } from "next/server";
-import { createSession, session, state } from "@/lib/db";
+import { createSession, session, state, isPublicDemo } from "@/lib/db";
 export const runtime = "nodejs";
 export async function GET() {
   const jar = await cookies();
   let s = session(jar.get("ditto_session")?.value);
-  if (!s) {
+  if (!s || isPublicDemo(s)) {
     s = createSession();
     jar.set("ditto_session", s.id, {
       httpOnly: true,

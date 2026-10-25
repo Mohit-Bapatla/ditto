@@ -2,10 +2,13 @@ import { isAllowedOrigin, publicOrigin } from "./security";
 import { PublicError } from "./errors";
 import { cookies } from "next/headers";
 import { NextRequest, NextResponse } from "next/server";
-import { session, type Session } from "./db";
+import { demoContext } from "./demo-context";
+import { session, isPublicDemo, type Session } from "./db";
 import { ZodError } from "zod";
 export async function auth(): Promise<Session> {
-  const s = session((await cookies()).get("ditto_session")?.value);
+  const ctx = demoContext.getStore();
+  const s = ctx ? session(ctx.session.id) : session((await cookies()).get("ditto_session")?.value);
+  if (s && (ctx ? s.owner !== ctx.session.owner || !isPublicDemo(s) : isPublicDemo(s))) throw new PublicError("Session not available in this mode.");
   if (!s) throw new PublicError("Session expired. Refresh the page.");
   return s;
 }

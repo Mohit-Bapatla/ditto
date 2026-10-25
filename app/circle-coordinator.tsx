@@ -1,4 +1,5 @@
 "use client";
+import { apiPath } from "@/lib/api-path";
 import { useState, useRef, useEffect } from "react";
 import type { Circle } from "@/lib/types";
 import { categories } from "@/lib/types";
@@ -49,7 +50,7 @@ export function CircleCoordinator({
     setBusy(true);
     setError("");
     try {
-      const r = await fetch("/api/coordination", {
+      const r = await fetch(apiPath("/api/coordination"), {
         method: "POST",
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
