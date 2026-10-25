@@ -10,7 +10,9 @@
     "typecheck": "tsc --noEmit",
     "test": "tsx --test tests/*.test.ts",
     "test:integration": "node scripts/integration-test.mjs",
-    "test:persistence": "node scripts/verify-persistence.mjs"
+    "test:persistence": "node scripts/verify-persistence.mjs",
+    "test:multiuser": "node scripts/multiuser-test.mjs",
+    "test:live": "node scripts/live-smoke.mjs"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

@@ -16,7 +16,7 @@ Railway project `ditto` (`bb53170f-6766-4dc5-92ef-6e9e3a290e47`), production ser
 
 Verified: production build, lint, typecheck, 12 unit tests, production-container integration tests, container replacement with the same volume, online SQLite backup integrity, public HTTPS integration tests with independent cookie sessions, and saved sessions/membership/votes/matches after public redeployment and restart. Public Discover and Circles were also opened in a browser. Public automated collaboration checks use independent HTTP cookie clients; a two-device visual polling walkthrough remains a recommended judging rehearsal.
 
-Both provider secrets are configured privately on Railway. Live SerpApi search returned six venues. Meta model access succeeds, but completion requests return HTTP 402 `billing_not_configured`. Resolve billing in the [Meta developer portal](https://dev.meta.ai/billing/) to enable live AI; credentials alone do not resolve it. The explicitly labeled demo itinerary flow passes end to end.
+Both provider secrets are configured privately on Railway. The former Meta billing blocker has been resolved and live local planning, extraction and discovery passed. See API_STATUS.md for counts and estimates. The coordination release explicitly activates live providers; the default in code remains off.
 
 For future CLI access, authenticate with `railway login`; never paste tokens into chat. CLI 5.62.1 has a volume creation bug; the provisioning command below uses the verified 5.71.0 version. Railway currently accepts `railway.json` until 2026-12-01; migrate to its newer infrastructure configuration after HackTX, before that deadline.
 
@@ -45,7 +45,8 @@ railway variable set --service ditto --skip-deploys \
   DATABASE_PATH=/data/ditto.sqlite COOKIE_SECURE=true \
   REQUIRE_PERSISTENT_VOLUME=true \
   PUBLIC_ORIGIN=https://YOUR-DOMAIN.up.railway.app \
-  META_MODEL=muse-spark-1.3 MODEL_BASE_URL=https://api.meta.ai/v1
+  META_MODEL=muse-spark-1.3 MODEL_BASE_URL=https://api.meta.ai/v1 \
+  ALLOW_LIVE_PROVIDERS=true
 ```
 
 `RAILWAY_PUBLIC_DOMAIN` is also supported as the origin fallback. An explicit `PUBLIC_ORIGIN` takes precedence; update it if switching to a custom domain. The reverse proxy's internal Host header does not override this allowlist. Client writes must carry the exact configured Origin.
@@ -71,28 +72,17 @@ railway logs --service ditto --lines 80
 
 ## Public acceptance checks
 
-After Railway says the deployment is healthy:
+Read-only health check: `curl --fail https://ditto-production.up.railway.app/api/health`.
+
+Run regression suites only against an isolated local database. For explicitly authorized bounded live acceptance, use:
 
 ```bash
-export TEST_BASE_URL=https://YOUR-DOMAIN.up.railway.app
-export TEST_SESSION_SNAPSHOT=test-results/public-sessions.json
-npm run test:integration
+RUN_LIVE_SMOKE=true TEST_BASE_URL=https://ditto-production.up.railway.app npm run test:live
 ```
 
-This creates two **test-only** independent cookie sessions and exercises Discover interest/attendance, demo member voting, private vote visibility, matching, itinerary drafts, all approvals, RSVP, calendar authorization, personal profiles, invite joining and true two-session collaboration. It checks Secure/HttpOnly/SameSite cookies, no-store responses, health, cross-origin rejection and blocked sensitive-file URLs. No keys or session cookies are printed. The private snapshot is ignored by Git and should not be shared.
+This creates its own four fictional sessions, tests one two-stop AI plan through approvals/RSVP/calendar, and writes a private local snapshot. It does not reset any database or alter other users' records. It consumes provider credits; never put it in recurring CI. Open the public UI afterward without repeatedly regenerating plans.
 
-Then deliberately restart **only the Ditto test deployment before judges use it**:
-
-```bash
-railway service restart --service ditto --yes
-# Wait until /api/health responds 200 again:
-curl --fail "$TEST_BASE_URL/api/health"
-npm run test:persistence
-```
-
-Both original sessions, Circle membership, votes and match must survive. For a stronger redeploy check, repeat with `railway redeploy --service ditto --yes`, wait for health, and rerun `npm run test:persistence`.
-
-Finally open the public URL in a regular browser and a separate private window. Create personal profiles, invite the second browser into a new Circle, start a round, vote independently, and verify both views update within five seconds. Test the judge flow on a phone and desktop. Verify SerpApi with one real venue search if configured; only claim live Meta planning after a successful provider response.
+Existing `test:persistence` snapshots can be reused for read-only checks after deployment. Verify the same session IDs and saved votes remain. All schema changes are additive. The first deployment with coordination tables writes a consistent private `before-coordination-*.sqlite` backup before applying the schema.
 
 ## Backup and recovery
 
@@ -102,7 +92,7 @@ Create a consistent online backup (including committed WAL state) instead of cop
 railway ssh --service ditto -- gosu node node /app/deployment/backup.mjs
 ```
 
-The backup path is printed, but no database contents are displayed. Use Railway's volume download tooling to save that specific backup into an ignored local `backups/` directory, or configure Railway volume backups. A backup on the same volume is not disaster recovery; keep an off-volume copy before the demo. Backups include session credentials and private Circle data: never commit, upload publicly, or paste them into chat.
+Railway CLI 5.71 SSH requires a registered SSH identity. This workstation has none, so an ad-hoc remote backup command was unavailable; the new startup migration automatically backs up the existing database before adding tables. For later manual backups, set up Railway SSH through your account first. The backup path is printed, but no database contents are displayed. Use Railway's volume download tooling to save that specific backup into an ignored local `backups/` directory, or configure Railway volume backups. A backup on the same volume is not disaster recovery; keep an off-volume copy before the demo. Backups include session credentials and private Circle data: never commit, upload publicly, or paste them into chat.
 
 For recovery, stop the service first, preserve the existing DB/WAL/SHM as a rollback set, and restore a verified backup as `/data/ditto.sqlite` without mixing old WAL/SHM files into it. Restart and rerun integrity/acceptance checks. Do not delete the persistent volume to restart the app. Roll back the app deployment before considering any database restore; this change introduces no destructive schema migration.
 

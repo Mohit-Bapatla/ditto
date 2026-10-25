@@ -21,12 +21,12 @@ export async function POST(req: NextRequest) {
     if (b.natural) {
       const intent = intentSchema.parse(
         await modelJSON(
-          "Interpret this person’s activity request. Return {queries: string[] (1–3 short Maps search phrases), explanation: string}. Respect their budget and interests; do not claim prices or availability are verified.",
+          "Interpret this person’s activity request. Return {queries: string[] (1–2 short Maps search phrases), explanation: string, timing: string, constraints: string[]}. Extract stated timing, budgets and restrictions; do not invent missing details. Respect their budget and interests; do not claim prices or availability are verified.",
           { request: b.query, city: b.city, profile: person(s.user) },
         ),
       );
-      queries = intent.queries;
-      explanation = intent.explanation;
+      queries = intent.queries.slice(0,2);
+      explanation = intent.explanation + (intent.timing ? ` Timing requested: ${intent.timing}.` : "") + (intent.constraints?.length ? ` Constraints: ${intent.constraints.join("; ")}.` : "");
     }
     const results = (
       await Promise.all(queries.map((q) => venues(q, b.city)))

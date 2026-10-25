@@ -1,4 +1,6 @@
 "use client";
+import { CircleCoordinator } from "./circle-coordinator";
+import { PlanEditor } from "./plan-editor";
 import {
   useState,
   useEffect,
@@ -102,7 +104,7 @@ function Logo() {
         <i />
         <i />
       </span>
-      ditto<span className="brand-dot">.</span>
+      ditto
     </span>
   );
 }
@@ -276,10 +278,13 @@ export default function Home() {
   const [searchNote, setSearchNote] = useState("");
   const [invite, setInvite] = useState("");
   const [circleTab, setCircleTab] = useState("Ideas");
+  const [template, setTemplate] = useState("flexible");
+  const [planIdeas, setPlanIdeas] = useState<string[]>([]);
   const [planStart, setPlanStart] = useState(tomorrow());
   const [origin, setOrigin] = useState("UT Austin");
   const [drive, setDrive] = useState("");
   const pending = useRef(false);
+  const activityNonce = useRef<string>("");
   const refresh = useCallback(async () => {
     try {
       setData(await request("/api/state"));
@@ -328,6 +333,7 @@ export default function Home() {
     }
   };
   const close = () => {
+    activityNonce.current = "";
     setModal(undefined);
     setDetail(undefined);
     setError("");
@@ -343,6 +349,8 @@ export default function Home() {
     data?.activities.filter(
       (a) =>
         !a.swipe &&
+        !a.cancelled &&
+        !a.expired &&
         (category === "All vibes" || a.category === category) &&
         a.budget <= budget &&
         (!city || a.city.toLowerCase().includes(city.toLowerCase())) &&
@@ -367,6 +375,9 @@ export default function Home() {
       body = {
         ...body,
         budget: Number(values.budget),
+        nonce:
+          activityNonce.current ||
+          (activityNonce.current = crypto.randomUUID()),
         capacity: Number(values.capacity),
         start: new Date(String(values.start)).toISOString(),
       };
@@ -375,7 +386,7 @@ export default function Home() {
     if (type === "profile")
       body = {
         ...body,
-        budget: Number(values.budget),
+        budget: values.budget ? Number(values.budget) : 40,
         interests: form.getAll("interests"),
       };
     const r = await act(
@@ -428,6 +439,8 @@ export default function Home() {
         circle: c.id,
         start: new Date(planStart).toISOString(),
         demo,
+        template,
+        ...(planIdeas.length ? { ideaIds: planIdeas } : {}),
       });
       await refresh();
       close();
@@ -486,6 +499,28 @@ export default function Home() {
       </div>
       <h2>{p.title}</h2>
       <p className="muted">{p.explanation}</p>
+      {p.why && (
+        <details>
+          <summary>Why this plan?</summary>
+          <ul>
+            {p.why.map((t) => (
+              <li key={t}>{t}</li>
+            ))}
+          </ul>
+          <p className="small">
+            Actual round votes. Majority support is not unanimous agreement;
+            everyone must approve this itinerary.
+          </p>
+        </details>
+      )}
+      <p className="small">
+        Participants:{" "}
+        {data.circles
+          .find((c) => c.id === p.circle)
+          ?.members.filter((m) => p.eligible.includes(m.id))
+          .map((m) => m.name)
+          .join(", ")}
+      </p>
       <p className="date-line">
         <CalendarDays size={17} />
         {fmt(p.start)}{" "}
@@ -499,6 +534,24 @@ export default function Home() {
             <span className="stop-number">{i + 1}</span>
             <div>
               <h3>{stop.title}</h3>
+              <p className="small">
+                {new Date(
+                  new Date(p.start).getTime() +
+                    p.stops
+                      .slice(0, i)
+                      .reduce(
+                        (n, s) => n + s.duration + (s.drive?.seconds || 0) / 60,
+                        0,
+                      ) *
+                      60000 +
+                    (stop.drive?.seconds || 0) * 1000,
+                ).toLocaleTimeString([], {
+                  hour: "numeric",
+                  minute: "2-digit",
+                })}{" "}
+                · proposed time{" "}
+                {i > 0 && !stop.drive ? "(travel not included)" : ""}
+              </p>
               <p>
                 {stop.venue?.name || "Venue to be decided"}{" "}
                 <span className="small muted">
@@ -530,6 +583,21 @@ export default function Home() {
         {p.approvals.length} / {p.eligible.length} approvals · Opening hours,
         budget, and reservations must be checked by the group.
       </p>
+      {p.eligible.includes(data.user.id) && <PlanEditor plan={p} act={act} />}
+      {p.approvals.includes(data.user.id) && (
+        <button
+          className="text-button"
+          disabled={busy}
+          onClick={() =>
+            act(
+              { type: "unapprove", plan: p.id },
+              "Approval withdrawn. The group must agree again.",
+            )
+          }
+        >
+          Withdraw my approval
+        </button>
+      )}
       <div className="button-row">
         {p.status === "proposed" ? (
           <button
@@ -796,7 +864,7 @@ export default function Home() {
                       <span>
                         Not your thing?
                         <br />
-                        <strong>Find your ditto.</strong>
+                        <strong>Find your ditto</strong>
                       </span>
                       <button
                         className="swipe-action heart"
@@ -885,7 +953,7 @@ export default function Home() {
                         <br />
                         More <em>“remember when?”</em>
                       </p>
-                      <small>YOU WANNA GO? DITTO.</small>
+                      <small>YOU WANNA GO? DITTO</small>
                     </div>
                   </aside>
                 </div>
@@ -1032,7 +1100,7 @@ export default function Home() {
                   </div>
                 )}
                 <div className="tabs">
-                  {["Ideas", "Matches", "Plans"].map((t) => (
+                  {["Ideas", "Matches", "Chat & AI", "Plans"].map((t) => (
                     <button
                       key={t}
                       className={circleTab === t ? "active" : ""}
@@ -1045,6 +1113,19 @@ export default function Home() {
                     </button>
                   ))}
                 </div>
+                {circleTab === "Chat & AI" && (
+                  <CircleCoordinator
+                    key={c.id + data.user.id}
+                    circle={c}
+                    user={data.user.id}
+                    live={data.integrations.live}
+                    act={act}
+                    onPlaces={(query) => {
+                      setSearch(query);
+                      setModal("search");
+                    }}
+                  />
+                )}
                 {circleTab === "Ideas" && (
                   <>
                     <div className="round-banner">
@@ -1086,7 +1167,7 @@ export default function Home() {
                         ) : (
                           <span className="pill lavender">
                             {c.round.threshold === "everyone"
-                              ? "Everyone agrees"
+                              ? "Needs everyone’s yes"
                               : "Majority agrees"}
                           </span>
                         )}
@@ -1113,6 +1194,9 @@ export default function Home() {
                               {idea.category}
                             </span>
                             <h3>{idea.title}</h3>
+                            {idea.notes && (
+                              <p className="small muted">{idea.notes}</p>
+                            )}
                             <p className="small muted">
                               From{" "}
                               {c.members.find((m) => m.id === idea.creator)
@@ -1200,8 +1284,8 @@ export default function Home() {
                         </div>
                         <h1>
                           {c.ideas.some((i) => i.matched)
-                            ? "It’s a ditto."
-                            : "Not quite a ditto. Yet."}
+                            ? "It’s a ditto"
+                            : "No match yet. Try another round."}
                         </h1>
                         <p>
                           {c.ideas.some((i) => i.matched)
@@ -1229,7 +1313,11 @@ export default function Home() {
                         {c.ideas.some((i) => i.matched) && (
                           <button
                             className="primary"
-                            onClick={() => setModal("plan")}
+                            onClick={() => {
+                              setPlanIdeas([]);
+                              setTemplate("flexible");
+                              setModal("plan");
+                            }}
                           >
                             <Sparkles size={18} />
                             Plan our hangout
@@ -1398,7 +1486,9 @@ export default function Home() {
                       <span>Meta Muse Spark</span>
                       <span className="pill lavender">
                         {data.integrations.meta
-                          ? "Key configured · not yet verified"
+                          ? data.integrations.live
+                            ? "Enabled · key configured"
+                            : "Paused · key configured"
                           : "API key needed"}
                       </span>
                     </div>
@@ -1406,7 +1496,9 @@ export default function Home() {
                       <span>SerpApi places</span>
                       <span className="pill lavender">
                         {data.integrations.serpapi
-                          ? "Key configured · not yet verified"
+                          ? data.integrations.live
+                            ? "Enabled · key configured"
+                            : "Paused · key configured"
                           : "API key needed"}
                       </span>
                     </div>
@@ -1421,7 +1513,7 @@ export default function Home() {
           </main>
           <footer className="footer">
             <Logo />
-            <span>YOU WANNA GO? DITTO.</span>
+            <span>YOU WANNA GO? DITTO</span>
             <span>Made for real life ↗</span>
           </footer>
         </div>
@@ -1465,10 +1557,111 @@ export default function Home() {
                   alt="Activity inspiration"
                 />
                 <span className="pill lavender">
+                  {detail.cancelled ? "Cancelled · " : ""}
                   {detail.demo ? "Fictional demo meetup" : "Community meetup"} ·
                   Automatic joining
                 </span>
                 <h2>{detail.title}</h2>
+                {detail.creator === data.user.id && (
+                  <details>
+                    <summary>Host controls</summary>
+                    <form
+                      onSubmit={async (e) => {
+                        e.preventDefault();
+                        const f = new FormData(e.currentTarget);
+                        if (
+                          await act(
+                            {
+                              type: "editActivity",
+                              activity: detail.id,
+                              title: f.get("title"),
+                              description: f.get("description"),
+                              venue: f.get("venue"),
+                              start: new Date(
+                                String(f.get("start")),
+                              ).toISOString(),
+                              capacity: Number(f.get("capacity")),
+                            },
+                            "Activity updated.",
+                          )
+                        )
+                          close();
+                      }}
+                    >
+                      <label>
+                        Title
+                        <input
+                          name="title"
+                          required
+                          defaultValue={detail.title}
+                        />
+                      </label>
+                      <label>
+                        Description
+                        <textarea
+                          name="description"
+                          required
+                          maxLength={1000}
+                          defaultValue={detail.description}
+                        />
+                      </label>
+                      <label>
+                        Venue
+                        <input
+                          name="venue"
+                          required
+                          defaultValue={detail.venue}
+                        />
+                      </label>
+                      <label>
+                        Start
+                        <input
+                          name="start"
+                          type="datetime-local"
+                          required
+                          defaultValue={new Date(
+                            new Date(detail.start).getTime() -
+                              new Date(detail.start).getTimezoneOffset() *
+                                60000,
+                          )
+                            .toISOString()
+                            .slice(0, 16)}
+                        />
+                      </label>
+                      <label>
+                        Capacity
+                        <input
+                          name="capacity"
+                          type="number"
+                          min={2}
+                          max={100}
+                          defaultValue={detail.capacity}
+                        />
+                      </label>
+                      <button
+                        className="secondary"
+                        disabled={!!detail.cancelled}
+                      >
+                        Save activity changes
+                      </button>
+                    </form>
+                    <button
+                      className="text-button"
+                      disabled={!!detail.cancelled}
+                      onClick={async () => {
+                        if (
+                          await act(
+                            { type: "cancelActivity", activity: detail.id },
+                            "Activity cancelled. Existing records preserved.",
+                          )
+                        )
+                          close();
+                      }}
+                    >
+                      Cancel this activity
+                    </button>
+                  </details>
+                )}
                 <p>{detail.description}</p>
                 <p>
                   <MapPin size={16} />
@@ -1605,7 +1798,7 @@ export default function Home() {
                   />
                 </div>
                 <div className="field">
-                  <label htmlFor="avatar">Pick your little personality</label>
+                  <label htmlFor="avatar">Avatar (optional)</label>
                   <select
                     id="avatar"
                     name="avatar"
@@ -1628,7 +1821,7 @@ export default function Home() {
                   />
                 </div>
                 <fieldset>
-                  <legend>Your interests</legend>
+                  <legend>Interests (optional — skip for now)</legend>
                   <div className="interest-options">
                     {categories.slice(1).map((i) => (
                       <label key={i}>
@@ -1636,7 +1829,9 @@ export default function Home() {
                           type="checkbox"
                           name="interests"
                           value={i}
-                          defaultChecked={data.user.interests.includes(i)}
+                          defaultChecked={
+                            !data.user.demo && data.user.interests.includes(i)
+                          }
                         />
                         {i}
                       </label>
@@ -1644,15 +1839,16 @@ export default function Home() {
                   </div>
                 </fieldset>
                 <div className="field">
-                  <label htmlFor="budget">Comfortable outing budget ($)</label>
+                  <label htmlFor="budget">
+                    Outing budget (optional, defaults to $40)
+                  </label>
                   <input
                     id="budget"
                     name="budget"
                     type="number"
                     min="0"
                     max="1000"
-                    required
-                    defaultValue={data.user.budget}
+                    defaultValue={data.user.demo ? undefined : data.user.budget}
                   />
                 </div>
                 <button className="primary full" disabled={busy}>
@@ -1895,10 +2091,54 @@ export default function Home() {
                     required
                   />
                 </div>
+                <label>
+                  Outing structure
+                  <select
+                    value={template}
+                    onChange={(e) => setTemplate(e.target.value)}
+                  >
+                    <option value="flexible">Shared favorites</option>
+                    <option value="dinner">
+                      Dinner + Activity · two slots
+                    </option>
+                    <option value="surprise">
+                      Surprise Us · two different categories
+                    </option>
+                  </select>
+                </label>
+                <fieldset>
+                  <legend>
+                    Choose supported ideas for your slots (up to three)
+                  </legend>
+                  {c?.ideas
+                    .filter((i) => (i.yes || 0) > 0)
+                    .map((i) => (
+                      <label className="checkbox-label" key={i.id}>
+                        <input
+                          type="checkbox"
+                          checked={planIdeas.includes(i.id)}
+                          onChange={(e) =>
+                            setPlanIdeas(
+                              e.target.checked
+                                ? [...planIdeas, i.id].slice(-3)
+                                : planIdeas.filter((id) => id !== i.id),
+                            )
+                          }
+                        />
+                        {i.title} · {i.yes}/{c.round?.total} yes
+                      </label>
+                    ))}
+                </fieldset>
+                <p className="small">
+                  Leave unchecked to use matches. Dinner + Activity requires one
+                  Food idea and one other activity. You can revise timing after
+                  generation.
+                </p>
                 <button
                   className="primary full"
                   disabled={
                     busy ||
+                    !data.integrations.live ||
                     !data.integrations.meta ||
                     !data.integrations.serpapi
                   }
@@ -1913,7 +2153,7 @@ export default function Home() {
                 </button>
                 {(!data.integrations.meta || !data.integrations.serpapi) && (
                   <p className="notice">
-                    Live planning needs Meta and SerpApi keys on the server.
+                    Live planning needs activated Meta and SerpApi access.
                   </p>
                 )}
                 <button

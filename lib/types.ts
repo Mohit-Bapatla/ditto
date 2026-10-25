@@ -25,6 +25,8 @@ export type Activity = {
   attending: number;
   status?: string;
   swipe?: string;
+  cancelled?: boolean;
+  expired?: boolean;
 };
 export type Idea = {
   id: string;
@@ -32,6 +34,8 @@ export type Idea = {
   category: string;
   creator: string;
   image: string;
+  slot?: string;
+  notes?: string;
   vote?: boolean;
   yes?: number;
   unanimous?: boolean;
@@ -56,6 +60,8 @@ export type Circle = {
     ideaIds: string[];
   };
   plans: Plan[];
+  messages: ChatMessage[];
+  constraints: { user: string; text: string }[];
 };
 export type Venue = {
   id: string;
@@ -68,7 +74,8 @@ export type Venue = {
   latitude?: number;
   longitude?: number;
   url: string;
-  source: "SerpApi";
+  hours?: string;
+  source: "SerpApi" | "fixture";
 };
 export type Stop = {
   title: string;
@@ -85,6 +92,9 @@ export type Plan = {
   start: string;
   stops: Stop[];
   source: "demo" | "meta";
+  template?: string;
+  revision?: number;
+  why?: string[];
   status: "proposed" | "confirmed";
   approvals: string[];
   eligible: string[];
@@ -95,7 +105,7 @@ export type State = {
   demoUsers: Person[];
   activities: Activity[];
   circles: Circle[];
-  integrations: { meta: boolean; serpapi: boolean };
+  integrations: { meta: boolean; serpapi: boolean; live: boolean };
 };
 export const categories = [
   "All vibes",
@@ -120,4 +130,14 @@ export const photos: Record<string, string> = {
     "https://images.unsplash.com/photo-1516280440614-37939bbacd81?auto=format&fit=crop&w=1200&q=85",
   Fitness:
     "https://images.unsplash.com/photo-1522163182402-834f871fd851?auto=format&fit=crop&w=1200&q=85",
+};
+
+export type ChatMessage = {
+  id: string;
+  sequence: number;
+  user: string;
+  name: string;
+  avatar: string;
+  text: string;
+  createdAt: string;
 };

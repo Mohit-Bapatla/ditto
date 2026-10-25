@@ -1,7 +1,11 @@
 import assert from "node:assert/strict";
 import { mkdirSync, writeFileSync } from "node:fs";
 import { dirname } from "node:path";
-const base = process.env.TEST_BASE_URL || "http://localhost:3000";
+const base = process.env.TEST_BASE_URL || "http://localhost:3102";
+if (!["localhost", "127.0.0.1"].includes(new URL(base).hostname))
+  throw new Error(
+    "Run regression tests against an isolated local database; use the opt-in live smoke for public acceptance.",
+  );
 const origin = process.env.TEST_ORIGIN || new URL(base).origin;
 async function client() {
   const res = await fetch(base + "/api/state");
@@ -50,15 +54,21 @@ await b.call(
   { type: "round", circle: circle.id, threshold: "everyone" },
   400,
 );
-const activity = a.state.activities[0];
+const activity = a.state.activities.find(
+  (a) => a.demo && !a.cancelled && !a.expired,
+);
+assert.ok(activity);
 await a.call("/api/action", {
   type: "swipe",
   activity: activity.id,
   direction: "yes",
 });
-assert.equal(a.state.activities[0].status, "interested");
+assert.equal(
+  a.state.activities.find((i) => i.id === activity.id).status,
+  "interested",
+);
 await a.call("/api/action", { type: "attend", activity: activity.id });
-assert.equal(a.state.activities[0].attending, 1);
+assert.equal(a.state.activities.find((i) => i.id === activity.id).attending, 1);
 await a.call("/api/action", {
   type: "round",
   circle: circle.id,

@@ -1,3 +1,4 @@
+import { liveProvidersEnabled } from "./provider-policy";
 import { PublicError } from "./errors";
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 import { mkdirSync, readFileSync } from "node:fs";
@@ -279,6 +280,8 @@ export function swipe(s: Session, aid: string, direction: string) {
 }
 export function attend(s: Session, aid: string, withdraw = false) {
   const a = accessibleActivity(s, aid);
+  if (!withdraw && (a.cancelled || new Date(a.start).getTime() <= Date.now()))
+    throw new PublicError("This activity is cancelled or has already started.");
   const count = Number(
     one(
       "SELECT count(*) n FROM participation WHERE activity_id=? AND status='attending'",
@@ -323,6 +326,22 @@ export function circleState(s: Session, cid: string): Circle {
   c.ideas = all("SELECT data FROM ideas WHERE circle_id=?", cid).map((r) =>
     parse<Idea>(r),
   );
+  c.messages = all(
+    "SELECT * FROM (SELECT * FROM messages WHERE circle_id=? ORDER BY sequence DESC LIMIT 100) ORDER BY sequence",
+    cid,
+  ).map((r) => ({
+    id: String(r.id),
+    sequence: Number(r.sequence),
+    user: String(r.user_id),
+    name: person(String(r.user_id)).name,
+    avatar: person(String(r.user_id)).avatar,
+    text: String(r.text),
+    createdAt: String(r.created_at),
+  }));
+  c.constraints = all(
+    "SELECT user_id, text FROM constraints_by_member WHERE circle_id=?",
+    cid,
+  ).map((r) => ({ user: String(r.user_id), text: String(r.text) }));
   c.plans = all("SELECT * FROM plans WHERE circle_id=?", cid).map(planState);
   const r = one(
     "SELECT * FROM rounds WHERE circle_id=? ORDER BY created_at DESC LIMIT 1",
@@ -382,6 +401,7 @@ export function state(s: Session): State {
         const a = parse<Activity>(r);
         return {
           ...a,
+          expired: new Date(a.start).getTime() <= Date.now(),
           host: person(a.creator).name,
           attending: Number(
             one(
@@ -403,6 +423,7 @@ export function state(s: Session): State {
       })
       .reverse(),
     integrations: {
+      live: liveProvidersEnabled(),
       meta: !!process.env.MODEL_API_KEY,
       serpapi: !!process.env.SERPAPI_API_KEY,
     },

@@ -17,6 +17,7 @@ import {
   attend,
   requireMember,
   planState,
+  accessibleActivity,
 } from "@/lib/db";
 import { photos } from "@/lib/types";
 const str = z.string().trim().min(1).max(200);
@@ -26,10 +27,10 @@ const schema = z.discriminatedUnion("type", [
   z.object({
     type: z.literal("profile"),
     name: str,
-    avatar: z.string().max(10),
+    avatar: z.string().max(10).default("🪻"),
     city: str,
-    interests: z.array(str).max(12),
-    budget: z.number().min(0).max(1000),
+    interests: z.array(str).max(12).default([]),
+    budget: z.number().min(0).max(1000).default(40),
   }),
   z.object({
     type: z.literal("circle"),
@@ -68,8 +69,9 @@ const schema = z.discriminatedUnion("type", [
   }),
   z.object({
     type: z.literal("activity"),
+    nonce: uuid.optional(),
     title: str,
-    description: z.string().max(1000),
+    description: z.string().trim().min(1).max(1000),
     category: str,
     venue: str,
     city: str,
@@ -79,6 +81,52 @@ const schema = z.discriminatedUnion("type", [
   }),
   z.object({ type: z.literal("approve"), plan: uuid }),
   z.object({ type: z.literal("rsvp"), plan: uuid, going: z.boolean() }),
+  z.object({
+    type: z.literal("chat"),
+    circle: uuid,
+    text: z.string().trim().min(1).max(1000),
+    nonce: uuid,
+  }),
+  z.object({
+    type: z.literal("constraints"),
+    circle: uuid,
+    text: z.string().trim().max(500),
+  }),
+  z.object({
+    type: z.literal("acceptProposal"),
+    timing: z.string().max(160).optional(),
+    proposal: uuid,
+    title: str,
+    category: str,
+  }),
+  z.object({ type: z.literal("cancelActivity"), activity: uuid }),
+  z.object({
+    type: z.literal("editActivity"),
+    activity: uuid,
+    title: str,
+    description: z.string().trim().min(1).max(1000),
+    venue: str,
+    start: z.iso.datetime(),
+    capacity: z.number().int().min(2).max(100),
+  }),
+  z.object({
+    type: z.literal("editPlan"),
+    plan: uuid,
+    revision: z.number().int().min(0),
+    title: str,
+    start: z.iso.datetime(),
+    stops: z
+      .array(
+        z.object({
+          title: str,
+          duration: z.number().int().min(30).max(180),
+          note: z.string().max(500),
+        }),
+      )
+      .min(1)
+      .max(3),
+  }),
+  z.object({ type: z.literal("unapprove"), plan: uuid }),
   z.object({ type: z.literal("resetDeck") }),
 ]);
 export async function POST(req: NextRequest) {
@@ -90,6 +138,130 @@ export async function POST(req: NextRequest) {
     let resultId: string | undefined;
     transaction(() => {
       switch (b.type) {
+        case "chat": {
+          requireMember(s, b.circle);
+          const previous = one(
+            "SELECT circle_id,id FROM messages WHERE user_id=? AND nonce=?",
+            s.user,
+            b.nonce,
+          );
+          if (previous && previous.circle_id !== b.circle)
+            throw new PublicError("Message retry belongs to another Circle.");
+          resultId = previous ? String(previous.id) : id();
+          if (!previous)
+            run(
+              "INSERT INTO messages(id,circle_id,user_id,text,created_at,nonce) VALUES(?,?,?,?,?,?)",
+              resultId,
+              b.circle,
+              s.user,
+              b.text,
+              new Date().toISOString(),
+              b.nonce,
+            );
+          break;
+        }
+        case "constraints":
+          requireMember(s, b.circle);
+          run(
+            "INSERT INTO constraints_by_member VALUES(?,?,?) ON CONFLICT(circle_id,user_id) DO UPDATE SET text=excluded.text",
+            b.circle,
+            s.user,
+            b.text,
+          );
+          break;
+        case "acceptProposal": {
+          const row = one("SELECT * FROM proposals WHERE id=?", b.proposal);
+          if (!row) throw new PublicError("Proposal not found.");
+          requireMember(s, String(row.circle_id));
+          if (row.idea_id) {
+            resultId = String(row.idea_id);
+            break;
+          }
+          resultId = addIdea(s, String(row.circle_id), b.title, b.category);
+          const proposal = JSON.parse(String(row.data));
+          const ideaRow = one("SELECT data FROM ideas WHERE id=?", resultId)!;
+          const idea = {
+            ...JSON.parse(String(ideaRow.data)),
+            notes: [b.timing ?? proposal.timing, ...proposal.uncertainty]
+              .filter(Boolean)
+              .join(" · "),
+          };
+          run(
+            "UPDATE ideas SET data=? WHERE id=?",
+            JSON.stringify(idea),
+            resultId,
+          );
+          run(
+            "UPDATE proposals SET idea_id=? WHERE id=?",
+            resultId,
+            b.proposal,
+          );
+          break;
+        }
+        case "editActivity":
+        case "cancelActivity": {
+          const a = accessibleActivity(s, b.activity);
+          if (a.creator !== s.user)
+            throw new PublicError("Only the host can change this activity.");
+          if (b.type === "cancelActivity") a.cancelled = true;
+          else {
+            if (a.cancelled)
+              throw new PublicError("Cancelled activities cannot be edited.");
+            if (new Date(b.start).getTime() <= Date.now())
+              throw new PublicError("Choose a future date.");
+            const count = Number(
+              one(
+                "SELECT count(*) n FROM participation WHERE activity_id=? AND status='attending'",
+                a.id,
+              )!.n,
+            );
+            if (b.capacity < count)
+              throw new PublicError(
+                "Capacity cannot be below existing attendance.",
+              );
+            Object.assign(a, {
+              title: b.title,
+              description: b.description,
+              venue: b.venue,
+              start: b.start,
+              capacity: b.capacity,
+            });
+          }
+          run(
+            "UPDATE activities SET data=? WHERE id=?",
+            JSON.stringify(a),
+            a.id,
+          );
+          break;
+        }
+        case "editPlan": {
+          const row = one("SELECT * FROM plans WHERE id=?", b.plan);
+          if (!row) throw new PublicError("Plan not found.");
+          requireMember(s, String(row.circle_id));
+          const p = planState(row);
+          if (!p.eligible.includes(s.user))
+            throw new PublicError(
+              "Only the original participants can revise this plan.",
+            );
+          if ((p.revision || 0) !== b.revision)
+            throw new PublicError("This plan changed. Refresh before editing.");
+          if (new Date(b.start).getTime() <= Date.now())
+            throw new PublicError("Choose a future date.");
+          p.title = b.title;
+          p.start = b.start;
+          p.revision = (p.revision || 0) + 1;
+          // Changed activities must not inherit stale verified venues or routes.
+          p.stops = b.stops.map((stop, i) => ({
+            ...stop,
+            ...(p.stops[i]?.title === stop.title
+              ? { venue: p.stops[i].venue }
+              : {}),
+          }));
+          run("UPDATE plans SET data=? WHERE id=?", JSON.stringify(p), p.id);
+          run("DELETE FROM approvals WHERE plan_id=?", p.id);
+          run("DELETE FROM rsvps WHERE plan_id=?", p.id);
+          break;
+        }
         case "switch": {
           if (
             !one(
@@ -171,6 +343,18 @@ export async function POST(req: NextRequest) {
           attend(s, b.activity, b.withdraw);
           break;
         case "activity": {
+          if (b.nonce) {
+            const previous = one(
+              "SELECT activity_id FROM submissions WHERE user_id=? AND nonce=?",
+              s.user,
+              b.nonce,
+            );
+            if (previous) {
+              resultId = String(previous.activity_id);
+              break;
+            }
+          }
+
           if (new Date(b.start).getTime() < Date.now())
             throw new PublicError("Choose a future date.");
           const a = {
@@ -188,9 +372,12 @@ export async function POST(req: NextRequest) {
             s.user,
             JSON.stringify(a),
           );
+          if (b.nonce)
+            run("INSERT INTO submissions VALUES(?,?,?)", s.user, b.nonce, a.id);
           resultId = a.id;
           break;
         }
+        case "unapprove":
         case "approve":
         case "rsvp": {
           const row = one("SELECT * FROM plans WHERE id=?", b.plan);
@@ -199,7 +386,14 @@ export async function POST(req: NextRequest) {
           const p = planState(row);
           if (!p.eligible.includes(s.user))
             throw new PublicError("You joined after this plan was proposed.");
-          if (b.type === "approve")
+          if (b.type === "unapprove") {
+            run(
+              "DELETE FROM approvals WHERE plan_id=? AND user_id=?",
+              b.plan,
+              s.user,
+            );
+            run("DELETE FROM rsvps WHERE plan_id=?", b.plan);
+          } else if (b.type === "approve")
             run("INSERT OR IGNORE INTO approvals VALUES(?,?)", b.plan, s.user);
           else {
             if (p.status !== "confirmed")

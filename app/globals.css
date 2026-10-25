@@ -158,9 +158,6 @@ legend {
   line-height: 1;
   color: #25242a;
 }
-.brand-dot {
-  color: var(--purple);
-}
 .brand-mark {
   position: relative;
   display: inline-flex;
@@ -2349,3 +2346,10 @@ dialog > p > svg {
     scroll-behavior: auto !important;
   }
 }
+
+/* Circle coordination shares the existing cards, type and palette. */
+.coordination-grid{display:grid;grid-template-columns:minmax(0,1fr) minmax(0,1fr);gap:24px;align-items:start}
+.coordination-grid .plan-card{min-width:0;margin:0}.chat-log{max-height:460px;overflow:auto;padding:8px 0;display:flex;flex-direction:column;gap:12px}
+.chat-message{background:#f4f1ec;border-radius:18px;padding:14px;overflow-wrap:anywhere}.chat-message.mine{background:#eee6ff}.chat-message time{font-size:11px;color:#68616e}.chat-message p{white-space:pre-wrap;margin:8px 0}.chat-message label{color:#665b73}.chat-message input{width:auto}
+.coordination-grid textarea,.plan-editor textarea{width:100%;min-height:80px}.coordination-grid form,.plan-editor form{display:grid;gap:12px;margin:16px 0}.coordination-grid input[type=checkbox]{width:auto}.coordination-grid ul,.plan-card details ul{padding-left:20px}.coordination-grid li{margin:8px 0}.coordination-grid hr{margin:24px 0;border:0;border-top:1px solid #e6dfeb}.proposal-review{background:#f7f3ff;padding:18px;border-radius:20px}.proposal-review blockquote{border-left:3px solid #9b7ade;padding-left:12px}.plan-editor{margin:16px 0}.plan-editor fieldset{display:grid;gap:8px;padding:12px}.plan-editor label{display:grid;gap:6px}details summary{cursor:pointer;font-weight:650;padding:10px 0}.form-error{color:#a92d42}.empty-small{padding:24px;color:#746b7f}.tabs{overflow-x:auto}.coordination-grid .button-row{flex-wrap:wrap}.coordination-grid button{white-space:normal}
+@media(max-width:900px){.coordination-grid{grid-template-columns:1fr}.chat-log{max-height:360px}.coordination-grid .plan-card{padding:20px}}

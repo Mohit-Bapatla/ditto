@@ -21,7 +21,8 @@ npm test
 npm run build
 npm start
 # Against a running development or production server:
-npm run test:integration
+TEST_BASE_URL=http://localhost:3102 npm run test:integration
+npm run test:multiuser
 ```
 
 The integration script creates isolated test identities and records on the running server. Run it only against a development/test instance. `TEST_BASE_URL` overrides localhost:3000.
@@ -37,13 +38,24 @@ The integration script creates isolated test identities and records on the runni
 - Explicit demo plan creation when live providers are unavailable. These drafts contain no fake venue results and are visibly labeled “no AI.”
 - Per-member plan approval, unanimous confirmation, separate voluntary RSVP, copy invitation, and authenticated `.ics` downloads after approval. Calendar timestamps are UTC; the UI displays the viewer’s timezone. Verified drive durations are included in calendar duration where available. Unknown travel time is clearly flagged.
 
+## Coordination features
+
+- Persistent member-only Circle chat with ordered messages, sender identity from the session, retry protection and five-second polling.
+- Opt-in Social Autopilot: selected messages → cited, editable proposal → explicit acceptance into Ideas → independent voting. Live Muse Spark and clearly labeled fixed-sample modes.
+- Exact group-fit facts distinguish unanimity, majority, minority and zero support. Optional member constraints enter synthesis and planning; AI compromises remain suggestions.
+- Dinner + Activity and Surprise Us use two supported idea slots. Plans show participants, proposed stop times, source venues/routes, approval state and grounded “Why this plan?” facts.
+- Plan revisions clear approvals and RSVPs. Members can withdraw approval. Hosts can edit/cancel activities; cancellation and capacity are enforced server-side.
+- Onboarding requires only name and city. Avatar, interests and budget are optional. No personality classification; wordmark has no trailing period.
+
+See [demo walkthrough](docs/DEMO_WALKTHROUGH.md), [QA report](docs/QA_REPORT.md), [Meta judging](docs/META_JUDGING.md), and [API status](docs/API_STATUS.md).
+
 ## Two-minute judging walkthrough
 
 1. Open Discover. Click the heart or drag right. Open **Plans** to see the interested activity; interest does not imply attendance.
 2. Open **Circles → Weekend Crew → Start a round → Everyone’s in**.
 3. Vote yes on **Korean BBQ** and **Bowling**. Make different choices for the other two ideas. Use the Alex/Jordan/Maya/Sam buttons to repeat independently as each fictional member. Every vote is really stored; none is seeded or simulated automatically.
 4. Click **Reveal your matches**. Korean BBQ and Bowling show “Everyone’s in” only if all four said yes.
-5. Click **Plan our hangout**. With keys, run the live Meta + SerpApi flow. Without keys, explicitly choose **Create a labeled demo draft**.
+5. Click **Plan our hangout**. When live providers are activated, use the Meta + SerpApi flow. Otherwise choose **Create a labeled demo draft**.
 6. In **Plans**, approve as each member. Once everyone approves, download the calendar invite and RSVP. Nothing is sent automatically.
 
 To test genuine multi-session collaboration: create a personal profile, create a new Circle, copy its invite URL, and open it in another browser or private window. Create a second personal profile and join. Start a round after both members join. New members participate in the next round, not an already-started one.
@@ -59,7 +71,7 @@ To test genuine multi-session collaboration: create a personal profile, create a
 | `SERPAPI_API_KEY` | Real Maps search and directions                                                                                        |
 | `COOKIE_SECURE`   | Set `true` behind HTTPS; leave `false` for local HTTP                                                                  |
 
-The UI reports key presence as **configured**, not proof of a successful call. No credentials were provided during implementation, so live provider calls remain unverified. Add keys to `.env.local` and restart the server; never commit that file.
+The UI reports key presence and activation, not proof of each request. Live Muse Spark discovery, selected-message extraction, group planning and SerpApi venues/directions have passed bounded acceptance testing. Set `ALLOW_LIVE_PROVIDERS=true` only when explicitly activating live use; it defaults off. Keep keys in `.env.local` or private Railway variables. See [API status and usage](docs/API_STATUS.md).
 
 ### Provider contracts
 
@@ -72,9 +84,9 @@ The UI reports key presence as **configured**, not proof of a successful call. N
 
 Next.js App Router + React + TypeScript; Tailwind v4 and custom responsive CSS; Motion; Lucide; Zod. `lib/db.ts` implements the SQLite repository and server authorization. `database/schema.sql` is the idempotent relational migration, automatically applied on startup. Foreign keys, unique vote/swipe/member keys, checked enums, indexes and `BEGIN IMMEDIATE` transactions protect consistency.
 
-Tables: profiles, sessions, circles, members, activities, participation, swipes, ideas, rounds, round_members, round_ideas, votes, plans, approvals, rsvps. Seed data is created in `createSession()` and isolated by sandbox owner. Production state is never bundled into source or browser local storage.
+Tables: profiles, sessions, circles, members, activities, participation, swipes, ideas, rounds, round_members, round_ideas, votes, plans, approvals, rsvps, messages, constraints_by_member, proposals, submissions. Seed data is created in `createSession()` and isolated by sandbox owner. Production state is never bundled into source or browser local storage.
 
-Session cookies are HttpOnly, SameSite=Lax, random UUIDs, and optionally Secure. Server handlers authorize every private Circle/plan read and write. Switching identities only allows profiles owned by the current session; private demo Circles cannot be joined by invite. Only the current member’s votes and aggregate progress are returned until all participants finish. Expensive provider actions have per-owner process-local rate limits. Cross-origin writes are rejected by comparing Origin to Host.
+Session cookies are HttpOnly, SameSite=Lax, random UUIDs, and optionally Secure. Server handlers authorize every private Circle/plan read and write. Switching identities only allows profiles owned by the current session; private demo Circles cannot be joined by invite. Only the current member’s votes and aggregate progress are returned until all participants finish. Expensive provider actions have per-owner process-local rate limits. Production cross-origin writes require the exact configured public origin.
 
 Photos are illustrative Unsplash images selected by category, not venue photos. Seeded meetups are fictional even when a known public landmark is named. Real public activities come only from user submissions.
 
@@ -83,12 +95,16 @@ Photos are illustrative Unsplash images selected by category, not venue photos. 
 - SQLite replaces the preferred Supabase PostgreSQL/Auth/Realtime stack. No Supabase integration or RLS migration is claimed. Authorization is server-side; live collaboration uses polling.
 - Browser sessions are anonymous, device-bound identities, not recoverable verified accounts. Clearing cookies loses access. Add production authentication before a public launch.
 - No email/SMS, push, scheduled reminders, external calendars, or external private-message access. Sharing is manual; calendar support is a file download, not a write to an account.
-- No chat/autopilot, wildcard mode, venue reservations, availability calendar, host approval queue, uploaded covers, geolocation request, or driving-distance filter. Activities use automatic joining; private activity ideas live inside Circles.
-- No live provider success is claimed until valid credentials are supplied. AI can propose a start and venue; people must verify hours, prices, travel and availability.
+- No venue reservations, availability calendar, host approval queue, uploaded covers, geolocation request, or driving-distance filter. Activities use automatic joining; private activity ideas live inside Circles.
+- Live integration acceptance has passed. AI still proposes rather than confirms: people must verify hours, prices, travel and availability.
 - Single-server, persistent-disk deployment only. Do not deploy this SQLite implementation to ephemeral/serverless storage. Multi-instance production needs a shared database and distributed rate limiting. Automated session expiration/cleanup and distributed abuse controls are not yet implemented.
 
 ## Deployment
 
 Use **one Railway Node service with a persistent `/data` volume**. The repository now includes a standalone Docker image, secure-cookie defaults, explicit production origin checks, database startup/integrity validation, health checks, online backups and cross-session restart tests. Local SQLite data and `.env` files are excluded from the deployment image.
 
-See [the deployment runbook](docs/DEPLOYMENT.md) for exact provisioning, secret configuration, deployment, public acceptance, restart and backup commands. Live demo: **https://ditto-production.up.railway.app**. Public cross-session and persistence checks pass. SerpApi is live; Meta completion requests are blocked by provider billing (HTTP 402), so use the labeled demo itinerary option until billing is resolved. No Supabase migration is required.
+See [the deployment runbook](docs/DEPLOYMENT.md) for exact provisioning, secret configuration, deployment, public acceptance, restart and backup commands. Live demo: **https://ditto-production.up.railway.app**. Public cross-session and persistence checks pass. Muse Spark and SerpApi now work together in bounded live acceptance tests. Labeled demo itineraries remain available. No Supabase migration is required.
+
+## Public repository release
+
+The repository is currently private; this task does not change visibility. A focused scan of all 86 prior history blobs found no current provider secret values, common credential patterns, environment files or databases. Before publishing, review the final diff and confirm no private artifacts are tracked. Then, only when authorized, open GitHub → repository Settings → General → Danger Zone → Change repository visibility → Public. Recheck the public repository without signing in. This manual step is required for the public-code submission requirement. Test cookies, SQLite files, backups and environment files must remain ignored.

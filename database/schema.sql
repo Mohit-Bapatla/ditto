@@ -18,3 +18,9 @@ CREATE TABLE IF NOT EXISTS rsvps(plan_id TEXT REFERENCES plans(id), user_id TEXT
 CREATE INDEX IF NOT EXISTS ideas_circle ON ideas(circle_id);
 CREATE INDEX IF NOT EXISTS rounds_circle ON rounds(circle_id,created_at);
 CREATE INDEX IF NOT EXISTS plans_circle ON plans(circle_id);
+
+CREATE TABLE IF NOT EXISTS messages(sequence INTEGER PRIMARY KEY AUTOINCREMENT, id TEXT UNIQUE NOT NULL, circle_id TEXT NOT NULL REFERENCES circles(id), user_id TEXT NOT NULL REFERENCES profiles(id), text TEXT NOT NULL CHECK(length(text) BETWEEN 1 AND 1000), created_at TEXT NOT NULL, nonce TEXT NOT NULL, UNIQUE(user_id,nonce));
+CREATE INDEX IF NOT EXISTS messages_circle ON messages(circle_id,sequence);
+CREATE TABLE IF NOT EXISTS constraints_by_member(circle_id TEXT REFERENCES circles(id), user_id TEXT REFERENCES profiles(id), text TEXT NOT NULL, PRIMARY KEY(circle_id,user_id));
+CREATE TABLE IF NOT EXISTS proposals(id TEXT PRIMARY KEY, circle_id TEXT NOT NULL REFERENCES circles(id), creator TEXT NOT NULL REFERENCES profiles(id), data TEXT NOT NULL, idea_id TEXT REFERENCES ideas(id));
+CREATE TABLE IF NOT EXISTS submissions(user_id TEXT REFERENCES profiles(id), nonce TEXT NOT NULL, activity_id TEXT NOT NULL REFERENCES activities(id), PRIMARY KEY(user_id,nonce));
