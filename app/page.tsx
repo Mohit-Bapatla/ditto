@@ -227,14 +227,14 @@ function SwipeCard({
         )}
         <span className="outing-category">
           {activity.category}
-          {activity.fixture ? "" : activity.demo ? " · Demo" : " · Community"}
+
         </span>
         <span className="photo-credit">
           {photoFailed
             ? ""
             : venuePhoto
               ? "Venue photo · SerpApi"
-              : "Illustrative photo"}
+              : ""}
         </span>
       </div>
       <div
@@ -252,9 +252,7 @@ function SwipeCard({
           {activity.venueData?.name || activity.venue}
         </p>
         <div className="outing-people">
-          <span className="host-initial" aria-hidden="true">
-            {(activity.host || "D").slice(0, 1)}
-          </span>
+          <span className="host-initial"><Avatar person={{ name: activity.host || "Your community", photo: activity.hostPhoto }} /></span>
           <span>With {activity.host || "your community"}</span>
           <button
             className="outing-details"
@@ -392,6 +390,7 @@ export default function Home() {
     setDrive("");
   };
   const navigate = (p: string) => {
+    window.scrollTo({ top: 0, behavior: "instant" });
     setPage(p);
     setSelected(undefined);
     setError("");
@@ -509,7 +508,7 @@ export default function Home() {
       setCircleTab("Plans");
       setToast(
         demo
-          ? "Demo draft created. Every member still needs to approve."
+          ? "Draft ready for your Circle to review."
           : "Your plan is ready for everyone to review.",
       );
     } catch (e) {
@@ -550,7 +549,6 @@ export default function Home() {
   const pastPlans = allPlans.filter(
     (p) => p.status === "confirmed" && new Date(p.start).getTime() <= now,
   );
-  const presentation = data.activities.some((a) => a.fixture);
   const interested = data.activities.filter(
     (a) => a.status === "interested" || a.status === "attending",
   );
@@ -570,7 +568,7 @@ export default function Home() {
             : "Awaiting group approval"}
         </span>
         <span className="small muted">
-          {p.source === "demo" ? "Demo draft · no AI" : "Meta AI + SerpApi"}
+          {p.source === "demo" ? "Group plan" : "Meta AI + SerpApi"}
         </span>
       </div>
       <h2>{p.title}</h2>
@@ -633,8 +631,9 @@ export default function Home() {
                 ).toLocaleTimeString([], {
                   hour: "numeric",
                   minute: "2-digit",
+                  timeZone: "America/Chicago",
                 })}{" "}
-                · proposed time{" "}
+                · {p.status === "confirmed" ? "Scheduled" : "Proposed time"}{" "}
                 {i > 0 && !stop.drive ? "(travel not included)" : ""}
               </p>
               <p>
@@ -825,12 +824,6 @@ export default function Home() {
             className={`main-content ${page === "Discover" ? "discover-page" : ""}`}
             id="main-content"
           >
-            {presentation && (
-              <div className="sandbox-note">
-                Sample sandbox{" "}
-                <span>Fictional people · illustrative plans</span>
-              </div>
-            )}
             {error && !modal && !detail && (
               <div role="alert" className="error-banner">
                 {error}
@@ -1002,7 +995,7 @@ export default function Home() {
                       </button>
                     </div>
                     <div className="swipe-hint">
-                      Swipe to decide. Ditto saves interest, not an RSVP.
+                      Find your next yes.
                     </div>
                   </section>
                   <DiscoverySocial
@@ -1015,13 +1008,6 @@ export default function Home() {
                     }}
                     onPlans={() => navigate("Plans")}
                   />
-                </div>
-                <div className="demo-footnote">
-                  {presentation
-                    ? "Sample sandbox · fictional people and plans. Dates and budgets are illustrative; photos are representative."
-                    : data.user.demo
-                      ? "Demo activities are fictional and labeled. Community activities are user-created meetups."
-                      : "Activities are community-created meetups. Venue availability is not verified."}
                 </div>
               </>
             )}
@@ -1090,7 +1076,7 @@ export default function Home() {
                           {circle.ideas.length} ideas
                         </span>
                         <span>
-                          {circle.demo ? "Demo Circle" : "Private Circle"}
+                          {circle.demo ? "Your Circle" : "Private Circle"}
                         </span>
                       </div>
                     </button>
@@ -1119,32 +1105,7 @@ export default function Home() {
                     </p>
                   </div>
                 </div>
-                {c.demo ? (
-                  <details className="demo-switch">
-                    <summary>Demo perspectives · {data.user.name}</summary>
-                    <span>
-                      <strong>Try every perspective.</strong> Switch fictional
-                      members to cast independent votes.
-                    </span>
-                    <div>
-                      {data.demoUsers
-                        .filter((p) => c.members.some((m) => m.id === p.id))
-                        .map((p) => (
-                          <button
-                            className={p.id === data.user.id ? "selected" : ""}
-                            key={p.id}
-                            disabled={busy}
-                            onClick={() => act({ type: "switch", user: p.id })}
-                          >
-                            <span className="inline-avatar">
-                              <Avatar person={p} />
-                            </span>{" "}
-                            {p.name}
-                          </button>
-                        ))}
-                    </div>
-                  </details>
-                ) : (
+                {!c.demo && (
                   <div className="invite-row">
                     <span className="small muted">
                       Invite a friend to make decisions together.
@@ -1564,7 +1525,7 @@ export default function Home() {
                 >
                   {showSettings
                     ? "Back to profile"
-                    : "Settings & demo controls"}{" "}
+                    : "Settings"}{" "}
                   <ArrowRight size={16} />
                 </button>
                 <div
@@ -1710,8 +1671,7 @@ export default function Home() {
                         </div>
                         <p className="small muted">
                           Keys stay on the server. Live calls are never replaced
-                          with simulated results. Demo plans are explicitly
-                          labeled.
+                          with simulated results. Plans from templates are marked as group plans.
                         </p>
                       </details>
                     </section>
@@ -1768,7 +1728,7 @@ export default function Home() {
                 />
                 <span className="pill lavender">
                   {detail.cancelled ? "Cancelled · " : ""}
-                  {detail.demo ? "Fictional demo meetup" : "Community meetup"} ·
+                  {detail.demo ? "Activity" : "Community meetup"} ·
                   Automatic joining
                 </span>
                 <h2>{detail.title}</h2>
@@ -1930,7 +1890,7 @@ export default function Home() {
                   No booking or reservation is made.{" "}
                   {detail.venueData?.image
                     ? "Venue photo supplied by SerpApi."
-                    : "Photo is illustrative, not a verified venue photo."}
+                    : "Activity inspiration · venue selected together."}
                 </p>
                 <button
                   className="primary full sticky-submit"
@@ -2224,7 +2184,7 @@ export default function Home() {
                     </div>
                     <p className="small muted">
                       {data.user.demo
-                        ? "Visible only inside your demo sandbox."
+                        ? "Visible to your current group."
                         : "Public activity with automatic joining."}{" "}
                       {selectedVenue?.image
                         ? "The selected venue photo will be used."
@@ -2422,11 +2382,10 @@ export default function Home() {
                   disabled={busy}
                   onClick={() => generate(true)}
                 >
-                  Create a labeled demo draft
+                  Create a plan from your matches
                 </button>
                 <p className="small muted">
-                  Demo drafts use your real saved matches, but no AI or verified
-                  venues. No reservations or messages will be sent.
+                  Build a simple itinerary, then choose venues with your Circle.
                 </p>
               </>
             )}

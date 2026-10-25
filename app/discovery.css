@@ -322,25 +322,23 @@
 }
 .swipe-feedback span {
   position: absolute;
-  top: 40px;
-  padding: 4px 12px;
-  border: 4px solid currentColor;
-  border-radius: 7px;
-  background: #ffffffeb;
-  font-size: clamp(48px, 8vw, 68px);
+  top: 64px;
+  padding: 0;
+  border: 0;
+  background: transparent;
+  text-shadow: 0 2px 20px #0008;
+  font-size: clamp(62px, 12vw, 88px);
   line-height: 1.1;
   font-weight: 850;
-  letter-spacing: 0.06em;
+  letter-spacing: -0.03em;
 }
 .swipe-feedback.positive span {
   left: 24px;
-  color: var(--vote-yes);
-  transform: rotate(-12deg);
+  color: #40f39a;
 }
 .swipe-feedback.negative span {
   right: 24px;
-  color: var(--vote-no);
-  transform: rotate(12deg);
+  color: #ff5269;
 }
 .swipe-saving,
 .swipe-failure {

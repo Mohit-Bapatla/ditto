@@ -89,6 +89,7 @@ export function SwipeSurface({
   const screenOpacity = useMotionValue(0);
   const screenColor = useTransform(x, (value) => value >= 0 ? "#16b96b" : "#ed3650");
   const yesOpacity = useTransform(x, [0, 12, 65], [0, 0.35, 1]);
+  const stampScale = useTransform(x, [-110, 0, 110], [1.08, 0.84, 1.08]);
   const noOpacity = useTransform(x, [-65, -12, 0], [1, 0.35, 0]);
   useMotionValueEvent(x, "change", (value) => {
     progress?.set(Math.min(Math.abs(value) / 110, 1));
@@ -379,14 +380,14 @@ export function SwipeSurface({
         className="swipe-feedback positive"
         style={{ opacity: yesOpacity }}
       >
-        <span>DITTO</span>
+        <motion.span style={{ scale: stampScale }}>DITTO</motion.span>
       </motion.div>
       <motion.div
         aria-hidden="true"
         className="swipe-feedback negative"
         style={{ opacity: noOpacity }}
       >
-        <span>PASS</span>
+        <motion.span style={{ scale: stampScale }}>PASS</motion.span>
       </motion.div>
       {phase === "saving" && (
         <span className="swipe-saving" role="status">

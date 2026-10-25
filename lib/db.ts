@@ -535,7 +535,36 @@ export function circleState(s: Session, cid: string): Circle {
   }
   return c;
 }
+// Persistent, isolated presentation plans. Never runs against a deployed/live database.
+function seedPresentationPlans(s: Session) {
+  if (!presentationEnabled(process.env, path)) return;
+  const circles = all("SELECT * FROM circles WHERE owner=? ORDER BY rowid", s.owner);
+  if (!circles.length || one("SELECT 1 FROM plans p JOIN circles c ON c.id=p.circle_id WHERE c.owner=? AND json_extract(p.data, '$.template')='presentation-polish-v1'", s.owner)) return;
+  const activities = all("SELECT data FROM activities WHERE owner=?", s.owner).map(r => parse<Activity>(r));
+  if (!activities.some(a => a.fixture)) return;
+  const old = all("SELECT p.* FROM plans p JOIN circles c ON c.id=p.circle_id WHERE c.owner=?", s.owner);
+  old.forEach(row => { const p = parse<Plan>(row); if (p.title === "Coffee, chess, and a proper break" && p.source === "demo") { p.explanation = "Bring a board, grab a coffee, and make time for a proper catch-up."; p.stops.forEach(stop => { stop.note = "Hyde Park. Bring a board and choose a café together."; }); run("UPDATE plans SET data=? WHERE id=?", JSON.stringify(p),p.id); } });
+  const picks = ["Pickleball doubles", "Bouldering session", "Arcade night", "Sunset hike"];
+  const anchor = new Date();
+  anchor.setUTCHours(23, 0, 0, 0);
+  circles.slice(0,4).forEach((row, index) => {
+    const cid = String(row.id), a = activities.find(a => a.title === picks[index]);
+    if (!a) return;
+    const eligible = all("SELECT user_id FROM members WHERE circle_id=?", cid).map(r => String(r.user_id));
+    const pid = id();
+    const plan: Plan = { id:pid, circle:cid, title:a.title, explanation:a.description,
+      start:new Date(+anchor + (index + 1) * 86400000).toISOString(),
+      stops:[{title:a.title, duration:90, note:`${a.fixture?.area || a.city}. ${a.description}`}],
+      source:"demo", template:"presentation-polish-v1", status:"proposed", approvals:[], eligible, rsvps:[] };
+    run("INSERT INTO plans VALUES(?,?,?)",pid,cid,JSON.stringify(plan));
+    // Explicit sample commitments; regular users' plans and approvals are untouched.
+    const approved = index === 0 ? eligible : eligible.slice(0,1);
+    approved.forEach(uid => run("INSERT INTO approvals VALUES(?,?)",pid,uid));
+    if (index === 0) eligible.forEach(uid => run("INSERT INTO rsvps VALUES(?,?)",pid,uid));
+  });
+}
 export function state(s: Session): State {
+  seedPresentationPlans(s);
   return {
     user: person(s.user),
     demoUsers: all("SELECT data FROM profiles WHERE owner=?", s.owner).map(
@@ -552,6 +581,7 @@ export function state(s: Session): State {
           ...a,
           expired: new Date(a.start).getTime() <= Date.now(),
           host: person(a.creator).name,
+          hostPhoto: person(a.creator).photo,
           attending: Number(
             one(
               "SELECT count(*) n FROM participation WHERE activity_id=? AND status='attending'",

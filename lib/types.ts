@@ -20,6 +20,7 @@ export type Activity = {
   id: string;
   creator: string;
   host?: string;
+  hostPhoto?: string | null;
   title: string;
   description: string;
   category: string;

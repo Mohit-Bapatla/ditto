@@ -79,14 +79,19 @@ test("presentation sessions preserve privacy, persistence and honest commitments
         c.ideas.every((i) => i.yes === undefined),
     ),
   );
-  assert.ok(
-    a.circles
-      .flatMap((c) => c.plans)
-      .every(
-        (p) =>
-          p.status === "proposed" && !p.approvals.length && !p.rsvps.length,
-      ),
-  );
+  const plans = a.circles.flatMap(c => c.plans);
+  assert.equal(plans.length, 5);
+  const confirmed = plans.filter(p => p.status === "confirmed");
+  assert.equal(confirmed.length, 1);
+  assert.equal(confirmed[0].title, "Pickleball doubles");
+  assert.deepEqual(confirmed[0].approvals.slice().sort(), confirmed[0].eligible.slice().sort());
+  assert.equal(confirmed[0].rsvps.length, 3);
+  assert.ok(plans.every(p => Date.parse(p.start) > Date.now()));
+  assert.deepEqual(db.state(first).circles.flatMap(c => c.plans).map(p => [p.id,p.start]), plans.map(p => [p.id,p.start]), "repeat reads must not duplicate or reschedule plans");
+  const host = a.demoUsers[0];
+  db.run("UPDATE profiles SET data=? WHERE id=?",JSON.stringify({...host,photo:"data:image/jpeg;base64,test"}),host.id);
+  assert.ok(db.state(first).activities.filter(a => a.creator === host.id).every(a => a.hostPhoto === "data:image/jpeg;base64,test"));
+  assert.ok(db.state(second).activities.every(a => !a.hostPhoto));
   assert.ok(
     !b.activities.some((activity) =>
       a.activities.some((a) => a.id === activity.id),

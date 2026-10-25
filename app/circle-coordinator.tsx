@@ -175,7 +175,7 @@ export function CircleCoordinator({
           </button>
         </form>
         <details>
-          <summary>Sample conversation for fixture demo</summary>
+          <summary>Try a planning conversation</summary>
           <p className="small">
             Send these as separate members, then select the messages. This is a
             fixed sample, not live AI extraction.
@@ -221,8 +221,7 @@ export function CircleCoordinator({
         </div>
         {!live && (
           <p className="small muted">
-            Live providers paused. The sample uses a deterministic fixture; no
-            message leaves Ditto
+            Live AI is paused. You can still organize the conversation here.
           </p>
         )}
         {busy && <p role="status">Preparing your review…</p>}
@@ -253,7 +252,7 @@ export function CircleCoordinator({
           >
             <span className="pill lavender">
               {proposal.source === "demo"
-                ? "Fixture proposal · no AI"
+                ? "Suggested plan · review together"
                 : "AI suggestion · review required"}
             </span>
             <h3>Looks like a plan is forming!</h3>
@@ -402,7 +401,7 @@ export function CircleCoordinator({
           <div>
             <p className="pill lavender">
               {source === "demo"
-                ? "Deterministic review · no AI"
+                ? "Ideas to discuss"
                 : "AI-suggested compromises · not agreement"}
             </p>
             {suggestions.map((s, i) => (

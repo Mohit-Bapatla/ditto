@@ -15,6 +15,7 @@ import {
   shiftDay,
   weekDays,
 } from "@/lib/agenda";
+import { Avatar } from "./profile-photo";
 import { ActivityPhoto } from "./activity-photo";
 export function WeekAgenda({
   data,
@@ -44,6 +45,8 @@ export function WeekAgenda({
   const selectedActivities = activities
     .filter((a) => dayKey(a.start) === selected)
     .sort((a, b) => a.start.localeCompare(b.start));
+  const showUpcoming = !selectedPlans.length && !selectedActivities.length;
+  const visiblePlans = showUpcoming ? plans.filter(({plan}) => dayKey(plan.start) >= selected).sort((a,b) => a.plan.start.localeCompare(b.plan.start)).slice(0,6) : selectedPlans;
   const month = new Date(`${selected}T12:00:00Z`).toLocaleDateString("en-US", {
     timeZone: "UTC",
     month: "long",
@@ -131,11 +134,11 @@ export function WeekAgenda({
           <i className="agenda-dot pending" />
           Proposed / interest
         </span>
-        <span>{agendaTimeZone}</span>
+        <span>Austin time</span>
       </div>
       <div className="agenda-day-heading">
         <h3>
-          {selected === today
+          {showUpcoming && visiblePlans.length ? "Coming up" : selected === today
             ? "Today"
             : new Date(`${selected}T12:00:00Z`).toLocaleDateString("en-US", {
                 timeZone: "UTC",
@@ -150,10 +153,11 @@ export function WeekAgenda({
         </button>
       </div>
       <div className="day-agenda" aria-live="polite">
-        {selectedPlans.map(({ plan, circle }) => {
+        {visiblePlans.map(({ plan, circle }) => {
           const venue = plan.stops.find((s) => s.venue)?.venue;
+          const activity = data.activities.find(a => plan.stops.some(s => s.title === a.title));
           const image =
-            venue?.image ||
+            venue?.image || activity?.image ||
             circle.ideas.find((i) =>
               plan.stops.some((s) => s.title === i.title),
             )?.image ||
@@ -176,12 +180,13 @@ export function WeekAgenda({
                   </span>
                   <strong>{plan.title}</strong>
                   <span>
-                    {agendaTime(plan.start)} ·{" "}
-                    {venue?.name || "Venue to be decided"}
+                    {new Date(plan.start).toLocaleDateString("en-US", {timeZone:agendaTimeZone, month:"short", day:"numeric"})} · {agendaTime(plan.start)} ·{" "}
+                    {venue?.name || activity?.fixture?.area || circle.city}
                   </span>
-                  <small>With {circle.members.filter(member => plan.eligible.includes(member.id)).map(member => member.name).join(", ")}</small>
+                  <span className="agenda-context">{(activity?.description || plan.explanation).split(/(?<=\.)\s/)[0]}</span>
+                  <span className="agenda-people">{circle.members.filter(member => plan.eligible.includes(member.id)).map(member => <span className="inline-avatar" key={member.id}><Avatar person={member}/></span>)}<small>{circle.name}</small></span>
                   <small>
-                    {circle.name} · {plan.approvals.length}/
+                    {plan.approvals.length}/
                     {plan.eligible.length} approved · {plan.rsvps.length} RSVP
                     {plan.rsvps.length === 1 ? "" : "s"}
                   </small>
@@ -210,30 +215,25 @@ export function WeekAgenda({
                   ? "Canceled"
                   : activity.status === "attending"
                     ? "You RSVP’d"
-                    : "Interested · not a commitment"}
+                    : "Interested"}
               </span>
               <strong>{activity.title}</strong>
               <span>
-                {activity.fixture
-                  ? "Illustrative time"
-                  : agendaTime(activity.start)}{" "}
+                {agendaTime(activity.start)}{" "}
                 · {activity.fixture?.area || activity.venue}
               </span>
-              <small>
-                {activity.host ? `With ${activity.host}` : "Community activity"}
-              </small>
+              <span className="agenda-people"><span className="inline-avatar"><Avatar person={{name:activity.host || "Community",photo:activity.hostPhoto}}/></span><small>{activity.host ? `With ${activity.host}` : "Community activity"}</small></span>
             </span>
             <ArrowRight size={17} />
           </button>
         ))}
-        {!selectedPlans.length && !selectedActivities.length && (
+        {!visiblePlans.length && !selectedActivities.length && (
           <div className="agenda-empty">
             <CalendarDays size={24} />
             <div>
               <strong>A little room for something good.</strong>
               <p>
-                No saved activities or plans on this day. Start with your
-                Circle.
+                Find something you love and bring your Circle.
               </p>
             </div>
           </div>
