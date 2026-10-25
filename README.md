@@ -50,14 +50,14 @@ To test genuine multi-session collaboration: create a personal profile, create a
 
 ## Configuration
 
-| Variable | Purpose |
-| --- | --- |
-| `DATABASE_PATH` | SQLite path on persistent disk; default `./data/ditto.sqlite` |
-| `MODEL_API_KEY` | Meta Model API credential, server-side only |
-| `META_MODEL` | Desired model, defaults to `muse-spark-1.3`; verified with account model listing before inference |
-| `MODEL_BASE_URL` | Defaults to `https://api.meta.ai/v1`; an OpenAI-compatible provider with `/models` and `/chat/completions` can be used |
-| `SERPAPI_API_KEY` | Real Maps search and directions |
-| `COOKIE_SECURE` | Set `true` behind HTTPS; leave `false` for local HTTP |
+| Variable          | Purpose                                                                                                                |
+| ----------------- | ---------------------------------------------------------------------------------------------------------------------- |
+| `DATABASE_PATH`   | SQLite path on persistent disk; default `./data/ditto.sqlite`                                                          |
+| `MODEL_API_KEY`   | Meta Model API credential, server-side only                                                                            |
+| `META_MODEL`      | Desired model, defaults to `muse-spark-1.3`; verified with account model listing before inference                      |
+| `MODEL_BASE_URL`  | Defaults to `https://api.meta.ai/v1`; an OpenAI-compatible provider with `/models` and `/chat/completions` can be used |
+| `SERPAPI_API_KEY` | Real Maps search and directions                                                                                        |
+| `COOKIE_SECURE`   | Set `true` behind HTTPS; leave `false` for local HTTP                                                                  |
 
 The UI reports key presence as **configured**, not proof of a successful call. No credentials were provided during implementation, so live provider calls remain unverified. Add keys to `.env.local` and restart the server; never commit that file.
 
