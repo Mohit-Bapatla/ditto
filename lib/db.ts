@@ -5,6 +5,7 @@ import {
   presentationVersion,
 } from "./presentation-fixtures";
 import { liveProvidersEnabled } from "./provider-policy";
+import { showcaseActive, showcaseId, showcaseNames } from "./showcase-policy";
 import { PublicError } from "./errors";
 import { DatabaseSync, type SQLInputValue } from "node:sqlite";
 import { mkdirSync, readFileSync } from "node:fs";
@@ -20,6 +21,7 @@ import {
   type Plan,
   type State,
 } from "./types";
+showcaseActive(); // Validate before opening or migrating any database.
 const path = resolve(
   /* turbopackIgnore: true */ process.env.DATABASE_PATH || "data/ditto.sqlite",
 );
@@ -63,6 +65,7 @@ export function person(user: string): Person {
 }
 export function createSession(): Session {
   return transaction(() => {
+    showcaseActive(); // Fail closed if showcase flags reach an unsupported environment.
     if (presentationEnabled(process.env, path)) {
       // Explicit local recovery mode rejoins an existing sample graph. Normal
       // presentation sessions remain independent when this setting is absent.
@@ -614,6 +617,7 @@ export function circleState(s: Session, cid: string): Circle {
 }
 // Persistent, isolated presentation plans. Never runs against a deployed/live database.
 function seedPresentationPlans(s: Session) {
+  if (showcaseActive()) return;
   if (!presentationEnabled(process.env, path)) return;
   const circles = all("SELECT * FROM circles WHERE owner=? ORDER BY rowid", s.owner);
   if (!circles.length || one("SELECT 1 FROM plans p JOIN circles c ON c.id=p.circle_id WHERE c.owner=? AND json_extract(p.data, '$.template')='presentation-polish-v1'", s.owner)) return;
@@ -643,11 +647,12 @@ function seedPresentationPlans(s: Session) {
 export function state(s: Session): State {
   seedPresentationPlans(s);
   return {
+    showcase: showcaseActive(),
     user: person(s.user),
     undoSwipe: eligibleUndo(s),
     demoUsers: all("SELECT data FROM profiles WHERE owner=?", s.owner).map(
       (r) => parse<Person>(r),
-    ),
+    ).filter(p => p.demo && (!showcaseActive() || showcaseNames.some(n => p.id === showcaseId("person:" + n)))),
     circles: all("SELECT circle_id FROM members WHERE user_id=?", s.user).map(
       (r) => circleState(s, String(r.circle_id)),
     ),

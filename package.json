@@ -13,7 +13,10 @@
     "test:persistence": "node scripts/verify-persistence.mjs",
     "test:multiuser": "node scripts/multiuser-test.mjs",
     "test:live": "node scripts/live-smoke.mjs",
-    "dev:presentation": "node scripts/presentation.mjs"
+    "dev:presentation": "node scripts/presentation.mjs",
+    "showcase": "tsx scripts/showcase.ts start",
+    "showcase:seed": "tsx scripts/showcase.ts seed",
+    "showcase:reset": "tsx scripts/showcase.ts reset"
   },
   "dependencies": {
     "lucide-react": "^0.468.0",

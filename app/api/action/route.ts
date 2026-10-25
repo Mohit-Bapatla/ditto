@@ -1,4 +1,5 @@
 import { normalizeProfilePhoto } from "@/lib/profile-photo";
+import { showcaseActive, showcaseId, showcaseNames } from "@/lib/showcase-policy";
 import { PublicError } from "@/lib/errors";
 import { NextRequest, NextResponse } from "next/server";
 import { z } from "zod";
@@ -282,9 +283,11 @@ export async function POST(req: NextRequest) {
           break;
         }
         case "switch": {
+          if (showcaseActive() && !showcaseNames.some(n => b.user === showcaseId("person:" + n)))
+            throw new PublicError("Only the three showcase identities can be selected.");
           if (
             !one(
-              "SELECT 1 FROM profiles WHERE id=? AND owner=?",
+              "SELECT 1 FROM profiles WHERE id=? AND owner=? AND json_extract(data, '$.demo')=1",
               b.user,
               s.owner,
             )

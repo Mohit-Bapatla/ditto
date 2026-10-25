@@ -423,7 +423,7 @@ export default function Home() {
     return false;
   };
   function openActivity() {
-    if (data?.user.demo) { setAfterProfile("activity"); setModal("profile"); }
+    if (data?.user.demo && !data.showcase) { setAfterProfile("activity"); setModal("profile"); }
     else setModal("activity");
   }
   async function undoLastSwipe() {
@@ -1630,10 +1630,11 @@ export default function Home() {
                         Personal profiles use a persistent session in this
                         browser. No passwords, no complicated sign-up.
                       </p>
-                      <h3>Explore the demo</h3>
+                      <h3>{data.showcase ? "Local showcase" : "Explore the demo"}</h3>
                       <p className="small muted">
-                        These fictional identities belong only to your sandbox.
-                        They cannot access someone else’s private Circle.
+                        {data.showcase
+                          ? "Sample plans and decisions, shared across your local test sessions. Choose Mohit, Edwin, or Paxton; real accounts are never available here."
+                          : "These fictional identities belong only to your sandbox. They cannot access someone else’s private Circle."}
                       </p>
                       <div className="profile-switch-list">
                         {data.demoUsers.map((p) => (
