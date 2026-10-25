@@ -652,7 +652,9 @@ export function seedPresentationPlans(s: Session, publicDemo = false) {
 }
 export function state(s: Session): State {
   seedPresentationPlans(s);
+  const discovery = one("SELECT data FROM discovery_searches WHERE user_id=?", s.user);
   return {
+    discovery: discovery ? JSON.parse(String(discovery.data)) : undefined,
     showcase: showcaseActive(),
     publicDemo: isPublicDemo(s),
     user: person(s.user),

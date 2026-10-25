@@ -13,7 +13,7 @@ backups/
 *.sqlite*
 *.db*
 
-.next-demo/
+.next-*/
 
 # Local submission media (retain reproducible scripts and documentation)
 docs/submission/video/clips/
@@ -21,3 +21,8 @@ docs/submission/video/work/
 docs/submission/video/graphics/*.png
 docs/submission/video/*.mp4
 docs/submission/video/thumbnail.png
+
+# Generated local skill caches and downloaded platform executables
+__pycache__/
+*.pyc
+.agents/skills/impeccable/scripts/bin/

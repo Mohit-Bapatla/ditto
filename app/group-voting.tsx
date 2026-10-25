@@ -62,7 +62,7 @@ export function GroupVoting({
     return Boolean(
       await act(
         { type: "vote", circle: c.id, idea: idea.id, vote },
-        "Vote saved. Visible to the group after everyone finishes.",
+        undefined,
         afterSave,
       ),
     );
@@ -120,7 +120,7 @@ export function GroupVoting({
             src={idea.image}
             alt={idea.imageKind ? idea.title : `${idea.category} inspiration, not a verified venue`}
           />
-          <span className="group-photo-note">{idea.imageKind === "upload" ? "Activity photo" : idea.imageKind === "venue" ? "Venue photo" : "Illustrative photo"}</span>
+          <span className="group-photo-note">{idea.venueData && !idea.image ? "No venue photo supplied" : idea.imageKind === "upload" ? "Activity photo" : idea.imageKind === "venue" ? "Venue photo" : "Illustrative photo"}</span>
           <div
             className={`group-caption ${idea.title.length > 70 ? "long-title" : ""}`}
           >

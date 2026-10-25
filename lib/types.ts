@@ -9,6 +9,8 @@ export type Person = {
   demo: boolean;
 };
 export type Activity = {
+  discovery?: {kind: "venue"; query: string; city: string; timing?: string; constraints: string[]; budgetLimit?: number; interpretedBy: "user" | "Muse Spark"; cachedExample?: boolean};
+  publishedEvent?: {start: string; sourceUrl: string};
   visibility?: "public" | "saved" | "circle";
   circle?: string;
   budgetKnown?: boolean;
@@ -44,6 +46,10 @@ export type Activity = {
   expired?: boolean;
 };
 export type Idea = {
+  sourceActivityId?: string;
+  suggestedStart?: string;
+  proposerNote?: string;
+  venueData?: Venue;
   activityId?: string;
   imageKind?: "upload" | "venue";
   id: string;
@@ -84,6 +90,7 @@ export type Circle = {
   constraints: { user: string; text: string }[];
 };
 export type Venue = {
+  provenance?: {retrievedAt: string; query: string; city: string; cached: boolean};
   id: string;
   name: string;
   address?: string;
@@ -122,6 +129,7 @@ export type Plan = {
   rsvps: string[];
 };
 export type State = {
+  discovery?: {ids: string[]; query: string; city: string; explanation: string; intent: Omit<NonNullable<Activity["discovery"]>, "kind">};
   publicDemo?: boolean;
   showcase?: boolean;
   undoSwipe?: UndoDecision;

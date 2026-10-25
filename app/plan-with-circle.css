@@ -1,0 +1,28 @@
+.circle-picker {display:grid;gap:20px}
+.circle-picker h3 {margin:0;font-size:1.2rem;line-height:1.25;overflow-wrap:anywhere}
+.circle-picker p {margin:8px 0 0}
+.circle-picker-activity {display:flex;gap:14px;align-items:center}
+.circle-picker-activity img {width:64px;height:72px;object-fit:cover;border-radius:12px;flex-shrink:0}
+.circle-picker-activity span,.circle-picker small {font-size:.8rem;color:var(--muted,#67636a)}
+.circle-picker-activity span {display:block;margin-bottom:5px}
+.circle-picker form {display:grid;gap:20px}
+.circle-picker fieldset {border:0;padding:0;margin:0;min-width:0}
+.circle-picker legend {font-weight:650;margin-bottom:10px}
+.circle-options {display:grid;gap:8px}
+.circle-picker .circle-option {display:flex;align-items:center;gap:12px;border:1px solid #ded8dc;border-radius:14px;padding:12px;cursor:pointer;margin:0;min-height:68px}
+.circle-picker .circle-option.selected {border-color:var(--accent,#ed164c);background:#fff3f6}
+.circle-picker .circle-option input {width:18px;height:18px;margin:0;accent-color:var(--accent,#ed164c);flex-shrink:0}
+.circle-option-copy {display:grid;gap:4px;flex:1;min-width:0;overflow-wrap:anywhere}
+.circle-option-avatars {display:flex;padding-left:5px}
+.circle-option-avatars>span {display:grid;place-items:center;width:30px;height:30px;margin-left:-5px;border-radius:50%;overflow:hidden;border:2px solid white;background:#eee}
+.circle-option-avatars img {width:100%;height:100%;object-fit:cover}
+.circle-picker label {display:grid;gap:8px}
+.circle-picker input[type=datetime-local] {max-width:100%;min-width:0;width:100%;box-sizing:border-box;min-height:48px}
+.circle-picker textarea {width:100%;box-sizing:border-box;resize:vertical}
+.circle-picker-submit {display:grid;gap:10px;padding-bottom:env(safe-area-inset-bottom)}
+.circle-picker-success,.circle-picker-empty {display:grid;gap:14px;padding:12px 0}
+.circle-picker-success>svg {color:#16804a}
+.detail-circle-action {position:sticky;top:0;z-index:2;background:var(--paper,#fffaf9);padding:0 0 14px}
+.modal.planning-sheet {margin:auto;width:min(560px,calc(100% - 32px))}
+.modal.planning-sheet .modal-body {padding-top:16px}
+@media(max-width:700px){.modal.planning-sheet{position:fixed;inset:auto 0 0;margin:0;width:100%;max-width:100%;max-height:92dvh;border-radius:24px 24px 0 0}.modal.planning-sheet .modal-head{padding:18px 20px}.modal.planning-sheet .modal-body{padding:16px 20px 24px}.circle-picker{gap:16px}.circle-picker form{gap:16px}}

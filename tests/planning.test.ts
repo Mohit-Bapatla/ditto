@@ -61,3 +61,8 @@ test("empty venues, hallucinated IDs, invalid durations and unfilled template fa
     /unverified/,
   );
 });
+
+test("saved venue survives planning without another venue lookup", async()=>{
+ const result=await livePlan(c,[{...ideas[0],venueData:v}],"2026-10-26T00:00:00Z","flexible",{...deps,venues:async()=>{throw Error("Must reuse selected place");}});
+ assert.equal(result.stops[0].venue?.id,v.id);
+});

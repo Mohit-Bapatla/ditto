@@ -75,7 +75,7 @@ async function serp(
   const key = JSON.stringify(params);
   const hit = cache.get(key);
   if (hit && hit.until > Date.now())
-    return hit.value as Record<string, unknown>;
+    return {...hit.value as Record<string, unknown>, __cacheHit: true};
   const query = new URLSearchParams({
     ...params,
     api_key: process.env.SERPAPI_API_KEY,
@@ -92,7 +92,7 @@ async function serp(
     throw new PublicError(
       "Place provider is unavailable or over quota. Please try later.",
     );
-  const data = await res.json();
+  const data = { ...await res.json(), __retrievedAt: new Date().toISOString(), __cacheHit: false };
   if (data.error)
     throw new PublicError("The place provider could not complete this search.");
   if (cache.size > 250) cache.clear();
@@ -109,7 +109,8 @@ export async function venues(query: string, city: string): Promise<Venue[]> {
   return (Array.isArray(data.local_results) ? data.local_results : [])
     .map(normalizeVenue)
     .filter((v): v is Venue => v !== null)
-    .slice(0, 6);
+    .slice(0, 6)
+    .map(v => ({...v, provenance: {retrievedAt: String(data.__retrievedAt), query, city, cached: Boolean(data.__cacheHit)}}));
 }
 export async function directions(origin: string, destination: string) {
   const data = await serp(

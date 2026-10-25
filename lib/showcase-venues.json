@@ -1,0 +1,88 @@
+[
+  {
+    "venue": {
+      "id": "ChIJUckS5Xi2RIYRvwB4-ZZ7Gto",
+      "name": "Bouldering Project - Springdale",
+      "address": "979 Springdale Rd, Austin, TX 78702",
+      "category": "Rock climbing gym",
+      "rating": 4.8,
+      "image": "https://lh3.googleusercontent.com/grass-cs/AABkmLfTqWUxnIAw-lPE10kwg02x1vGuYfke-4TWcQEFj2cSKDjkEx4IQeD6wb2UjCzf08KusrLIe7PfGLwsBAWYaZ9wmx1eh-mKXgswhCW38DW0kngx0WmzUr1n957ixJVDgAfYq0c=w1000-h1000-c-n",
+      "hours": "Opens soon · 8 AM",
+      "latitude": 30.263260199999998,
+      "longitude": -97.6964809,
+      "url": "https://www.google.com/maps/search/?api=1&query=Bouldering%20Project%20-%20Springdale&query_place_id=ChIJUckS5Xi2RIYRvwB4-ZZ7Gto",
+      "source": "SerpApi",
+      "provenance": {
+        "retrievedAt": "2026-10-25T12:49:32.237Z",
+        "query": "bouldering in Austin",
+        "city": "Austin, TX",
+        "cached": true
+      }
+    },
+    "intent": {
+      "query": "bouldering in Austin",
+      "city": "Austin, TX",
+      "constraints": [],
+      "interpretedBy": "user"
+    }
+  },
+  {
+    "venue": {
+      "id": "ChIJMRToLu61RIYRnq7rxVeoOAU",
+      "name": "Urban Pickleball Club",
+      "address": "300 San Antonio St, Austin, TX 78701",
+      "category": "Sports club",
+      "rating": 4.6,
+      "image": "https://lh3.googleusercontent.com/grass-cs/AABkmLd1slND0ZReA4h2t8oKnRzVFl_0VGziG-STwPkNXtp88mTNp45BjE_dNFqCaitaSX_uU1H6Uq4cYFDc3z7D3oMw8WwzrrfywQEEWJ8w-KGOEnyeAKuV7i1S8FUbXP9A1nne2itc=w1000-h1000-c-n",
+      "latitude": 30.2671161,
+      "longitude": -97.7486304,
+      "url": "https://www.google.com/maps/search/?api=1&query=Urban%20Pickleball%20Club&query_place_id=ChIJMRToLu61RIYRnq7rxVeoOAU",
+      "source": "SerpApi",
+      "provenance": {
+        "retrievedAt": "2026-10-25T12:52:03.058Z",
+        "query": "pickleball near UT Austin",
+        "city": "Austin, TX",
+        "cached": true
+      }
+    },
+    "intent": {
+      "query": "pickleball near UT Austin",
+      "city": "Austin, TX",
+      "constraints": [],
+      "interpretedBy": "user"
+    }
+  },
+  {
+    "venue": {
+      "id": "ChIJK1vgC3i1RIYRsSCz9uP0hkQ",
+      "name": "Lucky Lab Coffee Co.",
+      "address": "2421 San Antonio St, Austin, TX 78705",
+      "category": "Coffee shop",
+      "rating": 4.4,
+      "image": "https://lh3.googleusercontent.com/grass-cs/AABkmLdaYSMoHVkuVdt74U794Eny36SWyjxjZDPeBBQbnkX5ZoXm7WMkcx_dZLXqz0g5mlIYwAxo-aeLnIXBBO-MxX36ilwtrbHgbPaQMjh9bnocih--hvPtJydAbBmVZrvcntmm68JJ=w1000-h1000-c-n",
+      "hours": "Open · Closes 7 PM",
+      "latitude": 30.2885615,
+      "longitude": -97.7420686,
+      "url": "https://www.google.com/maps/search/?api=1&query=Lucky%20Lab%20Coffee%20Co.&query_place_id=ChIJK1vgC3i1RIYRsSCz9uP0hkQ",
+      "source": "SerpApi",
+      "provenance": {
+        "retrievedAt": "2026-10-25T12:52:34.178Z",
+        "query": "Coffee shops near UT Austin",
+        "city": "Austin, TX",
+        "cached": true
+      }
+    },
+    "intent": {
+      "query": "Coffee shops near UT Austin where three friends could play chess tomorrow under $25",
+      "city": "Austin, TX",
+      "timing": "tomorrow",
+      "constraints": [
+        "near UT Austin",
+        "under $25",
+        "for three friends",
+        "suitable for playing chess"
+      ],
+      "interpretedBy": "Muse Spark"
+    }
+  }
+]

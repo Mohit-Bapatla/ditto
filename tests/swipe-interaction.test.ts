@@ -504,3 +504,98 @@ test("StrictMode effect replay completes Undo entrance instead of stranding the 
   assert.ok(transform==='none' || Math.abs(Number(transform.match(/translateX\(([-\d.]+)px/)?.[1]))<1,transform);
   await act(async()=>root.unmount());host.remove();
 });
+
+test("a new touch interrupts snapback immediately and saves without waiting for the spring", async () => {
+  const votes:boolean[]=[];
+  const t=await mount(async yes=>{votes.push(yes);return true;});
+  await t.pointer('pointerdown',120,200);
+  await t.pointer('pointermove',160,202);
+  await pause(120);
+  await t.pointer('pointerup',160,202);
+  assert.equal(t.card.dataset.swipePhase,'returning');
+  await t.pointer('pointerdown',160,202);
+  await t.pointer('pointermove',300,204);
+  await t.pointer('pointerup',300,204);
+  assert.deepEqual(votes,[true]);
+  await act(async()=>pause(700));
+  assert.notEqual(t.card.dataset.swipePhase,'idle','stale recovery must not unlock a committed card');
+  await t.cleanup();
+});
+
+test("an initially diagonal touch can resolve horizontal, while a vertical scroll cannot vote", async()=>{
+  const votes:boolean[]=[];
+  const t=await mount(async yes=>{votes.push(yes);return true;});
+  await t.pointer('pointerdown',100,200);
+  await t.pointer('pointermove',110,210);
+  await t.pointer('pointermove',240,220);
+  await t.pointer('pointerup',240,220);
+  assert.deepEqual(votes,[true]);
+  await t.cleanup();
+});
+
+test("tap then immediate swipe does not create a recovery dead zone",async()=>{
+  const votes:boolean[]=[];
+  const t=await mount(async yes=>{votes.push(yes);return true;});
+  await t.pointer('pointerdown',230,200);
+  await t.pointer('pointerup',230,200);
+  await t.pointer('pointerdown',230,200);
+  await t.pointer('pointermove',60,203);
+  await t.pointer('pointerup',60,203);
+  assert.deepEqual(votes,[false]);
+  await t.cleanup();
+});
+
+test("six consecutive touch swipes publish one saved vote per keyed card",async()=>{
+ const host=win.document.createElement('div');win.document.body.append(host);const root=createRoot(host);
+ const votes:{card:number;yes:boolean}[]=[];let index=0;
+ const render=()=>{const current=index;root.render(createElement(SwipeSurface,{key:current,label:'Card '+current,disabled:false,children:'Card '+current,onSwipe:async(yes,exit)=>{votes.push({card:current,yes});await pause(20);await exit();index++;render();return true;}}));};
+ await act(async()=>render());
+ for(let i=0;i<6;i++){
+  const card=host.querySelector('article')!;Object.defineProperty(card,'clientWidth',{value:360});
+  const start=i%2?240:100,end=i%2?70:270;
+  for(const [type,x] of [['pointerdown',start],['pointermove',end],['pointerup',end]] as const){
+   await act(async()=>{const e=new win.MouseEvent(type,{bubbles:true,cancelable:true,clientX:x,clientY:200,button:0});Object.defineProperties(e,{pointerId:{value:i+1},isPrimary:{value:true},pointerType:{value:'touch'}});card.dispatchEvent(e);await pause(16);});
+  }
+  await act(async()=>pause(380));
+  assert.equal(index,i+1);assert.equal(votes.length,i+1);assert.equal(host.querySelector('article')!.getAttribute('aria-label'),'Card '+(i+1));
+ }
+ assert.deepEqual(votes.map(v=>v.yes),[true,false,true,false,true,false]);
+ assert.deepEqual(votes.map(v=>v.card),[0,1,2,3,4,5]);
+ await act(async()=>root.unmount());host.remove();
+});
+
+test("a touch begun on the preview transfers to the next card after the real save",async()=>{
+ const {pendingTouches}=await import('../lib/pointer-handoff');
+ const host=win.document.createElement('div');win.document.body.append(host);const root=createRoot(host);
+ const deck=win.document.createElement('div');const ref={current:deck};const old=win.document.createElement('article');
+ pendingTouches.set(deck,{id:7,x:240,y:200,lastX:80,lastY:203,time:performance.now()-120,blockedCard:old});
+ const votes:boolean[]=[];
+ await act(async()=>root.render(createElement(SwipeSurface,{label:'Next',children:null,disabled:false,wheelTarget:ref,onSwipe:async yes=>{votes.push(yes);return true;}})));
+ const card=host.querySelector('article')!;Object.defineProperty(card,'clientWidth',{value:360});
+ assert.equal(card.dataset.swipePhase,'dragging');assert.equal(pendingTouches.has(deck),false);
+ await act(async()=>{const e=new win.MouseEvent('pointerup',{bubbles:true,clientX:70,clientY:203});Object.defineProperties(e,{pointerId:{value:7},pointerType:{value:'touch'}});card.dispatchEvent(e);});
+ assert.deepEqual(votes,[false]);await act(async()=>root.unmount());host.remove();
+});
+
+test("a completed preview swipe is applied once after save; stale gestures are discarded",async()=>{
+ const {pendingTouches}=await import('../lib/pointer-handoff');
+ for(const age of [100,2000]){
+  const host=win.document.createElement('div');win.document.body.append(host);const root=createRoot(host),deck=win.document.createElement('div');
+  pendingTouches.set(deck,{id:9,x:80,y:200,lastX:250,lastY:204,time:performance.now()-age,endedAt:performance.now(),blockedCard:null,touch:true});
+  const votes:boolean[]=[];
+  await act(async()=>{root.render(createElement(SwipeSurface,{label:'Ready',children:null,disabled:false,wheelTarget:{current:deck},onSwipe:async yes=>{votes.push(yes);return true;}}));});
+  assert.deepEqual(votes,age===100?[true]:[]);assert.equal(pendingTouches.has(deck),false);
+  await act(async()=>root.unmount());host.remove();
+ }
+});
+
+test("completed exit stays hidden while a slow save finishes, then failure restores it",async()=>{
+ let finish!:(v:boolean)=>void;
+ const t=await mount(async()=>new Promise<boolean>(r=>{finish=r;}));
+ await t.pointer('pointerdown',100,200);await t.pointer('pointermove',260,202);await t.pointer('pointerup',260,202);
+ await act(async()=>pause(350));
+ assert.equal(t.card.style.visibility,'hidden');assert.equal(t.card.style.opacity,'0');
+ await act(async()=>{finish(false);await pause(700);});
+ assert.equal(t.card.style.visibility,'visible');assert.equal(t.card.style.opacity,'1');assert.equal(t.card.dataset.swipePhase,'idle');
+ await t.cleanup();
+});

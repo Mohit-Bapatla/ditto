@@ -20,6 +20,7 @@ import {
 } from "motion/react";
 import { createPortal } from "react-dom";
 import { WheelGesture, type WheelGate } from "@/lib/wheel-gesture";
+import { pendingTouches } from "@/lib/pointer-handoff";
 import { swipeDecision } from "@/lib/swipe-gesture";
 
 export type SwipeHandle = { swipe: (yes: boolean) => Promise<void> };
@@ -59,6 +60,7 @@ export function SwipeSurface({
   const start = useRef<
     | {
         x: number;
+        originX: number;
         y: number;
         time: number;
         id: number;
@@ -72,13 +74,15 @@ export function SwipeSurface({
   const wheel = useRef<WheelGesture | undefined>(undefined);
   const wheelCallbacks = useRef({
     disabled,
-    commit: (yes: boolean, velocity?: number) => {
+    commit: (yes: boolean, velocity?: number, touch?: boolean) => {
+      void touch;
       void velocity;
       void yes;
     },
     snap: () => {},
   });
   const locked = useRef(false);
+  const recovery = useRef(0);
   const mounted = useRef(true);
   const suppressClick = useRef(false);
   const finishExit = useRef<(() => void) | undefined>(undefined);
@@ -143,9 +147,11 @@ export function SwipeSurface({
     };
   }, [progress, x]);
   async function snapBack() {
+    const ticket = ++recovery.current;
     x.stop();
     void animate(screenOpacity, 0, { duration: 0.15 });
-    locked.current = true;
+    // Recovery is interruptible: the next finger-down owns the card immediately.
+    locked.current = false;
     if (mounted.current) setPhase("returning");
     await animate(
       x,
@@ -154,13 +160,14 @@ export function SwipeSurface({
         ? { duration: 0 }
         : { type: "spring", stiffness: 440, damping: 30, mass: 0.85 },
     );
-    if (mounted.current) {
+    if (mounted.current && recovery.current === ticket) {
       locked.current = false;
       setPhase("idle");
     }
   }
-  async function commit(yes: boolean, velocity = 0) {
+  async function commit(yes: boolean, velocity = 0, touch = false) {
     if (disabled || locked.current) return;
+    recovery.current++;
     wheel.current?.discard(performance.now());
     locked.current = true;
     start.current = undefined;
@@ -196,12 +203,19 @@ export function SwipeSurface({
       }
     };
     const exit = new Promise<void>((resolve) => {
+      const complete = () => {
+        // Keep the old bitmap hidden until React replaces this keyed surface.
+        // A delayed response or a Motion cleanup must never reveal it at x=0.
+        opacity.set(0);
+        if(element.current)element.current.style.visibility="hidden";
+        done(); resolve();
+      };
       finishExit.current = () => { done(); resolve(); };
-      if (reduced) animate(opacity, 0, { duration: 0.1, onComplete: () => { done(); resolve(); } });
+      if (reduced) animate(opacity, 0, { duration: 0.1, onComplete: complete });
       else animate(x, target, {
-        duration: Math.max(0.46, 0.5 - Math.min(Math.abs(velocity), 2) * 0.02),
+        duration: touch ? 0.28 : Math.max(0.46, 0.5 - Math.min(Math.abs(velocity), 2) * 0.02),
         ease: [0.28, 0.5, 0.4, 1],
-        onComplete: () => { done(); resolve(); },
+        onComplete: complete,
       });
     });
     if (!reduced) void animate(screenOpacity, [screenOpacity.get(), 0.24, 0], {
@@ -219,20 +233,22 @@ export function SwipeSurface({
       /* The parent also exposes the actionable network/server error. */
     }
     if (mounted.current) {
+      if(wheelTarget?.current)pendingTouches.delete(wheelTarget.current);
       x.stop();
       opacity.stop();
       finishExit.current?.();
       finishExit.current = undefined;
       setFailure("Your vote wasn’t saved. Try again.");
       opacity.set(1);
+      if(element.current)element.current.style.visibility="visible";
       await snapBack();
     }
   }
   useLayoutEffect(() => {
     wheelCallbacks.current = {
       disabled,
-      commit: (yes, velocity) => {
-        void commit(yes, velocity);
+      commit: (yes, velocity, touch) => {
+        void commit(yes, velocity, touch);
       },
       snap: () => {
         void snapBack();
@@ -299,6 +315,25 @@ export function SwipeSurface({
       wheel.current = undefined;
     };
   }, [wheelGate, wheelTarget, x]);
+  useLayoutEffect(()=>{
+    const deck=wheelTarget?.current, card=element.current;
+    const p=deck && pendingTouches.get(deck);
+    if(disabled || !card || !deck || !p || p.blockedCard===card)return;
+    pendingTouches.delete(deck);
+    if(performance.now()-p.time>1500)return;
+    if(p.endedAt!==undefined){
+      const vote=swipeDecision(p.lastX-p.x,p.lastY-p.y,p.endedAt-p.time,card.clientWidth);
+      if(vote!==undefined)queueMicrotask(()=>{if(mounted.current)wheelCallbacks.current.commit(vote,0,!!p.touch);});
+      return;
+    }
+    if(Math.abs(p.lastY-p.y)>Math.abs(p.lastX-p.x)*1.15 && Math.abs(p.lastY-p.y)>8)return;
+    recovery.current++;
+    x.stop();
+    const horizontal=Math.abs(p.lastX-p.x)>8 && Math.abs(p.lastX-p.x)>Math.abs(p.lastY-p.y)*1.15;
+    start.current={x:p.x,originX:p.x,y:p.y,time:p.time,id:p.id,lastX:p.lastX,lastTime:performance.now(),velocity:0,axis:horizontal?"x":undefined};
+    try {card.setPointerCapture(p.id);} catch {start.current=undefined;return;}
+    if(horizontal){x.set(p.lastX-p.x);suppressClick.current=true;queueMicrotask(()=>{if(mounted.current && start.current?.id===p.id)setPhase("dragging");});}
+  }, [wheelTarget, disabled, x]);
   useImperativeHandle(controlRef, () => ({ swipe: commit }));
   function cancelPointer() {
     if (!start.current) return;
@@ -338,10 +373,12 @@ export function SwipeSurface({
           (e.target as HTMLElement).closest("button,a,input,select,textarea")
         )
           return;
+        recovery.current++;
         x.stop();
         setFailure("");
         start.current = {
           x: e.clientX - x.get(),
+          originX: e.clientX,
           y: e.clientY,
           time: performance.now(),
           id: e.pointerId,
@@ -356,8 +393,12 @@ export function SwipeSurface({
         const dx = e.clientX - s.x,
           dy = e.clientY - s.y,
           now = performance.now();
-        if (!s.axis && Math.max(Math.abs(dx), Math.abs(dy)) > 8)
-          s.axis = Math.abs(dx) > Math.abs(dy) * 1.25 ? "x" : "y";
+        const travelX = e.clientX - s.originX;
+        if (!s.axis && Math.max(Math.abs(travelX), Math.abs(dy)) > 8) {
+          if (Math.abs(travelX) > Math.abs(dy) * 1.15) s.axis = "x";
+          else if (Math.abs(dy) > Math.abs(travelX) * 1.15) s.axis = "y";
+          // Ambiguous diagonal starts stay undecided rather than becoming a dead swipe.
+        }
         if (s.axis === "x") {
           if (e.cancelable) e.preventDefault();
           if (!e.currentTarget.hasPointerCapture(e.pointerId))
@@ -378,7 +419,7 @@ export function SwipeSurface({
         const vote =
           s.axis === "x"
             ? swipeDecision(
-                e.clientX - s.x,
+                e.clientX - s.originX,
                 e.clientY - s.y,
                 now - s.time,
                 e.currentTarget.clientWidth,
@@ -390,7 +431,7 @@ export function SwipeSurface({
         if (e.currentTarget.hasPointerCapture(e.pointerId))
           e.currentTarget.releasePointerCapture(e.pointerId);
         if (vote === undefined) void snapBack();
-        else void commit(vote, s.velocity);
+        else void commit(vote, s.velocity, e.pointerType === "touch");
       }}
       onPointerCancel={cancelPointer}
       onLostPointerCapture={(e) => {

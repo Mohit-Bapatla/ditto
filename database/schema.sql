@@ -34,3 +34,6 @@ CREATE INDEX IF NOT EXISTS decision_history_user ON decision_history(user_id,kin
 -- Public demo namespaces are distinct from normal accounts and local showcase data.
 CREATE TABLE IF NOT EXISTS demo_sandboxes(id TEXT PRIMARY KEY, owner TEXT UNIQUE NOT NULL, expires_at INTEGER NOT NULL);
 CREATE TABLE IF NOT EXISTS demo_usage(key TEXT PRIMARY KEY, count INTEGER NOT NULL, expires_at INTEGER NOT NULL);
+
+-- Private persisted search decks; existing votes and activity rows remain intact.
+CREATE TABLE IF NOT EXISTS discovery_searches(user_id TEXT PRIMARY KEY REFERENCES profiles(id), data TEXT NOT NULL);

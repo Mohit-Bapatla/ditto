@@ -1,0 +1,23 @@
+import test from 'node:test';
+import assert from 'node:assert/strict';
+process.env.DATABASE_PATH=':memory:';
+const d=await import('../lib/db');
+const {storeDiscovery,discoveryId}=await import('../lib/discovery-store');
+const v={id:'stable-place',name:'Recorded place',source:'SerpApi' as const,url:'https://www.google.com/maps/search/?api=1&query=recorded'};
+const intent={query:'bouldering',city:'Austin',constraints:[],interpretedBy:'user' as const};
+test('private search persists, repeated retrieval cannot recycle votes, Undo survives reload',()=>{
+ const a=d.createSession(),b=d.createSession();
+ const search=storeDiscovery(a,[v],intent,'Provider listing');const aid=search.ids[0];
+ assert.equal(d.state(a).discovery?.query,'bouldering');assert.equal(d.state(a).activities.find(x=>x.id===aid)?.status,undefined);
+ assert.throws(()=>d.accessibleActivity(b,aid));assert.ok(!d.state(b).activities.some(x=>x.id===aid));
+ d.transaction(()=>d.swipe(a,aid,'yes'));
+ const op=d.state(a).undoSwipe!;
+ assert.equal(d.state(d.session(a.id)!).activities.find(x=>x.id===aid)?.status,'interested');
+ assert.deepEqual(storeDiscovery(a,[v],{...intent,query:'different wording'},'Again').ids,[aid]);
+ assert.equal(d.state(a).activities.find(x=>x.id===aid)?.swipe,'yes');
+ d.transaction(()=>d.undoDecision(a,op.id));assert.equal(d.state(a).activities.find(x=>x.id===aid)?.swipe,undefined);
+ d.transaction(()=>d.swipe(a,aid,'no'));assert.equal(d.state(a).activities.find(x=>x.id===aid)?.status,undefined);
+ assert.notEqual(storeDiscovery(b,[v],intent,'Other user').ids[0],aid);
+ assert.notEqual(discoveryId('circle',aid),aid);
+ assert.throws(()=>d.attend(a,aid),/Choose a date/);
+});

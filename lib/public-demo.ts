@@ -1,8 +1,23 @@
 import { all, one, run, id, transaction, createPresentationSession, seedPresentationPlans, session, type Session } from "./db";
 import { demoContext } from "./demo-context";
 import { PublicError } from "./errors";
+import { existsSync, readFileSync } from "node:fs";
+import { resolve } from "node:path";
 const DAY = 86400000;
 export const demoCookie = "ditto_demo";
+// Explicitly configured, consented sample assets only. Never import account photos.
+function restoreDemoPhotos(owner: string) {
+  const directory = process.env.PUBLIC_DEMO_PHOTO_DIR;
+  if (!directory || !one("SELECT 1 FROM demo_sandboxes WHERE owner=?", owner)) return;
+  for (const row of all("SELECT id,data FROM profiles WHERE owner=?", owner)) {
+    const profile = JSON.parse(String(row.data));
+    if (!profile.demo || profile.photo || !["Mohit", "Edwin", "Paxton"].includes(profile.name)) continue;
+    const file = resolve(directory, profile.name.toLowerCase() + ".jpg");
+    if (!existsSync(file)) continue;
+    profile.photo = "data:image/jpeg;base64," + readFileSync(file).toString("base64");
+    run("UPDATE profiles SET data=? WHERE id=? AND owner=?", JSON.stringify(profile), row.id, owner);
+  }
+}
 // Persistent, transactionally reserved quotas survive resets and server restarts.
 export function reserveDemoUsage(keys: { key: string; max: number; expires: number }[]) {
   transaction(() => {
@@ -29,6 +44,7 @@ export function demoSession(token?: string) {
   const s = session(token);
   if (!s) return;
   const row = one("SELECT id FROM demo_sandboxes WHERE owner=? AND expires_at>?", s.owner, Date.now());
+  if (row) restoreDemoPhotos(s.owner);
   return row ? { sandbox: String(row.id), session: s } : undefined;
 }
 // Delete only rows owned by this marked demo namespace, never arbitrary user IDs.
@@ -44,7 +60,7 @@ function clearDemo(owner: string) {
   for (const table of ["round_members", "round_ideas"]) run(`DELETE FROM ${table} WHERE round_id IN (${rounds})`, owner);
   for (const table of ["rounds", "proposals", "messages", "constraints_by_member", "ideas", "members"]) run(`DELETE FROM ${table} WHERE circle_id IN (${circles})`, owner);
   run("DELETE FROM circles WHERE owner=?", owner);
-  for (const table of ["swipes", "participation", "submissions", "venue_selections", "decision_history"]) run(`DELETE FROM ${table} WHERE user_id IN (${users})`, owner);
+  for (const table of ["swipes", "participation", "submissions", "venue_selections", "decision_history", "discovery_searches"]) run(`DELETE FROM ${table} WHERE user_id IN (${users})`, owner);
   run("DELETE FROM activities WHERE owner=?", owner);
   run("DELETE FROM sessions WHERE owner=?", owner);
   run("DELETE FROM profiles WHERE owner=?", owner);
@@ -67,6 +83,7 @@ export function startPublicDemo(existing?: ReturnType<typeof demoSession>, reset
     const sandbox = existing?.sandbox || id();
     run("INSERT INTO demo_sandboxes VALUES(?,?,?) ON CONFLICT(id) DO UPDATE SET owner=excluded.owner,expires_at=excluded.expires_at", sandbox, s.owner, Date.now() + DAY);
     seedPresentationPlans(s, true);
+    restoreDemoPhotos(s.owner);
     return { sandbox, session: s };
   });
 }

@@ -436,3 +436,6 @@
   z-index: 1000;
   pointer-events: none;
 }
+
+/* The stationary preview must preserve horizontal touches during card handoff. */
+.physical-stack, .group-stack { touch-action: pan-y; }

@@ -17,7 +17,7 @@ export async function livePlan(
     ...new Map(
       (
         await Promise.all(
-          matches.slice(0, 3).map((i) => provider.venues(i.title, c.city)),
+          matches.slice(0, 3).map((i) => i.venueData ? Promise.resolve([i.venueData]) : provider.venues(i.title, c.city)),
         )
       )
         .flat()
@@ -40,6 +40,8 @@ export async function livePlan(
           title: i.title,
           category: i.category,
           notes: i.notes,
+          suggestedStart: i.suggestedStart,
+          proposerNote: i.proposerNote,
           yes: i.yes,
           total: c.round?.total,
           unanimous: i.unanimous,

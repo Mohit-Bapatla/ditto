@@ -1,3 +1,4 @@
+import { proposeActivity } from "@/lib/circle-activity";
 import { normalizeProfilePhoto } from "@/lib/profile-photo";
 import { showcaseActive, showcaseId, showcaseNames } from "@/lib/showcase-policy";
 import { PublicError } from "@/lib/errors";
@@ -28,6 +29,9 @@ import { photos, type Venue } from "@/lib/types";
 const str = z.string().trim().min(1).max(200);
 const uuid = z.string().uuid();
 const schema = z.discriminatedUnion("type", [
+  z.object({type: z.literal("browseActivities")}),
+  z.object({type: z.literal("proposeVenue"), activity: uuid, circle: uuid}),
+  z.object({type: z.literal("proposeActivity"), activity: uuid, circle: uuid, suggestedStart: z.iso.datetime().optional(), message: z.string().trim().max(1000).optional()}),
   z.object({ type: z.literal("switch"), user: uuid }),
   z.object({ type: z.literal("profilePhoto"), photo: z.string().max(180000).nullable() }),
   z.object({
@@ -160,6 +164,14 @@ export async function POST(req: NextRequest) {
     const activityImage = b.type === "activity" ? await normalizeProfilePhoto(b.image, 640) : undefined;
     transaction(() => {
       switch (b.type) {
+        case "browseActivities":
+          run("DELETE FROM discovery_searches WHERE user_id=?", s.user);
+          break;
+        case "proposeVenue":
+        case "proposeActivity": {
+          resultId = proposeActivity(s, b);
+          break;
+        }
         case "chat": {
           requireMember(s, b.circle);
           const previous = one(

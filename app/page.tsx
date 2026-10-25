@@ -1,4 +1,9 @@
 "use client";
+import { DiscoverySearch } from "./discovery-search";
+import "./plan-with-circle.css";
+import { PlanWithCircle } from "./plan-with-circle";
+import { VenueDetails } from "./venue-details";
+import "./venue-discovery.css";
 import { apiPath } from "@/lib/api-path";
 import { DemoControls } from "./demo-controls";
 import "./discovery.css";
@@ -35,7 +40,6 @@ import {
 } from "react";
 import {
   motion,
-  AnimatePresence,
   MotionConfig,
   useMotionValue,
   useTransform,
@@ -134,10 +138,12 @@ function Avatars({
   );
 }
 function Modal({
+  planning = false,
   title,
   close,
   children,
 }: {
+  planning?: boolean;
   title: string;
   close: () => void;
   children: ReactNode;
@@ -150,7 +156,7 @@ function Modal({
   }, []);
   return (
     <dialog
-      className="modal"
+      className={`modal ${planning ? "planning-sheet" : ""}`}
       ref={ref}
       aria-label={title}
       onCancel={close}
@@ -206,7 +212,7 @@ function SwipeCard({
   const content = (
     <>
       <div className={`outing-photo ${photoFailed ? "photo-unavailable" : ""}`}>
-        {!photoFailed ? (
+        {!photoFailed && activity.image ? (
           <img
             src={activity.image}
             alt={
@@ -232,7 +238,7 @@ function SwipeCard({
           {photoFailed
             ? ""
             : venuePhoto
-              ? "Venue photo · SerpApi"
+              ? (activity.discovery?.cachedExample ? "Cached venue · SerpApi" : "Venue photo · SerpApi")
               : ""}
         </span>
       </div>
@@ -242,8 +248,7 @@ function SwipeCard({
         <h2>{activity.title}</h2>
         <ActivityMetadata activity={activity}/>
         <div className="outing-people">
-          <span className="host-initial"><Avatar person={{ name: activity.host || "Your community", photo: activity.hostPhoto }} /></span>
-          <span>With {activity.host || "your community"}</span>
+          {activity.discovery ? <span>Suggested outing · not a venue event</span> : <><span className="host-initial"><Avatar person={{ name: activity.host || "Your community", photo: activity.hostPhoto }} /></span><span>With {activity.host || "your community"}</span></>}
           <button
             className="outing-details"
             onClick={onDetails}
@@ -288,6 +293,9 @@ export default function Home() {
   const [showSettings, setShowSettings] = useState(false);
   const [selected, setSelected] = useState<string>();
   const [modal, setModal] = useState<string>();
+  const [planningActivity,setPlanningActivity] = useState(false);
+  const [pendingCircleActivity,setPendingCircleActivity] = useState<Activity>();
+  const [newPlanningCircle,setNewPlanningCircle] = useState<string>();
   const [detail, setDetail] = useState<Activity>();
   const [category, setCategory] = useState("All vibes");
   const [budget, setBudget] = useState(1000);
@@ -298,7 +306,7 @@ export default function Home() {
   const [toast, setToast] = useState("");
   const [error, setError] = useState("");
   const [search, setSearch] = useState("");
-  const [found, setFound] = useState<Venue[]>([]);
+  const [searching, setSearching] = useState(false);
   const [searchNote, setSearchNote] = useState("");
   const [invite, setInvite] = useState("");
   const [circleTab, setCircleTab] = useState("Ideas");
@@ -309,19 +317,24 @@ export default function Home() {
   const [drive, setDrive] = useState("");
   const [restored, setRestored] = useState<{ id: string; direction: string }>();
   const swipeAttempt = useRef<{ activity: string; direction: string; nonce: string } | undefined>(undefined);
-  const seenVenues = useRef(new Set<string>());
+
   const [selectedVenue, setSelectedVenue] = useState<Venue>();
   const [activityCity, setActivityCity] = useState("");
   const [afterProfile, setAfterProfile] = useState<string>();
   const pending = useRef(false);
   const stateVersion = useRef(0);
   const activityNonce = useRef<string>("");
+  const searchInitialized = useRef(false);
   const refresh = useCallback(async () => {
     try {
       const version = stateVersion.current;
       const next = await request("/api/state");
       if (version === stateVersion.current) {
         setData(next);
+        if (!searchInitialized.current) {
+          searchInitialized.current = true;
+          if (next.discovery) { setSearch(next.discovery.query); setCity(next.discovery.city); }
+        }
         setNow(Date.now());
       }
     } catch (e) {
@@ -376,6 +389,9 @@ export default function Home() {
     }
   };
   const close = () => {
+    setPendingCircleActivity(undefined);
+    setPlanningActivity(false);
+    setNewPlanningCircle(undefined);
     activityNonce.current = "";
     setSelectedVenue(undefined);
     setModal(undefined);
@@ -393,14 +409,16 @@ export default function Home() {
   const deck =
     data?.activities.filter(
       (a) =>
+        (a.id === restored?.id || (data.discovery ? data.discovery.ids.includes(a.id) : !a.discovery || a.discovery.cachedExample)) &&
         (!a.swipe || a.id === restored?.id) &&
         !a.cancelled &&
         !a.expired &&
-        (a.id === restored?.id || ((category === "All vibes" || a.category === category) &&
+        (a.id === restored?.id || !!data.discovery || ((category === "All vibes" || a.category === category) &&
         a.budget <= budget &&
         (!city || a.city.toLowerCase().includes(city.toLowerCase())) &&
         (!available || a.attending < a.capacity))),
     ) || [];
+  if (!data?.discovery) deck.sort((a,b)=>Number(!!b.discovery?.cachedExample)-Number(!!a.discovery?.cachedExample));
   const restoredIndex = deck.findIndex(a => a.id === restored?.id);
   if (restoredIndex > 0) deck.unshift(...deck.splice(restoredIndex, 1));
   const top = deck[0];
@@ -410,10 +428,12 @@ export default function Home() {
       if (swipeAttempt.current?.activity !== top.id || swipeAttempt.current?.direction !== direction) swipeAttempt.current = {activity: top.id, direction, nonce: crypto.randomUUID()};
       const r = await act(
         { type: "swipe", ...swipeAttempt.current },
-        yes
-          ? "Saved to your interested list. Join when you’re ready."
-          : undefined,
-        afterSave,
+        undefined,
+        async () => {
+          await afterSave();
+          // Clear the Undo override in the same publication batch as the new deck.
+          setRestored(undefined);
+        },
       );
       if (r) { setRestored(undefined); swipeAttempt.current = undefined; }
       return Boolean(r);
@@ -476,6 +496,7 @@ export default function Home() {
         else { setPage("Plans"); setSelected(undefined); }
       }
       if (type === "circle") {
+        if (pendingCircleActivity) {setDetail(pendingCircleActivity);setPlanningActivity(true);setNewPlanningCircle(r.id);setPendingCircleActivity(undefined);}
         setSelected(r.id);
         setPage("Circles");
       }
@@ -486,37 +507,40 @@ export default function Home() {
       }
     }
   }
-  async function findPlaces(natural = false, query = search, fresh = false) {
+  async function findPlaces(natural = false, query = search) {
     if (!query.trim() || pending.current) return;
     pending.current = true;
+    stateVersion.current++;
     setBusy(true);
     setError("");
-    setFound([]);
+    setSearching(true);
     setSearchNote("");
     try {
       const r = await request("/api/places", {
         query,
-        excludeIds: fresh ? [...new Set([...seenVenues.current, ...(data?.activities.map(a => a.venueData?.id).filter((id): id is string => !!id) || [])])].slice(-500) : [],
+        deck: true,
+        budget: budget < 1000 ? budget : undefined,
         city: city || data?.user.city || "Austin, TX",
         natural,
       });
-      setFound(r.venues);
-      for (const v of r.venues) seenVenues.current.add(v.id);
-      setSearchNote(
-        r.explanation +
-          (r.venues.length ? "" : " No new places this time. Try another category or city, or create your own activity."),
-      );
+      stateVersion.current++;
+      setData(r.state);
+      setSearchNote(r.explanation);
+      setRestored(undefined);
+      close();
+      navigate("Discover");
     } catch (e) {
       setError((e as Error).message);
     } finally {
+      setSearching(false);
       setBusy(false);
       pending.current = false;
     }
   }
   function findMore() {
     const query = category === "All vibes" ? "things to do" : category.toLowerCase();
-    setSearch(query); setModal("search");
-    void findPlaces(false, query, true);
+    setSearch(query);
+    void findPlaces(false, query);
   }
   async function generate(demo: boolean) {
     if (!c) return;
@@ -905,6 +929,8 @@ export default function Home() {
                     </button>
                   </div>
                 </div>
+                <DiscoverySearch loading={searching} query={search} onQuery={setSearch} busy={busy} onSearch={findPlaces} city={city || data.user.city} onCity={setCity}/>
+                {data.discovery && <div className="discovery-result-context"><span>Places for “{data.discovery.query}”</span><button className="text-button" disabled={busy} onClick={()=>act({type:"browseActivities"})}>Browse all activities</button></div>}
                 <div className="discover-grid">
                   <DiscoveryBrowse
                     data={data}
@@ -916,7 +942,7 @@ export default function Home() {
                   />
                   <section className="deck-section">
                     <div className="deck-stack physical-stack" ref={wheelTarget}>
-                      {deck[1] && (
+                      {!searching && deck[1] && (
                         <motion.div
                           className="next-card"
                           aria-hidden="true"
@@ -933,8 +959,8 @@ export default function Home() {
                           />
                         </motion.div>
                       )}
-                      <AnimatePresence mode="wait">
-                        {top ? (
+                      <>
+                        {searching ? <div className="skeleton discovery-loading" key="searching" role="status"><Search size={28}/><h2>Finding places for you</h2><p>Matching your request with real listings.</p></div> : top ? (
                           <SwipeCard
                             key={top.id}
                             activity={top}
@@ -956,8 +982,8 @@ export default function Home() {
                             animate={{ opacity: 1 }}
                           >
                             <BrandLogo symbol />
-                            <h2>{data.activities.some(a => !a.swipe && !a.cancelled && !a.expired) ? "Nothing fits these filters yet." : "You’ve seen everything for now."}</h2>
-                            <p>Got something else in mind? Make your own plan or discover more.</p>
+                            <h2>{data.discovery ? "No unseen places in this search." : data.activities.some(a => !a.swipe && !a.cancelled && !a.expired) ? "Nothing fits these filters yet." : "You’ve seen everything for now."}</h2>
+                            <p>{data.discovery ? "Try a broader search, another city, or create an activity. Your previous choices stay saved." : "Got something else in mind? Make your own plan or discover more."}</p>
                             <div className="deck-next-actions">
                               <button className="primary" disabled={busy} onClick={openActivity}><Plus size={18}/>Create an activity</button>
                               <button className="secondary" disabled={busy} onClick={findMore}><Search size={18}/>Find more activities</button>
@@ -966,7 +992,7 @@ export default function Home() {
                             <button className="text-link" onClick={() => setModal("filters")}>Change filters</button>
                           </motion.div>
                         )}
-                      </AnimatePresence>
+                      </>
                     </div>
                     <div className={`swipe-controls ${!top ? "deck-finished" : ""}`}>
                       <button
@@ -1239,6 +1265,8 @@ export default function Home() {
                                 {idea.category}
                               </span>
                               <h3>{idea.title}</h3>
+                              {idea.slot && <p className="small">{idea.slot} · not confirmed</p>}
+                              {idea.proposerNote && <p className="small">{c.members.find(m=>m.id===idea.creator)?.name || "Proposer"}: {idea.proposerNote}</p>}
                               {idea.notes && (
                                 <p className="small muted">{idea.notes}</p>
                               )}
@@ -1704,7 +1732,9 @@ export default function Home() {
         )}
         {(modal || detail) && (
           <Modal
+            planning={planningActivity}
             title={
+              planningActivity ? "Plan with a Circle" :
               detail
                 ? "Activity details"
                 : (
@@ -1729,7 +1759,17 @@ export default function Home() {
                 {error}
               </p>
             )}
-            {detail && (
+            {detail && planningActivity ? <PlanWithCircle key={detail.id} activity={detail} circles={data.circles} initialCircle={newPlanningCircle}
+              onBack={()=>{setPlanningActivity(false);setError("");}}
+              onCreate={()=>{setPendingCircleActivity(detail);setDetail(undefined);setPlanningActivity(false);setModal("circle");}}
+              onView={circle=>{close();navigate("Circles");setSelected(circle);setCircleTab("Ideas");}}
+              onSubmit={async input=>Boolean(await act({type:"proposeActivity",activity:detail.id,...input}))}/>
+              : detail && <div className="detail-circle-action"><button className="primary full" disabled={!!detail.cancelled} onClick={()=>setPlanningActivity(true)}>Plan with a Circle</button></div>}
+            {!planningActivity && (detail?.discovery ? <>
+                {detail.image && <ActivityPhoto src={detail.image} alt={detail.venueData?.name || detail.title}/>}
+                <h2>{detail.title}</h2>
+                <VenueDetails activity={data.activities.find(a=>a.id===detail.id) || detail} busy={busy} onSave={()=>act({type:"swipe",activity:detail.id,direction:"yes",nonce:crypto.randomUUID()},"Saved to your interests.")}/>
+              </> : detail && (
               <>
                 <img
                   className="detail-image"
@@ -1941,7 +1981,7 @@ export default function Home() {
                   <ArrowRight size={17} />
                 </button>
               </>
-            )}
+            ))}
             {modal === "filters" && (
               <>
                 <fieldset>
@@ -2396,98 +2436,8 @@ export default function Home() {
                 </p>
               </>
             )}
-            {modal === "search" && (
-              <>
-                <p className="muted">
-                  Search places directly, or let Meta interpret your plans.
-                </p>
-                <div className="field">
-                  <label htmlFor="search">Your idea</label>
-                  <input
-                    id="search"
-                    value={search}
-                    onChange={(e) => setSearch(e.target.value)}
-                    placeholder="Bowling in Austin"
-                  />
-                </div>
-                <div className="button-row">
-                  <button
-                    className="primary"
-                    disabled={busy || !search.trim()}
-                    onClick={() => findPlaces(false)}
-                  >
-                    <Search size={16} />
-                    {busy ? "Searching…" : "Search real places"}
-                  </button>
-                  <button
-                    className="secondary"
-                    disabled={busy || !data.integrations.meta}
-                    onClick={() => findPlaces(true)}
-                  >
-                    <Sparkles size={16} />
-                    Use AI
-                  </button>
-                </div>
-                <p className="small muted">
-                  {searchNote ||
-                    "Search real venue listings. Prices, opening hours and availability can change."}
-                </p>
-                {busy && (
-                  <div
-                    className="skeleton venue-skeleton"
-                    role="status"
-                    aria-label="Searching places"
-                  />
-                )}
-                {!busy && !found.length && <button className="text-link" onClick={openActivity}>Create your own activity <Plus size={16}/></button>}
-                <div className="venue-results">
-                  {found.map((v) => (
-                    <article key={v.id}>
-                      {v.image ? (
-                        <img
-                          className="venue-photo"
-                          src={v.image}
-                          alt={v.name}
-                          loading="lazy"
-                          referrerPolicy="no-referrer"
-                        />
-                      ) : (
-                        <div className="photo-placeholder">
-                          <MapPin />
-                          <span>No venue photo supplied</span>
-                        </div>
-                      )}
-                      <h3>{v.name}</h3>
-                      <p>{v.address}</p>
-                      <p className="small muted">
-                        {v.rating ? `★ ${v.rating} · ` : ""}
-                        {v.price || "Price unavailable"} · Places powered by
-                        SerpApi
-                      </p>
-                      <a href={v.url} target="_blank" rel="noreferrer">
-                        View on Maps <ExternalLink size={13} />
-                      </a>
-                      <button
-                        className="secondary"
-                        onClick={() => {
-                          setSelectedVenue(v);
-                          setActivityCity(city || data.user.city);
-                          openActivity();
-                        }}
-                      >
-                        Plan something here <ArrowRight size={14} />
-                      </button>
-                      <button
-                        className="text-link"
-                        onClick={() => copy(v.name + ", " + (v.address || ""))}
-                      >
-                        Copy place <Copy size={13} />
-                      </button>
-                    </article>
-                  ))}
-                </div>
-              </>
-            )}
+            {modal === "search" && <><DiscoverySearch loading={searching} expanded query={search} onQuery={setSearch} busy={busy} onSearch={findPlaces} city={city || data.user.city} onCity={setCity}/><p className="small muted">Results open directly in Discover. Swipe to save a place, then suggest it to your Circle. Natural-language requests can use Muse Spark; simple searches go straight to SerpApi.</p>{searchNote && <p>{searchNote}</p>}</>}
+
           </Modal>
         )}
       </div>

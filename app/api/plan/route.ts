@@ -72,6 +72,7 @@ export async function POST(req: NextRequest) {
         "A manually assembled demo draft from your saved matches. Venues and travel times are not verified. No AI was used.",
       stops: Stop[] = matches.slice(0, 3).map((i) => ({
         title: i.title,
+        venue: i.venueData,
         duration: 90,
         note: "Choose a venue together. Suggested duration; budget and opening hours need checking.",
       }));

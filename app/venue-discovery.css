@@ -1,0 +1,26 @@
+.discover-page .discovery-search { max-width: 520px; margin: 0 auto 12px; }
+.discovery-search > label { display: block; font-size: 14px; font-weight: 700; margin-bottom: 6px; }
+.discovery-search .search-field { display: flex; align-items: center; gap: 8px; padding: 4px 4px 4px 12px; border: 1px solid var(--line); background: var(--surface,white); border-radius: 12px; }
+.discovery-search .search-field input { width: 100%; min-width: 0; border: 0; background: transparent; padding: 8px 0; font-size: 16px; }
+.discovery-search .search-field button { flex-shrink: 0; min-height: 44px; padding: 10px 16px; }
+.search-context,.discovery-result-context { display: flex; align-items: center; justify-content: space-between; gap: 8px; font-size: 12px; color: var(--muted); }
+.search-context .text-button { display: inline-flex; align-items: center; gap: 4px; min-height: 36px; padding: 4px; font-size: 12px; }
+.discovery-result-context { max-width: 520px; margin: 0 auto 12px; align-items: flex-start; color: var(--ink); }
+.discovery-result-context span { max-width: 65%; overflow-wrap: anywhere; }
+.discovery-result-context button { padding: 0; text-align: right; min-height: 36px; }
+.discovery-loading { height: 480px; display: flex; flex-direction: column; align-items: center; justify-content: center; text-align: center; padding: 28px; }
+.venue-detail-content { display: grid; gap: 16px; }
+.venue-facts { display: grid; grid-template-columns: minmax(100px,1fr) 2fr; gap: 12px; font-size: 14px; }
+.venue-facts dt { color: var(--muted); }.venue-facts dd { margin: 0; overflow-wrap: anywhere; }
+.venue-detail-content > a { display: inline-flex; gap: 8px; align-items: center; min-height: 44px; }
+@media (max-width:760px) {
+ .discover-page:has(.discovery-search) .outing-card { height: clamp(320px, calc(100svh - 400px), 520px); }
+ .discover-page:has(.discovery-result-context) .outing-card { height: clamp(300px, calc(100svh - 445px), 480px); }
+ .discover-page .discovery-search { margin-bottom: 6px; }
+ .discover-page .discovery-search > label { position:absolute; width:1px; height:1px; overflow:hidden; clip-path:inset(50%); }
+ .discovery-result-context { margin-bottom: 6px; }
+ .discovery-loading { height: 340px; }
+}
+@media (min-width:761px) {
+ .discover-page:has(.discovery-search) .outing-card { height: clamp(360px, calc(100svh - 470px), 540px); }
+}

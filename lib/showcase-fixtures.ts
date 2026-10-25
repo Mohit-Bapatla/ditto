@@ -2,6 +2,9 @@ import { DatabaseSync, backup } from "node:sqlite";
 import { existsSync, mkdirSync, readFileSync, writeFileSync, lstatSync, chmodSync } from "node:fs";
 import { join, resolve } from "node:path";
 import { presentationActivities, presentationCircles } from "./presentation-fixtures";
+import cachedVenues from "./showcase-venues.json";
+import { venueActivity, type DiscoveryIntent } from "./discovery-intent";
+import type { Venue } from "./types";
 import { dayKey, shiftDay } from "./agenda";
 import { assertShowcaseEnvironment, showcaseId as key, showcaseNames, showcaseOwner, showcaseVersion } from "./showcase-policy";
 
@@ -76,6 +79,17 @@ function seed(db: DatabaseSync, root: string, now: Date) {
   insert("showcase_meta",["owner",showcaseOwner]);
   insert("showcase_meta",["created",now.toISOString()]);
 }
+// Append only to this guarded, recognized local showcase. Never update existing records.
+export function appendShowcaseVenues(db: DatabaseSync) {
+  for (const name of showcaseNames) for (const entry of cachedVenues) {
+    const creator=key("person:"+name), aid=key("venue:"+name+":"+entry.venue.id);
+    const intent={...entry.intent,timing:undefined} as DiscoveryIntent;
+    const activity=venueActivity(entry.venue as Venue,intent,aid,creator,true);
+    activity.discovery!.cachedExample=true;
+    activity.description="Cached SerpApi showcase example. Choose a meetup time together; venue details may have changed.";
+    db.prepare("INSERT OR IGNORE INTO activities VALUES(?,?,?,?)").run(aid,showcaseOwner,creator,JSON.stringify(activity));
+  }
+}
 export async function prepareShowcase(root=process.cwd(), mode:"seed"|"reset"="seed", now=new Date(), env: Record<string, string | undefined>=process.env) {
   const path=assertShowcaseEnvironment(env,root);
   safePaths(root);
@@ -113,7 +127,7 @@ export async function prepareShowcase(root=process.cwd(), mode:"seed"|"reset"="s
     db.exec("BEGIN IMMEDIATE");
     try {
       if(mode==="reset") {
-        for(const table of ["decision_history","venue_selections","submissions","proposals","constraints_by_member","messages","rsvps","approvals","plans","votes","round_ideas","round_members","rounds","ideas","swipes","participation","activities","members","circles","sessions","profiles","showcase_schedule","showcase_meta"])db.exec(`DELETE FROM ${table}`);
+        for(const table of ["discovery_searches","decision_history","venue_selections","submissions","proposals","constraints_by_member","messages","rsvps","approvals","plans","votes","round_ideas","round_members","rounds","ideas","swipes","participation","activities","members","circles","sessions","profiles","showcase_schedule","showcase_meta"])db.exec(`DELETE FROM ${table}`);
       }
       if(!existed||mode==="reset")seed(db,root,now);
       else {
@@ -130,6 +144,7 @@ export async function prepareShowcase(root=process.cwd(), mode:"seed"|"reset"="s
           }
         }
       }
+      appendShowcaseVenues(db);
       if(db.prepare("PRAGMA foreign_key_check").all().length)throw new Error("Showcase foreign-key validation failed.");
       db.exec("COMMIT");
     }catch(e){db.exec("ROLLBACK");throw e;}

@@ -1,10 +1,34 @@
 import test from "node:test";
 import assert from "node:assert/strict";
+import { mkdtempSync, writeFileSync, rmSync } from "node:fs";
+import { tmpdir } from "node:os";
+import { join } from "node:path";
 process.env.DATABASE_PATH = ":memory:";
 process.env.DITTO_SHOWCASE = "0";
 const db = await import("../lib/db");
 const demo = await import("../lib/public-demo");
 const { demoContext } = await import("../lib/demo-context");
+test("consented sample photos repair existing demos without touching accounts or replacing photos", () => {
+  const directory = mkdtempSync(join(tmpdir(), "ditto-demo-photos-"));
+  const a = demo.startPublicDemo();
+  const original = db.state(a.session);
+  assert.ok(original.demoUsers.every(p => !p.photo));
+  process.env.PUBLIC_DEMO_PHOTO_DIR = directory;
+  try {
+    writeFileSync(join(directory, "mohit.jpg"), "sample-jpeg");
+    demo.demoSession(a.session.id);
+    const repaired = db.state(a.session);
+    assert.equal(repaired.demoUsers.find(p => p.name === "Mohit")?.photo, "data:image/jpeg;base64," + Buffer.from("sample-jpeg").toString("base64"));
+    assert.ok(repaired.demoUsers.filter(p => p.name !== "Mohit").every(p => !p.photo));
+    writeFileSync(join(directory, "mohit.jpg"), "replacement");
+    demo.demoSession(a.session.id);
+    assert.equal(db.state(a.session).user.photo, repaired.user.photo);
+    assert.equal(db.state(a.session).activities.length, original.activities.length);
+  } finally {
+    delete process.env.PUBLIC_DEMO_PHOTO_DIR;
+    rmSync(directory, {recursive:true,force:true});
+  }
+});
 test("public demo namespaces, resets, expiry and durable budgets are isolated", () => {
   const a = demo.startPublicDemo(), b = demo.startPublicDemo();
   const first = db.state(a.session), other = db.state(b.session);

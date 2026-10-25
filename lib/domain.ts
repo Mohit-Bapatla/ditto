@@ -30,6 +30,7 @@ export const intentSchema = z.object({
   queries: z.array(z.string().min(2).max(100)).min(1).max(3),
   explanation: z.string().max(600),
   timing:z.string().max(200).optional(),
+  budgetLimit:z.number().min(0).max(1000).optional(),
   constraints:z.array(z.string().max(200)).max(10).optional(),
 });
 export function parsePlan(value: unknown, venueIds: string[]) {
