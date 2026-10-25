@@ -14,3 +14,10 @@ backups/
 *.db*
 
 .next-demo/
+
+# Local submission media (retain reproducible scripts and documentation)
+docs/submission/video/clips/
+docs/submission/video/work/
+docs/submission/video/graphics/*.png
+docs/submission/video/*.mp4
+docs/submission/video/thumbnail.png

@@ -1,0 +1,344 @@
+[
+  {
+    "name": "opening-1",
+    "dur": 2,
+    "plate": "chat-1",
+    "clip": null,
+    "start": 0,
+    "mode": "graphic",
+    "extra": null
+  },
+  {
+    "name": "opening-2",
+    "dur": 2,
+    "plate": "chat-2",
+    "clip": null,
+    "start": 0,
+    "mode": "graphic",
+    "extra": null
+  },
+  {
+    "name": "opening-3",
+    "dur": 2,
+    "plate": "chat-3",
+    "clip": null,
+    "start": 0,
+    "mode": "graphic",
+    "extra": null
+  },
+  {
+    "name": "opening-4",
+    "dur": 2,
+    "plate": "chat-4",
+    "clip": null,
+    "start": 0,
+    "mode": "graphic",
+    "extra": null
+  },
+  {
+    "name": "problem",
+    "dur": 8,
+    "plate": "problem",
+    "clip": null,
+    "start": 0,
+    "mode": "graphic",
+    "extra": null
+  },
+  {
+    "name": "brand",
+    "dur": 4,
+    "plate": "logo",
+    "clip": null,
+    "start": 0,
+    "mode": "graphic",
+    "extra": null
+  },
+  {
+    "name": "intro",
+    "dur": 10,
+    "plate": "intro",
+    "clip": "09-discover-clean",
+    "start": 0,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "filters",
+    "dur": 6,
+    "plate": "filter",
+    "clip": "29-filter",
+    "start": 0.7,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "pass",
+    "dur": 6,
+    "plate": "pass",
+    "clip": "10-left-clean",
+    "start": 0,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "ditto",
+    "dur": 6,
+    "plate": "ditto",
+    "clip": "11-right-clean",
+    "start": 0,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "details",
+    "dur": 4,
+    "plate": "details",
+    "clip": "12-details-clean",
+    "start": 0.8,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "saved",
+    "dur": 3,
+    "plate": "saved",
+    "clip": "30-saved",
+    "start": 0,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "circles",
+    "dur": 6,
+    "plate": "circles",
+    "clip": "13-circles-clean",
+    "start": 0.9,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "chat",
+    "dur": 7,
+    "plate": "chat",
+    "clip": "27-chat-clean",
+    "start": 0,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "muse-processing",
+    "dur": 3,
+    "plate": "muse",
+    "clip": "28-muse-clean",
+    "start": 1,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "muse-result",
+    "dur": 4,
+    "plate": "suggestion",
+    "clip": "08-ai-result",
+    "start": 0,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "venues",
+    "dur": 5,
+    "plate": "venues",
+    "clip": "31-venues-result",
+    "start": 1.2,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "mohit",
+    "dur": 7,
+    "plate": "mohit",
+    "clip": "14-mohit-votes",
+    "start": 5.7,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "friends",
+    "dur": 7,
+    "plate": "edwin",
+    "clip": "15-edwin-votes",
+    "start": 5.7,
+    "mode": "duo",
+    "extra": "16-paxton-votes"
+  },
+  {
+    "name": "progress",
+    "dur": 6,
+    "plate": "paxton",
+    "clip": "16-paxton-votes",
+    "start": 7.2,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "consensus",
+    "dur": 5,
+    "plate": "consensus",
+    "clip": "17-consensus",
+    "start": 0.7,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "approve-paxton",
+    "dur": 2,
+    "plate": "approve",
+    "clip": "19-paxton-approval",
+    "start": 0.7,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "approve-mohit",
+    "dur": 3,
+    "plate": "approve",
+    "clip": "20-mohit-approval",
+    "start": 0.7,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "confirmed",
+    "dur": 4,
+    "plate": "confirmed",
+    "clip": "21-confirmed",
+    "start": 1,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "calendar",
+    "dur": 4,
+    "plate": "calendar",
+    "clip": "24-calendar-day",
+    "start": 1,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "export",
+    "dur": 2,
+    "plate": "export",
+    "clip": "22-calendar-export",
+    "start": 0.8,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "architecture-input",
+    "dur": 8,
+    "plate": "architecture-0",
+    "clip": "27-chat-clean",
+    "start": 0,
+    "mode": "architecture",
+    "extra": null
+  },
+  {
+    "name": "architecture-model",
+    "dur": 4,
+    "plate": "architecture-1",
+    "clip": "28-muse-clean",
+    "start": 1,
+    "mode": "architecture",
+    "extra": null
+  },
+  {
+    "name": "architecture-suggestion",
+    "dur": 4,
+    "plate": "architecture-2",
+    "clip": "08-ai-result",
+    "start": 0,
+    "mode": "architecture",
+    "extra": null
+  },
+  {
+    "name": "architecture-venues",
+    "dur": 7,
+    "plate": "architecture-3",
+    "clip": "31-venues-result",
+    "start": 1,
+    "mode": "architecture",
+    "extra": null
+  },
+  {
+    "name": "architecture-logic",
+    "dur": 7,
+    "plate": "architecture-4",
+    "clip": "17-consensus",
+    "start": 1,
+    "mode": "architecture",
+    "extra": null
+  },
+  {
+    "name": "technology",
+    "dur": 9,
+    "plate": "tech",
+    "clip": null,
+    "start": 0,
+    "mode": "graphic",
+    "extra": null
+  },
+  {
+    "name": "montage-swipe",
+    "dur": 3,
+    "plate": "ditto",
+    "clip": "11-right-clean",
+    "start": 0.4,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "montage-chat",
+    "dur": 2,
+    "plate": "chat",
+    "clip": "27-chat-clean",
+    "start": 0,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "montage-match",
+    "dur": 2,
+    "plate": "consensus",
+    "clip": "17-consensus",
+    "start": 1,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "montage-approved",
+    "dur": 2,
+    "plate": "confirmed",
+    "clip": "21-confirmed",
+    "start": 2,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "closing-app",
+    "dur": 7,
+    "plate": "closing",
+    "clip": "25-calendar-detail",
+    "start": 1,
+    "mode": "phone",
+    "extra": null
+  },
+  {
+    "name": "final",
+    "dur": 5,
+    "plate": "logo",
+    "clip": null,
+    "start": 0,
+    "mode": "graphic",
+    "extra": null
+  }
+]
