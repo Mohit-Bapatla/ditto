@@ -8,7 +8,7 @@ COPY . .
 # Only this public URL is needed by prerendered social metadata, never API keys.
 ARG PUBLIC_ORIGIN
 # No provider secrets are needed during build. This database is disposable.
-RUN DATABASE_PATH=/tmp/ditto-build.sqlite npm run build
+RUN DATABASE_PATH=:memory: npm run build
 
 FROM node:24-bookworm-slim AS runtime
 RUN apt-get update && apt-get install -y --no-install-recommends gosu \

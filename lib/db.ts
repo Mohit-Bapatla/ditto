@@ -22,10 +22,12 @@ import {
   type State,
 } from "./types";
 showcaseActive(); // Validate before opening or migrating any database.
-const path = resolve(
-  /* turbopackIgnore: true */ process.env.DATABASE_PATH || "data/ditto.sqlite",
-);
-mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
+// Build workers must not compete over one disposable SQLite migration file.
+// SQLite's :memory: sentinel gives each worker its own database; runtime keeps
+// the explicitly configured persistent path.
+const configuredPath = process.env.DATABASE_PATH || "data/ditto.sqlite";
+const path = configuredPath === ":memory:" ? ":memory:" : resolve(/* turbopackIgnore: true */ configuredPath);
+if (path !== ":memory:") mkdirSync(dirname(path), { recursive: true, mode: 0o700 });
 const globalDb = globalThis as unknown as { dittoDb?: DatabaseSync };
 export const db = globalDb.dittoDb ?? new DatabaseSync(path);
 globalDb.dittoDb = db;
