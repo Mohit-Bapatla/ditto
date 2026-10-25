@@ -86,17 +86,34 @@ export function SwipeSurface({
       focusHandoffRef.current = false;
     }
     return () => {
-      if (focusHandoffRef) focusHandoffRef.current = document.activeElement === card;
+      if (focusHandoffRef)
+        focusHandoffRef.current = document.activeElement === card;
     };
   }, [focusHandoffRef]);
   useEffect(() => {
     mounted.current = true;
+    // A tab/app switch can lose the pointer without delivering pointercancel.
+    const abandonDrag = () => {
+      if (!start.current) return;
+      start.current = undefined;
+      x.stop();
+      x.set(0);
+      locked.current = false;
+      setPhase("idle");
+    };
+    const visibility = () => {
+      if (document.hidden) abandonDrag();
+    };
+    window.addEventListener("blur", abandonDrag);
+    document.addEventListener("visibilitychange", visibility);
     return () => {
+      window.removeEventListener("blur", abandonDrag);
+      document.removeEventListener("visibilitychange", visibility);
       mounted.current = false;
       finishExit.current?.();
       progress?.set(0);
     };
-  }, [progress]);
+  }, [progress, x]);
   async function snapBack() {
     locked.current = true;
     if (mounted.current) setPhase("returning");

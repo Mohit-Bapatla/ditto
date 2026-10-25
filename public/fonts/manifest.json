@@ -1,0 +1,32 @@
+[
+  {
+    "file": "manrope-400.ttf",
+    "source": "https://fonts.gstatic.com/s/manrope/v20/xn7_YHE41ni1AdIRqAuZuw1Bx9mbZk79FO_F.ttf",
+    "family": "Manrope",
+    "weight": "400"
+  },
+  {
+    "file": "manrope-600.ttf",
+    "source": "https://fonts.gstatic.com/s/manrope/v20/xn7_YHE41ni1AdIRqAuZuw1Bx9mbZk4jE-_F.ttf",
+    "family": "Manrope",
+    "weight": "600"
+  },
+  {
+    "file": "manrope-700.ttf",
+    "source": "https://fonts.gstatic.com/s/manrope/v20/xn7_YHE41ni1AdIRqAuZuw1Bx9mbZk4aE-_F.ttf",
+    "family": "Manrope",
+    "weight": "700"
+  },
+  {
+    "file": "syne-700.ttf",
+    "source": "https://fonts.gstatic.com/s/syne/v24/8vIS7w4qzmVxsWxjBZRjr0FKM_3fvj6k.ttf",
+    "family": "Syne",
+    "weight": "700"
+  },
+  {
+    "file": "syne-800.ttf",
+    "source": "https://fonts.gstatic.com/s/syne/v24/8vIS7w4qzmVxsWxjBZRjr0FKM_24vj6k.ttf",
+    "family": "Syne",
+    "weight": "800"
+  }
+]

@@ -2,6 +2,7 @@
 import { CheckCheck, Heart, X } from "lucide-react";
 import type { Circle } from "@/lib/types";
 import { useRef } from "react";
+import { ActivityPhoto } from "./activity-photo";
 import { motion, useMotionValue, useTransform } from "motion/react";
 import {
   SwipeSurface,
@@ -26,8 +27,8 @@ export function GroupVoting({
   const control = useRef<SwipeHandle>(null);
   const swipeFocus = useRef(false);
   const progress = useMotionValue(0);
-  const scale = useTransform(progress, [0, 1], [0.95, 1]);
-  const y = useTransform(progress, [0, 1], [12, 0]);
+  const scale = useTransform(progress, [0, 1], [0.98, 1]);
+  const y = useTransform(progress, [0, 1], [5, 0]);
   const round = c.round!;
   const remaining = c.ideas.filter(
     (i) => round.ideaIds.includes(i.id) && i.vote === undefined,
@@ -59,7 +60,7 @@ export function GroupVoting({
   return (
     <section className="group-deck">
       <p className="section-meta">
-        YOUR PRIVATE VOTE{" "}
+        Your private vote{" "}
         <span>
           {round.ideaIds.length - remaining.length + 1} / {round.ideaIds.length}
         </span>
@@ -72,8 +73,14 @@ export function GroupVoting({
             inert
             style={{ scale, y }}
           >
-            <img src={remaining[1].image} alt="" draggable={false} />
-            <div className="group-caption">
+            <ActivityPhoto
+              key={remaining[1].id}
+              src={remaining[1].image}
+              alt="Activity inspiration"
+            />
+            <div
+              className={`group-caption ${remaining[1].title.length > 70 ? "long-title" : ""}`}
+            >
               <h2>{remaining[1].title}</h2>
               <p>{remaining[1].category}</p>
             </div>
@@ -89,13 +96,15 @@ export function GroupVoting({
           label={`${idea.title}. Left arrow to pass, right arrow for Ditto.`}
           onSwipe={cast}
         >
-          <img
+          <ActivityPhoto
+            key={idea.id}
             src={idea.image}
             alt={`${idea.category} inspiration, not a verified venue`}
-            draggable={false}
           />
           <span className="group-photo-note">Illustrative photo</span>
-          <div className="group-caption">
+          <div
+            className={`group-caption ${idea.title.length > 70 ? "long-title" : ""}`}
+          >
             <span className="pill white">{idea.category}</span>
             <h2>{idea.title}</h2>
             <p>{idea.notes || "Would you be up for this?"}</p>

@@ -46,13 +46,6 @@ import {
   ArrowLeft,
   ExternalLink,
   LoaderCircle,
-  Leaf,
-  Utensils,
-  CircleDot,
-  Gamepad2,
-  Palette,
-  Music,
-  Dumbbell,
   RotateCcw,
   Search,
   CheckCheck,
@@ -67,16 +60,6 @@ import {
   type Plan,
   type Venue,
 } from "@/lib/types";
-const icons = [
-  Compass,
-  Leaf,
-  Utensils,
-  CircleDot,
-  Gamepad2,
-  Palette,
-  Music,
-  Dumbbell,
-];
 const fmt = (s: string) =>
   new Date(s).toLocaleString("en-US", {
     weekday: "short",
@@ -156,6 +139,7 @@ function Modal({
   }, []);
   return (
     <dialog
+      className="modal"
       ref={ref}
       aria-label={title}
       onCancel={close}
@@ -235,12 +219,11 @@ function SwipeCard({
               : "Illustrative photo"}
         </span>
       </div>
-      <div className="outing-info">
+      <div
+        className={`outing-info ${activity.title.length > 70 ? "long-title" : ""}`}
+      >
         <div className="outing-when">
           <span>{fmt(activity.start)}</span>
-          <strong>
-            {activity.budget === 0 ? "Free" : `~$${activity.budget} / person`}
-          </strong>
         </div>
         <h2>{activity.title}</h2>
         <p className="outing-place">
@@ -250,18 +233,14 @@ function SwipeCard({
           <span className="host-initial" aria-hidden="true">
             {(activity.host || "D").slice(0, 1)}
           </span>
-          <span>
-            With {activity.host || "your community"}
-            <small>
-              {activity.attending} of {activity.capacity} going
-            </small>
-          </span>
+          <span>With {activity.host || "your community"}</span>
           <button
             className="outing-details"
             onClick={onDetails}
             aria-label="View activity details"
           >
-            <ArrowUpRight size={22} />
+            <span>Details</span>
+            <ArrowUpRight size={16} />
           </button>
         </div>
       </div>
@@ -287,8 +266,8 @@ export default function Home() {
   const swipeControl = useRef<SwipeHandle>(null);
   const swipeFocus = useRef(false);
   const swipeProgress = useMotionValue(0);
-  const nextScale = useTransform(swipeProgress, [0, 1], [0.95, 1]);
-  const nextY = useTransform(swipeProgress, [0, 1], [12, 0]);
+  const nextScale = useTransform(swipeProgress, [0, 1], [0.98, 1]);
+  const nextY = useTransform(swipeProgress, [0, 1], [5, 0]);
   const [data, setData] = useState<State>();
   const [page, setPage] = useState("Discover");
   const [selected, setSelected] = useState<string>();
@@ -750,16 +729,15 @@ export default function Home() {
         <a className="skip-link" href="#main-content">
           Skip to content
         </a>
-        <aside className="sidebar">
+        <nav className="app-nav" aria-label="Main navigation">
           <button
-            className="logo-button"
+            className="nav-brand"
             onClick={() => navigate("Discover")}
             aria-label="Ditto home"
           >
             <Logo />
           </button>
-          <div className="nav-label">MAKE ROOM FOR REAL LIFE</div>
-          <nav>
+          <div className="nav-items">
             {[
               { name: "Discover", icon: Compass },
               { name: "Circles", icon: Users },
@@ -772,48 +750,18 @@ export default function Home() {
                 aria-current={page === name ? "page" : undefined}
                 onClick={() => navigate(name)}
               >
-                <Icon size={21} />
+                <Icon size={22} aria-hidden="true" />
                 <span>{name}</span>
-                {name === "Circles" && <small>{data.circles.length}</small>}
               </button>
             ))}
-          </nav>
-          <div className="sidebar-note">
-            <span className="eyebrow">BETTER TOGETHER</span>
-            <h3>A yes from everyone.</h3>
-            <p>Find your common ground. Make it a date.</p>
-            <button
-              onClick={() => {
-                setPage("Circles");
-                setSelected(data.circles[0]?.id);
-              }}
-            >
-              Open your Circle <ArrowUpRight size={16} />
-            </button>
           </div>
-          <div className="sidebar-bottom">
-            <span className="pill lavender small">
-              {data.user.demo ? "Demo sandbox" : "Personal session"}
-            </span>
-            <button
-              className="profile-mini"
-              onClick={() => navigate("Profile")}
-            >
-              <span className="avatar">{data.user.avatar}</span>
-              <span>
-                <strong>{data.user.name}</strong>
-                <small>{data.user.city}</small>
-              </span>
-              <ChevronDown size={16} />
-            </button>
-          </div>
-        </aside>
+        </nav>
         <div className="workspace">
           <header className="topbar">
             <div className="mobile-logo">
               <Logo />
             </div>
-            <span className="desktop-only">Good people. Great plans.</span>
+
             <div className="top-actions">
               <button
                 className="location-button"
@@ -854,6 +802,20 @@ export default function Home() {
                   </div>
                   <div className="discover-tools">
                     <button
+                      className="filter-btn"
+                      onClick={() => setModal("filters")}
+                      aria-label={
+                        category === "All vibes"
+                          ? "Filters: all activities"
+                          : `Filters: ${category}`
+                      }
+                    >
+                      <SlidersHorizontal size={20} />
+                      <span>
+                        {category === "All vibes" ? "Filters" : category}
+                      </span>
+                    </button>
+                    <button
                       className="icon-btn"
                       aria-label={`Find real places in ${city || data.user.city}`}
                       onClick={() => {
@@ -872,37 +834,8 @@ export default function Home() {
                     </button>
                   </div>
                 </div>
-                <div className="filter-row">
-                  <div className="category-list">
-                    {categories.map((cat, i) => {
-                      const Icon = icons[i];
-                      return (
-                        <button
-                          className={category === cat ? "selected" : ""}
-                          key={cat}
-                          aria-pressed={category === cat}
-                          onClick={() => setCategory(cat)}
-                        >
-                          <Icon size={15} />
-                          {cat}
-                        </button>
-                      );
-                    })}
-                  </div>
-                  <button
-                    className="filter-btn"
-                    onClick={() => setModal("filters")}
-                    aria-label="Filter activities"
-                  >
-                    <SlidersHorizontal size={18} />
-                  </button>
-                </div>
                 <div className="discover-grid">
                   <section className="deck-section">
-                    <div className="section-meta">
-                      <span>Something worth going out for</span>
-                      <small>{deck.length} to discover</small>
-                    </div>
                     <div className="deck-stack physical-stack">
                       {deck[1] && (
                         <motion.div
@@ -912,6 +845,7 @@ export default function Home() {
                           style={{ scale: nextScale, y: nextY }}
                         >
                           <SwipeCard
+                            key={deck[1].id}
                             activity={deck[1]}
                             onSwipe={onSwipe}
                             onDetails={() => {}}
@@ -939,8 +873,14 @@ export default function Home() {
                             initial={{ opacity: 0 }}
                             animate={{ opacity: 1 }}
                           >
-                            <Compass size={32} />
-                            <h2>You’re all caught up.</h2>
+                            <img
+                              className="brand-art"
+                              src="/brand/invitations.webp"
+                              alt=""
+                              width={180}
+                              height={150}
+                            />
+                            <h2>You’re all caught up</h2>
                             <p>
                               No more activities match these filters. Change
                               your filters, revisit the deck, or create
@@ -1007,68 +947,9 @@ export default function Home() {
                       </button>
                     </div>
                     <div className="swipe-hint">
-                      ← Pass <span>Drag a card or use the buttons</span> Ditto →
+                      Swipe to decide. Ditto saves interest, not an RSVP.
                     </div>
                   </section>
-                  <aside className="discovery-aside">
-                    <section className="circle-promo">
-                      <span className="eyebrow">YOUR PEOPLE</span>
-                      <h2>Better with your people</h2>
-                      <p>
-                        Bring your ideas. Let everyone vote. Turn the things you
-                        agree on into a real outing.
-                      </p>
-                      <div className="social-proof">
-                        <Avatars
-                          members={data.circles[0]?.members || [data.user]}
-                        />
-                        <span>
-                          {data.circles[0]?.name || "Your next Circle"}
-                          <small>
-                            {data.circles[0]?.demo
-                              ? "Private demo · 4 fictional friends"
-                              : `${data.circles[0]?.members.length || 1} members`}
-                          </small>
-                        </span>
-                      </div>
-                      <button
-                        className="primary full"
-                        onClick={() => {
-                          setPage("Circles");
-                          setSelected(data.circles[0]?.id);
-                          setCircleTab("Ideas");
-                        }}
-                      >
-                        Plan with your Circle <ArrowRight size={17} />
-                      </button>
-                    </section>
-                    <section className="how-it-works">
-                      <span className="eyebrow">LESS BACK-AND-FORTH</span>
-                      <ol>
-                        <li>
-                          <span>01</span>
-                          <div>
-                            <strong>Find something good</strong>
-                            <p>Activities you want to make time for.</p>
-                          </div>
-                        </li>
-                        <li>
-                          <span>02</span>
-                          <div>
-                            <strong>Get on the same page</strong>
-                            <p>Private votes. Honest group matches.</p>
-                          </div>
-                        </li>
-                        <li>
-                          <span>03</span>
-                          <div>
-                            <strong>Put it in the calendar</strong>
-                            <p>Review the plan, approve, and RSVP.</p>
-                          </div>
-                        </li>
-                      </ol>
-                    </section>
-                  </aside>
                 </div>
                 <div className="demo-footnote">
                   {data.user.demo
@@ -1081,15 +962,8 @@ export default function Home() {
               <>
                 <div className="page-heading">
                   <div>
-                    <div className="eyebrow purple">
-                      YOUR PEOPLE, YOUR PLANS
-                    </div>
-                    <h1>
-                      Your people.
-                      <br />
-                      <span className="accent-text">Your next plan.</span>
-                    </h1>
-                    <p>A little less back-and-forth. A lot more together.</p>
+                    <h1>Your Circles</h1>
+                    <p>Bring your people. Find your next plan.</p>
                   </div>
                   <button
                     className="primary"
@@ -1164,11 +1038,6 @@ export default function Home() {
                 </button>
                 <div className="page-heading circle-heading">
                   <div>
-                    <div className="eyebrow purple">
-                      {c.demo
-                        ? "FICTIONAL FRIENDS · PRIVATE DEMO"
-                        : "YOUR PRIVATE CIRCLE"}
-                    </div>
                     <h1>{c.name}</h1>
                     <p>{c.description}</p>
                   </div>
@@ -1180,7 +1049,8 @@ export default function Home() {
                   </div>
                 </div>
                 {c.demo ? (
-                  <div className="demo-switch">
+                  <details className="demo-switch">
+                    <summary>Demo perspectives · {data.user.name}</summary>
                     <span>
                       <strong>Try every perspective.</strong> Switch fictional
                       members to cast independent votes.
@@ -1199,7 +1069,7 @@ export default function Home() {
                           </button>
                         ))}
                     </div>
-                  </div>
+                  </details>
                 ) : (
                   <div className="invite-row">
                     <span className="small muted">
@@ -1246,20 +1116,16 @@ export default function Home() {
                 )}
                 {circleTab === "Ideas" && (
                   <>
-                    <div className="round-banner">
+                    <details
+                      className="round-banner"
+                      open={!c.round || c.round.complete}
+                    >
+                      <summary>
+                        {c.round
+                          ? `${c.round.completed} of ${c.round.total} members finished`
+                          : "What should we do together?"}
+                      </summary>
                       <div>
-                        <span className="eyebrow purple">
-                          {c.round?.complete
-                            ? "ROUND COMPLETE"
-                            : c.round
-                              ? "FIND YOUR COMMON GROUND"
-                              : "A GOOD PLAN STARTS WITH AN IDEA"}
-                        </span>
-                        <h2>
-                          {c.round
-                            ? `${c.round.completed} of ${c.round.total} members finished`
-                            : "What should we do together?"}
-                        </h2>
                         <p>
                           {c.round
                             ? "Votes stay private until everyone finishes."
@@ -1290,7 +1156,7 @@ export default function Home() {
                           </span>
                         )}
                       </div>
-                    </div>
+                    </details>
                     {c.round && (
                       <div className="progress-track">
                         <div
@@ -1503,11 +1369,7 @@ export default function Home() {
               <>
                 <div className="page-heading">
                   <div>
-                    <div className="eyebrow purple">MAKE “SOMEDAY” A DATE</div>
-                    <h1>
-                      Your next{" "}
-                      <span className="accent-text">get-together.</span>
-                    </h1>
+                    <h1>Your plans</h1>
                     <p>Your group plans and activities you’re interested in.</p>
                   </div>
                 </div>
@@ -1543,8 +1405,14 @@ export default function Home() {
                 </div>
                 {!interested.length && !allPlans.length && (
                   <div className="empty-state">
-                    <CalendarDays />
-                    <h2>A wide-open calendar. A little possibility.</h2>
+                    <img
+                      className="brand-art"
+                      src="/brand/invitations.webp"
+                      alt=""
+                      width={180}
+                      height={150}
+                    />
+                    <h2>Your next plan starts here</h2>
                     <p>
                       Save an activity or match with your Circle to get started.
                     </p>
@@ -1562,16 +1430,15 @@ export default function Home() {
               <>
                 <div className="page-heading">
                   <div>
-                    <div className="eyebrow purple">COME AS YOU ARE</div>
-                    <h1>A little about you.</h1>
-                    <p>A few things that make you, you.</p>
+                    <h1>Your profile</h1>
+                    <p>Make the next outing feel like you.</p>
                   </div>
                 </div>
                 <div className="profile-grid">
                   <section className="profile-card">
                     <span className="large-avatar">{data.user.avatar}</span>
                     <h2>{data.user.name}</h2>
-                    <p className="muted">
+                    <p className="profile-location muted">
                       <MapPin size={15} />
                       {data.user.city}
                     </p>
@@ -1594,7 +1461,7 @@ export default function Home() {
                     </button>
                   </section>
                   <section className="settings-card">
-                    <h2>Make yourself at home.</h2>
+                    <h2>Your session</h2>
                     <p>
                       Personal profiles use a persistent session in this
                       browser. No passwords, no complicated sign-up.
@@ -1616,31 +1483,34 @@ export default function Home() {
                         </button>
                       ))}
                     </div>
-                    <h3>Connected capabilities</h3>
-                    <div className="status-row">
-                      <span>Meta Muse Spark</span>
-                      <span className="pill lavender">
-                        {data.integrations.meta
-                          ? data.integrations.live
-                            ? "Enabled · key configured"
-                            : "Paused · key configured"
-                          : "API key needed"}
-                      </span>
-                    </div>
-                    <div className="status-row">
-                      <span>SerpApi places</span>
-                      <span className="pill lavender">
-                        {data.integrations.serpapi
-                          ? data.integrations.live
-                            ? "Enabled · key configured"
-                            : "Paused · key configured"
-                          : "API key needed"}
-                      </span>
-                    </div>
-                    <p className="small muted">
-                      Keys stay on the server. Live calls are never replaced
-                      with simulated results. Demo plans are explicitly labeled.
-                    </p>
+                    <details className="capability-details">
+                      <summary>Connected services</summary>
+                      <div className="status-row">
+                        <span>Meta Muse Spark</span>
+                        <span className="pill lavender">
+                          {data.integrations.meta
+                            ? data.integrations.live
+                              ? "Enabled · key configured"
+                              : "Paused · key configured"
+                            : "API key needed"}
+                        </span>
+                      </div>
+                      <div className="status-row">
+                        <span>SerpApi places</span>
+                        <span className="pill lavender">
+                          {data.integrations.serpapi
+                            ? data.integrations.live
+                              ? "Enabled · key configured"
+                              : "Paused · key configured"
+                            : "API key needed"}
+                        </span>
+                      </div>
+                      <p className="small muted">
+                        Keys stay on the server. Live calls are never replaced
+                        with simulated results. Demo plans are explicitly
+                        labeled.
+                      </p>
+                    </details>
                   </section>
                 </div>
               </>
@@ -1898,6 +1768,21 @@ export default function Home() {
             )}
             {modal === "filters" && (
               <>
+                <fieldset>
+                  <legend>Activity category</legend>
+                  <div className="category-picker">
+                    {categories.map((cat) => (
+                      <button
+                        key={cat}
+                        className={category === cat ? "selected" : ""}
+                        aria-pressed={category === cat}
+                        onClick={() => setCategory(cat)}
+                      >
+                        {cat}
+                      </button>
+                    ))}
+                  </div>
+                </fieldset>
                 <div className="field">
                   <label htmlFor="cityfilter">City</label>
                   <input
@@ -1935,6 +1820,15 @@ export default function Home() {
             )}
             {modal === "profile" && (
               <form onSubmit={(e) => submit(e, "profile")}>
+                {data.user.demo && (
+                  <img
+                    className="brand-art"
+                    src="/brand/invitations.webp"
+                    alt=""
+                    width={180}
+                    height={150}
+                  />
+                )}
                 <p className="muted">
                   Meet people through things you actually want to do. Your new
                   personal profile is separate from the fictional demo crew.

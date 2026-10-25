@@ -75,7 +75,6 @@ export function CircleCoordinator({
   return (
     <div className="coordination-grid">
       <section className="plan-card chat-panel">
-        <span className="eyebrow purple">GOOD PLANS START HERE</span>
         <h2>Your group chat</h2>
         <p className="muted small">
           Private to this Circle · updates every five seconds · showing the
@@ -189,8 +188,7 @@ export function CircleCoordinator({
         </details>
       </section>
       <section className="plan-card autopilot-panel">
-        <span className="eyebrow purple">SOCIAL AUTOPILOT</span>
-        <h2>Turn a thought into a plan.</h2>
+        <h2>Plan from your chat</h2>
         <p>
           {selected.length} of 20 messages selected. Review the suggestion, edit
           it, then let everyone vote.

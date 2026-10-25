@@ -294,3 +294,47 @@ test("keyboard focus follows a replaced card without stealing button focus", asy
   host.remove();
   button.remove();
 });
+
+test("losing the window during a drag cancels without voting or stranding the card", async () => {
+  let calls = 0;
+  const t = await mount(async () => {
+    calls++;
+    return false;
+  });
+  await t.pointer("pointerdown", 100, 200);
+  await t.pointer("pointermove", 230, 201);
+  await act(async () => {
+    win.dispatchEvent(new win.Event("blur"));
+    await pause(25);
+  });
+  assert.equal(t.card.dataset.swipePhase, "idle");
+  assert.equal(t.card.style.transform, "none");
+  await t.pointer("pointerup", 230, 201);
+  assert.equal(calls, 0);
+  await t.cleanup();
+});
+
+test("failed activity imagery has a truthful readable fallback", async () => {
+  const { ActivityPhoto } = await import("../app/activity-photo");
+  const host = win.document.createElement("div");
+  win.document.body.append(host);
+  const root = createRoot(host);
+  await act(async () =>
+    root.render(
+      createElement(ActivityPhoto, {
+        src: "/missing-qa.jpg",
+        alt: "Outdoors inspiration",
+      }),
+    ),
+  );
+  await act(async () =>
+    host.querySelector("img")!.dispatchEvent(new win.Event("error")),
+  );
+  assert.equal(host.querySelector("img"), null);
+  assert.equal(
+    host.querySelector('[role="img"]')?.getAttribute("aria-label"),
+    "Outdoors inspiration. Photo unavailable",
+  );
+  await act(async () => root.unmount());
+  host.remove();
+});

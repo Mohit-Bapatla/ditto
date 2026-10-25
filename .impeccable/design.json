@@ -1,0 +1,347 @@
+{
+  "schemaVersion": 2,
+  "generatedAt": "2026-10-25T05:07:44.109333+00:00",
+  "title": "Design System: Ditto",
+  "extensions": {
+    "colorMeta": {
+      "accent": {
+        "role": "primary",
+        "displayName": "Accent",
+        "tonalRamp": [
+          "oklch(15% 0.2220 17.58)",
+          "oklch(26% 0.2220 17.58)",
+          "oklch(38% 0.2220 17.58)",
+          "oklch(49% 0.2220 17.58)",
+          "oklch(61% 0.2220 17.58)",
+          "oklch(72% 0.2220 17.58)",
+          "oklch(84% 0.2220 17.58)",
+          "oklch(95% 0.2220 17.58)"
+        ]
+      },
+      "accent-hover": {
+        "role": "primary",
+        "displayName": "Accent Hover",
+        "tonalRamp": [
+          "oklch(15% 0.1922 17.35)",
+          "oklch(26% 0.1922 17.35)",
+          "oklch(38% 0.1922 17.35)",
+          "oklch(49% 0.1922 17.35)",
+          "oklch(61% 0.1922 17.35)",
+          "oklch(72% 0.1922 17.35)",
+          "oklch(84% 0.1922 17.35)",
+          "oklch(95% 0.1922 17.35)"
+        ]
+      },
+      "paper": {
+        "role": "neutral",
+        "displayName": "Paper",
+        "tonalRamp": [
+          "oklch(15% 0.0065 5.62)",
+          "oklch(26% 0.0065 5.62)",
+          "oklch(38% 0.0065 5.62)",
+          "oklch(49% 0.0065 5.62)",
+          "oklch(61% 0.0065 5.62)",
+          "oklch(72% 0.0065 5.62)",
+          "oklch(84% 0.0065 5.62)",
+          "oklch(95% 0.0065 5.62)"
+        ]
+      },
+      "surface": {
+        "role": "neutral",
+        "displayName": "Surface",
+        "tonalRamp": [
+          "oklch(15% 0.0000 89.88)",
+          "oklch(26% 0.0000 89.88)",
+          "oklch(38% 0.0000 89.88)",
+          "oklch(49% 0.0000 89.88)",
+          "oklch(61% 0.0000 89.88)",
+          "oklch(72% 0.0000 89.88)",
+          "oklch(84% 0.0000 89.88)",
+          "oklch(95% 0.0000 89.88)"
+        ]
+      },
+      "ink": {
+        "role": "neutral",
+        "displayName": "Ink",
+        "tonalRamp": [
+          "oklch(15% 0.0131 331.57)",
+          "oklch(26% 0.0131 331.57)",
+          "oklch(38% 0.0131 331.57)",
+          "oklch(49% 0.0131 331.57)",
+          "oklch(61% 0.0131 331.57)",
+          "oklch(72% 0.0131 331.57)",
+          "oklch(84% 0.0131 331.57)",
+          "oklch(95% 0.0131 331.57)"
+        ]
+      },
+      "muted": {
+        "role": "neutral",
+        "displayName": "Muted",
+        "tonalRamp": [
+          "oklch(15% 0.0225 328.51)",
+          "oklch(26% 0.0225 328.51)",
+          "oklch(38% 0.0225 328.51)",
+          "oklch(49% 0.0225 328.51)",
+          "oklch(61% 0.0225 328.51)",
+          "oklch(72% 0.0225 328.51)",
+          "oklch(84% 0.0225 328.51)",
+          "oklch(95% 0.0225 328.51)"
+        ]
+      },
+      "line": {
+        "role": "neutral",
+        "displayName": "Line",
+        "tonalRamp": [
+          "oklch(15% 0.0137 347.97)",
+          "oklch(26% 0.0137 347.97)",
+          "oklch(38% 0.0137 347.97)",
+          "oklch(49% 0.0137 347.97)",
+          "oklch(61% 0.0137 347.97)",
+          "oklch(72% 0.0137 347.97)",
+          "oklch(84% 0.0137 347.97)",
+          "oklch(95% 0.0137 347.97)"
+        ]
+      },
+      "tint": {
+        "role": "neutral",
+        "displayName": "Tint",
+        "tonalRamp": [
+          "oklch(15% 0.0273 0.67)",
+          "oklch(26% 0.0273 0.67)",
+          "oklch(38% 0.0273 0.67)",
+          "oklch(49% 0.0273 0.67)",
+          "oklch(61% 0.0273 0.67)",
+          "oklch(72% 0.0273 0.67)",
+          "oklch(84% 0.0273 0.67)",
+          "oklch(95% 0.0273 0.67)"
+        ]
+      },
+      "lime": {
+        "role": "neutral",
+        "displayName": "Lime",
+        "tonalRamp": [
+          "oklch(15% 0.0530 358.99)",
+          "oklch(26% 0.0530 358.99)",
+          "oklch(38% 0.0530 358.99)",
+          "oklch(49% 0.0530 358.99)",
+          "oklch(61% 0.0530 358.99)",
+          "oklch(72% 0.0530 358.99)",
+          "oklch(84% 0.0530 358.99)",
+          "oklch(95% 0.0530 358.99)"
+        ]
+      },
+      "vote-yes": {
+        "role": "semantic",
+        "displayName": "Vote Yes",
+        "tonalRamp": [
+          "oklch(15% 0.1249 152.85)",
+          "oklch(26% 0.1249 152.85)",
+          "oklch(38% 0.1249 152.85)",
+          "oklch(49% 0.1249 152.85)",
+          "oklch(61% 0.1249 152.85)",
+          "oklch(72% 0.1249 152.85)",
+          "oklch(84% 0.1249 152.85)",
+          "oklch(95% 0.1249 152.85)"
+        ]
+      },
+      "vote-yes-hover": {
+        "role": "semantic",
+        "displayName": "Vote Yes Hover",
+        "tonalRamp": [
+          "oklch(15% 0.1042 153.60)",
+          "oklch(26% 0.1042 153.60)",
+          "oklch(38% 0.1042 153.60)",
+          "oklch(49% 0.1042 153.60)",
+          "oklch(61% 0.1042 153.60)",
+          "oklch(72% 0.1042 153.60)",
+          "oklch(84% 0.1042 153.60)",
+          "oklch(95% 0.1042 153.60)"
+        ]
+      },
+      "vote-yes-edge": {
+        "role": "semantic",
+        "displayName": "Vote Yes Edge",
+        "tonalRamp": [
+          "oklch(15% 0.1273 155.95)",
+          "oklch(26% 0.1273 155.95)",
+          "oklch(38% 0.1273 155.95)",
+          "oklch(49% 0.1273 155.95)",
+          "oklch(61% 0.1273 155.95)",
+          "oklch(72% 0.1273 155.95)",
+          "oklch(84% 0.1273 155.95)",
+          "oklch(95% 0.1273 155.95)"
+        ]
+      },
+      "vote-no": {
+        "role": "semantic",
+        "displayName": "Vote No",
+        "tonalRamp": [
+          "oklch(15% 0.1880 25.78)",
+          "oklch(26% 0.1880 25.78)",
+          "oklch(38% 0.1880 25.78)",
+          "oklch(49% 0.1880 25.78)",
+          "oklch(61% 0.1880 25.78)",
+          "oklch(72% 0.1880 25.78)",
+          "oklch(84% 0.1880 25.78)",
+          "oklch(95% 0.1880 25.78)"
+        ]
+      },
+      "vote-no-edge": {
+        "role": "semantic",
+        "displayName": "Vote No Edge",
+        "tonalRamp": [
+          "oklch(15% 0.1825 26.30)",
+          "oklch(26% 0.1825 26.30)",
+          "oklch(38% 0.1825 26.30)",
+          "oklch(49% 0.1825 26.30)",
+          "oklch(61% 0.1825 26.30)",
+          "oklch(72% 0.1825 26.30)",
+          "oklch(84% 0.1825 26.30)",
+          "oklch(95% 0.1825 26.30)"
+        ]
+      }
+    },
+    "typographyMeta": {
+      "display": {
+        "displayName": "Invitation identity",
+        "purpose": "Local Syne for active outing titles."
+      },
+      "body": {
+        "displayName": "Supporting content",
+        "purpose": "Local Manrope for readable task content."
+      }
+    },
+    "shadows": [
+      {
+        "name": "decision-control",
+        "value": "0 3px 16px #211b2009",
+        "purpose": "Subtle depth under circular decisions."
+      },
+      {
+        "name": "dialog",
+        "value": "0 24px 80px #211b2033",
+        "purpose": "Modal separation."
+      }
+    ],
+    "motion": [
+      {
+        "name": "snap-back",
+        "value": "spring: stiffness 440, damping 30, mass 0.85",
+        "purpose": "Return incomplete or failed swipes."
+      },
+      {
+        "name": "commit-exit",
+        "value": "320ms cubic-bezier(0.32,0.04,0.68,0.4)",
+        "purpose": "Exit only after saved vote."
+      },
+      {
+        "name": "reduced-exit",
+        "value": "opacity 100ms",
+        "purpose": "Reduced-motion confirmation without flyout."
+      }
+    ],
+    "breakpoints": [
+      {
+        "name": "narrow",
+        "value": "360px"
+      },
+      {
+        "name": "mobile-max",
+        "value": "760px"
+      },
+      {
+        "name": "desktop-min",
+        "value": "761px"
+      }
+    ],
+    "rampNote": "Tonal ramps are synthesized OKLCH preview metadata, not implemented CSS palette tokens; out-of-gamut colors rely on browser mapping."
+  },
+  "components": [
+    {
+      "name": "Primary button",
+      "kind": "button",
+      "refersTo": "button-primary",
+      "description": "Rose action for moving a planning task forward.",
+      "html": "<button class=\"ds-primary\">Create a Circle</button>",
+      "css": ".ds-primary{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 20px;border-radius:12px;font:650 14px/1.3 var(--font-body),sans-serif;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s;border:0;background:var(--accent);color:var(--surface)}.ds-primary:hover{background:var(--accent-hover)}.ds-primary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.ds-primary:active{filter:brightness(.96)}"
+    },
+    {
+      "name": "Secondary button",
+      "kind": "button",
+      "refersTo": "button-secondary",
+      "description": "Quiet action with a visible boundary.",
+      "html": "<button class=\"ds-secondary\">Change filters</button>",
+      "css": ".ds-secondary{display:inline-flex;align-items:center;justify-content:center;min-height:48px;padding:12px 20px;border-radius:12px;font:650 14px/1.3 var(--font-body),sans-serif;cursor:pointer;transition:background .18s,color .18s,box-shadow .18s;background:var(--surface);color:var(--ink);border:1px solid var(--line)}.ds-secondary:hover{background:var(--tint)}.ds-secondary:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.ds-secondary:active{filter:brightness(.96)}"
+    },
+    {
+      "name": "Text field",
+      "kind": "input",
+      "refersTo": "input",
+      "description": "Visible label and native input behavior.",
+      "html": "<label class=\"ds-label\" for=\"ds-city\">City</label><input class=\"ds-input\" id=\"ds-city\" value=\"Austin, TX\">",
+      "css": ".ds-label{display:block;font:600 12px var(--font-body),sans-serif;color:var(--ink);margin-bottom:8px}.ds-input{font:400 16px var(--font-body),sans-serif;min-height:48px;padding:12px;border:1px solid #bfc3b8;border-radius:var(--r-sm);background:var(--surface);color:var(--ink)}.ds-input:focus-visible{outline:3px solid var(--accent);outline-offset:4px}"
+    },
+    {
+      "name": "Category choice",
+      "kind": "chip",
+      "refersTo": "category-selected",
+      "description": "Selected filter choice; unselected choices use line border and transparent background.",
+      "html": "<button class=\"ds-category\" aria-pressed=\"true\">Outdoors</button>",
+      "css": ".ds-category{font:400 15px var(--font-body),sans-serif;min-height:44px;padding:8px 14px;border:1px solid var(--accent);border-radius:12px;background:var(--accent);color:var(--surface);cursor:pointer}.ds-category:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.ds-category:active{filter:brightness(.96)}"
+    },
+    {
+      "name": "Navigation",
+      "kind": "nav",
+      "description": "Desktop text treatment; production includes icons and switches to labeled bottom navigation on phones.",
+      "html": "<nav class=\"ds-nav\" aria-label=\"Main navigation\"><button aria-current=\"page\">Discover</button><button>Circles</button><button>Plans</button><button>Profile</button></nav>",
+      "css": ".ds-nav{display:flex;gap:16px;flex-wrap:wrap}.ds-nav button{font:600 14px var(--font-body),sans-serif;min-height:48px;padding:8px 16px;border:0;border-radius:12px;background:transparent;color:var(--muted);cursor:pointer}.ds-nav [aria-current]{color:var(--accent);background:var(--tint)}.ds-nav button:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.ds-nav button:active{filter:brightness(.96)}"
+    },
+    {
+      "name": "Invitation fallback",
+      "kind": "card",
+      "refersTo": "invitation",
+      "description": "Static fallback specimen; actual cards use truthful imagery and the SwipeSurface transaction, not this inert preview.",
+      "html": "<article class=\"ds-invitation\"><p>Photo unavailable</p><h2>Your next outing</h2><p>Venue to be decided</p></article>",
+      "css": ".ds-invitation{background:var(--ink);color:var(--surface);border-radius:24px;padding:24px 22px;max-width:360px;min-height:220px;font:400 14px/1.4 var(--font-body),sans-serif}.ds-invitation h2{font:700 30px/1.04 var(--font-display),sans-serif;letter-spacing:-.03em;overflow-wrap:anywhere}"
+    },
+    {
+      "name": "Ditto decision",
+      "kind": "button",
+      "refersTo": "decision-yes",
+      "description": "Personal interest; never communicates RSVP.",
+      "html": "<button class=\"ds-yes\" aria-label=\"Interested in activity\"><svg aria-hidden=\"true\" width=\"24\" height=\"24\" viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M20.8 4.6a5.5 5.5 0 0 0-7.8 0L12 5.7l-1.1-1.1a5.5 5.5 0 0 0-7.8 7.8L12 21l8.8-8.6a5.5 5.5 0 0 0 0-7.8Z\"/></svg></button>",
+      "css": ".ds-yes{display:flex;align-items:center;justify-content:center;width:56px;height:56px;border:0;border-radius:50%;background:var(--surface);color:var(--vote-yes);box-shadow:0 3px 16px #211b2009;cursor:pointer}.ds-yes:hover{background:#e2f4e9}.ds-yes:focus-visible{outline:3px solid var(--accent);outline-offset:4px}.ds-yes:active{filter:brightness(.96)}"
+    }
+  ],
+  "narrative": {
+    "northStar": "One physical invitation",
+    "overview": "Ditto is a photo-led, mobile-first place for friends to choose real outings together. The confirmed visual direction is Vibrant & Block-based + Motion-Driven: rose identity, near-white pink surfaces, expressive Syne headings and clear Manrope supporting text. Physical movement communicates a decision; it is not decoration.\n\nThis documents the implemented light identity, replacing the previous beige direction. It does not promise a dark theme. Product truth remains unchanged: interest is not an RSVP, and group consensus comes from independent real votes. Surface-specific composition and concept comparisons live in `docs/design-iterations/rebuild/DIRECTION.md`.",
+    "keyCharacteristics": [
+      "Authentic photography with honest venue, illustration and demo attribution.",
+      "Expressive headings, quiet utilities and semantic green/red decisions.",
+      "Tactile drag feedback with keyboard and button alternatives.",
+      "Progressive disclosure that preserves the complete planning flow."
+    ],
+    "rules": [
+      {
+        "name": "The Honest Decision Rule",
+        "body": "Always pair decision color with a word, icon or accessible name; never imply attendance or group agreement from personal interest.",
+        "section": "colors"
+      }
+    ],
+    "dos": [
+      "**Do** preserve real backend votes, RSVP, approvals, routing and calendar behavior while refining presentation.",
+      "**Do** use authentic venue imagery and identify illustrative or demo content plainly.",
+      "**Do** keep touch, mouse and keyboard decisions equivalent and guard against duplicate submissions.",
+      "**Do** check long names, failed images, empty/error states, enlarged text and reduced motion in rendered screens.",
+      "**Do** keep native phone Safari/Chrome verification explicitly pending until actual devices are tested."
+    ],
+    "donts": [
+      "**Don't** confuse rose brand emphasis with semantic green/red voting.",
+      "**Don't** fabricate venue imagery, attendance, or group agreement.",
+      "**Don't** replace this identity with generic SaaS panels, decorative blobs or gratuitous gradients.",
+      "**Don't** remove useful feedback globally to implement reduced motion.",
+      "**Don't** promise dark theme support or physical-device verification from this light-theme source documentation."
+    ]
+  }
+}
