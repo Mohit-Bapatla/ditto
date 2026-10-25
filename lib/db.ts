@@ -65,6 +65,19 @@ export function createSession(): Session {
   return transaction(() => {
     if (presentationEnabled(process.env, path))
       return createPresentationSession();
+    // Production visitors get only their own anonymous profile. Demo friends,
+    // activities and Circles require explicit opt-in; existing data is untouched.
+    if (process.env.DITTO_DEMO_SEED !== "true" &&
+        (process.env.NODE_ENV === "production" || process.env.DITTO_DEMO_SEED === "false")) {
+      const s = { id: id(), user: id(), owner: id() };
+      const profile: Person = {
+        id: s.user, name: "You", avatar: "", city: "Austin, TX",
+        interests: [], budget: 40, demo: true,
+      };
+      run("INSERT INTO profiles VALUES(?,?,?)", s.user, s.owner, JSON.stringify(profile));
+      run("INSERT INTO sessions(id,user_id,owner) VALUES(?,?,?)", s.id, s.user, s.owner);
+      return s;
+    }
     const owner = id(),
       token = id();
     const users = ["Alex", "Jordan", "Maya", "Sam"].map((name, i) => ({

@@ -5,6 +5,8 @@ ENV NEXT_TELEMETRY_DISABLED=1
 COPY package.json package-lock.json ./
 RUN npm ci
 COPY . .
+# Only this public URL is needed by prerendered social metadata, never API keys.
+ARG PUBLIC_ORIGIN
 # No provider secrets are needed during build. This database is disposable.
 RUN DATABASE_PATH=/tmp/ditto-build.sqlite npm run build
 
