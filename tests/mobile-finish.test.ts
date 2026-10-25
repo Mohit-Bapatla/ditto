@@ -50,7 +50,7 @@ test("wheel tracks progressively and one burst commits only once across keyed ca
   c.input(40, 1, 0, 1000, true);
   c.input(50, 1, 0, 1020, true);
   assert.deepEqual(moves, [40, 90]);
-  assert.equal(votes.length, 0);
+  assert.deepEqual([...votes], [true], "threshold commits synchronously, before idle");
   c.end(1200);
   assert.deepEqual([...votes], [true]);
   const next = new WheelGesture(
@@ -84,7 +84,8 @@ test("wheel snapback, vertical interruption, disabled state and flick", () => {
   c.input(100, 0, 0, 2200, false);
   c.end(2400);
   assert.equal(votes.length, 2);
-  c.input(40, 0, 0, 2900, true);
+  c.input(20, 0, 0, 2900, true);
+  c.input(35, 0, 0, 2920, true);
   c.end(3080);
   assert.equal(votes[2], true);
 });
@@ -122,7 +123,8 @@ test("profile photo strips metadata, resizes, rejects scripts and supports remov
 test("wheel resets velocity between bursts and cancels when disabled mid-drag", () => {
   const votes: (boolean | undefined)[] = [];
   const c = new WheelGesture({lastEvent:-Infinity,quietUntil:0}, () => 360, () => {}, v => votes.push(v));
-  c.input(40,0,0,1000,true);
+  c.input(20,0,0,1000,true);
+  c.input(35,0,0,1020,true);
   c.end(1180);
   for(let i=0;i<16;i++) c.input(2,0,0,1800+i*30,true);
   c.end(2460);
@@ -132,4 +134,40 @@ test("wheel resets velocity between bursts and cancels when disabled mid-drag", 
   c.end(3200);
   assert.deepEqual([...votes], [true,undefined,undefined]);
   assert.equal(c.dragging,false);
+});
+
+test("accepted wheel travel releases immediately and ignores momentum/opposite tails", () => {
+  const votes: (boolean | undefined)[] = [];
+  const gate = {lastEvent: -Infinity, quietUntil: 0};
+  const c = new WheelGesture(gate, () => 390, () => {}, v => votes.push(v));
+  for (let n = 0; n < 5; n++) c.input(20, 0, 0, 1000 + n * 70, true);
+  assert.deepEqual(votes, [true]); // No idle timeout has elapsed.
+  for (let n = 0; n < 20; n++) c.input(n % 2 ? -25 : 25, 0, 0, 1300 + n * 30, true);
+  assert.deepEqual(votes, [true]);
+  c.input(-20,0,0,2400,true); c.input(-35,0,0,2420,true);
+  assert.deepEqual(votes,[true,false]);
+});
+
+test("opposite-direction reversal below threshold follows current intention", () => {
+  const votes: (boolean | undefined)[] = [];
+  const c = new WheelGesture({lastEvent:-Infinity,quietUntil:0},()=>390,()=>{},v=>votes.push(v));
+  c.input(25,0,0,1000,true); c.input(-20,0,0,1100,true);
+  c.input(-40,0,0,1200,true); c.input(-70,0,0,1300,true);
+  assert.deepEqual(votes,[false]);
+});
+
+test("fresh acceleration after a short pause escapes momentum quarantine",()=>{
+ const gate={lastEvent:1000,quietUntil:1220,lastDelta:3};const votes:(boolean|undefined)[]=[];
+ const c=new WheelGesture(gate,()=>390,()=>{},v=>votes.push(v));
+ c.input(18,0,0,1100,true);c.input(80,0,0,1120,true);
+ assert.deepEqual(votes,[true]);
+});
+
+test("new acceleration after decaying momentum works without waiting for complete wheel silence",()=>{
+ const gate={lastEvent:-Infinity,quietUntil:0,lastDelta:0};const votes:(boolean|undefined)[]=[];
+ const c=new WheelGesture(gate,()=>390,()=>{},v=>votes.push(v));
+ c.input(110,0,0,1000,true);c.discard(1000);
+ for(const [time,delta] of [[1050,40],[1100,20],[1150,6],[1200,3]]) c.input(delta,0,0,time,true);
+ c.input(15,0,0,1220,true);c.input(85,0,0,1240,true);
+ assert.deepEqual(votes,[true,true]);
 });

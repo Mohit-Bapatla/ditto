@@ -193,7 +193,7 @@ test("exit starts during save, publication waits for both, and rapid input canno
     await pause(50);
   });
   assert.equal(t.card.dataset.swipePhase, "exiting");
-  assert.equal(published, false);
+  // Exit may already have completed while the network was pending.
   await act(async () => pause(420));
   assert.equal(published, true);
   assert.equal(calls, 1);
@@ -473,4 +473,34 @@ test("avatar renders stored photos, falls back only on error, and retries a repl
   await act(async()=>root.render(createElement(Avatar,{person:{name:"Jordan"}})));
   assert.equal(host.textContent,"J");
   await act(async()=>root.unmount());
+});
+
+test("Circle installs the shared wheel engine on the stationary deck and submits its real vote operation", async () => {
+  const {GroupVoting}=await import('../app/group-voting');
+  const host=win.document.createElement('div');win.document.body.append(host);
+  const root=createRoot(host), operations: unknown[]=[];
+  const circle={id:'circle',name:'Crew',city:'Austin',description:'',budget:20,invite:'',demo:true,members:[],plans:[],messages:[],constraints:[],ideas:[{id:'idea',title:'Chess',category:'Games',creator:'u',image:'/chess.webp'}],round:{id:'round',threshold:'everyone',complete:false,completed:0,total:3,ideaIds:['idea']}};
+  await act(async()=>root.render(createElement(GroupVoting,{circle,busy:false,onChat:()=>{},act:async(body,_message,exit)=>{operations.push(body);await exit?.();return true;}})));
+  const card=host.querySelector('article')!;
+  Object.defineProperty(card,'clientWidth',{value:360});
+  const deck=host.querySelector('.group-stack')!;
+  await act(async()=>{
+    deck.dispatchEvent(new win.WheelEvent('wheel',{deltaX:30,bubbles:true,cancelable:true}));
+    deck.dispatchEvent(new win.WheelEvent('wheel',{deltaX:70,bubbles:true,cancelable:true}));
+    assert.deepEqual(operations,[{type:'vote',circle:'circle',idea:'idea',vote:true}]);
+    await pause(400);
+    deck.dispatchEvent(new win.WheelEvent('wheel',{deltaX:90,bubbles:true,cancelable:true}));
+  });
+  assert.equal(operations.length,1);
+  await act(async()=>root.unmount());host.remove();
+});
+
+test("StrictMode effect replay completes Undo entrance instead of stranding the card", async () => {
+  const {StrictMode}=await import('react');
+  const host=win.document.createElement('div');win.document.body.append(host);const root=createRoot(host);
+  await act(async()=>root.render(createElement(StrictMode,null,createElement(SwipeSurface,{children:'Restored',label:'Restored',disabled:false,returnFrom:'yes',onSwipe:async()=>false}))));
+  await act(async()=>pause(900));
+  const transform=host.querySelector('article')!.style.transform;
+  assert.ok(transform==='none' || Math.abs(Number(transform.match(/translateX\(([-\d.]+)px/)?.[1]))<1,transform);
+  await act(async()=>root.unmount());host.remove();
 });

@@ -7,6 +7,7 @@ import {
   useState,
   type ReactNode,
   type Ref,
+  type RefObject,
 } from "react";
 import {
   animate,
@@ -39,6 +40,7 @@ export function SwipeSurface({
   progress,
   focusHandoffRef,
   wheelGate,
+  wheelTarget,
   returnFrom,
 }: {
   children: ReactNode;
@@ -50,6 +52,7 @@ export function SwipeSurface({
   progress?: MotionValue<number>;
   focusHandoffRef?: { current: boolean };
   wheelGate?: { current: WheelGate };
+  wheelTarget?: RefObject<HTMLDivElement | null>;
   returnFrom?: string;
 }) {
   const element = useRef<HTMLElement>(null);
@@ -69,7 +72,8 @@ export function SwipeSurface({
   const wheel = useRef<WheelGesture | undefined>(undefined);
   const wheelCallbacks = useRef({
     disabled,
-    commit: (yes: boolean) => {
+    commit: (yes: boolean, velocity?: number) => {
+      void velocity;
       void yes;
     },
     snap: () => {},
@@ -83,10 +87,8 @@ export function SwipeSurface({
   const reduced = useReducedMotion();
   const x = useMotionValue(0);
   const opacity = useMotionValue(1);
-  const entered = useRef(false);
   useLayoutEffect(() => {
-    if (entered.current || !returnFrom || reduced) return;
-    entered.current = true;
+    if (!returnFrom || reduced) return;
     x.set(returnFrom === "yes" ? 110 : -110);
     const animation = animate(x, 0, {type: "spring", stiffness: 280, damping: 30});
     return () => animation.stop();
@@ -141,6 +143,7 @@ export function SwipeSurface({
     };
   }, [progress, x]);
   async function snapBack() {
+    x.stop();
     void animate(screenOpacity, 0, { duration: 0.15 });
     locked.current = true;
     if (mounted.current) setPhase("returning");
@@ -156,7 +159,7 @@ export function SwipeSurface({
       setPhase("idle");
     }
   }
-  async function commit(yes: boolean) {
+  async function commit(yes: boolean, velocity = 0) {
     if (disabled || locked.current) return;
     wheel.current?.discard(performance.now());
     locked.current = true;
@@ -167,14 +170,38 @@ export function SwipeSurface({
     x.stop();
     // Start visual release immediately; publishing the next card still requires
     // BOTH the real server save and this exit. Network failure restores this card.
-    const target = sign * (window.innerWidth + (element.current?.clientWidth || 400));
+    const bounds = element.current?.getBoundingClientRect();
+    const width = element.current?.clientWidth || 400;
+    const travel = bounds
+      ? (yes ? window.innerWidth - bounds.left : bounds.right) + width * 0.3
+      : window.innerWidth + width;
+    const target = x.get() + sign * Math.max(width, travel);
+    const acceptedAt = performance.now();
+    // Development-only timing evidence, bounded and free of user/activity data.
+    const samples: {t: number; x: number}[] = [];
+    let frame = 0;
+    const trace = () => {
+      samples.push({t: performance.now() - acceptedAt, x: x.get()});
+      if (samples.length < 30 && mounted.current) frame = requestAnimationFrame(trace);
+    };
+    if (process.env.NODE_ENV === "development") {
+      element.current?.setAttribute("data-swipe-accepted-at", String(acceptedAt));
+      trace();
+    }
+    const done = () => {
+      cancelAnimationFrame(frame);
+      if (process.env.NODE_ENV === "development") {
+        const traceTarget = wheelTarget?.current || element.current;
+        traceTarget?.setAttribute("data-swipe-timing", JSON.stringify(samples));
+      }
+    };
     const exit = new Promise<void>((resolve) => {
-      finishExit.current = resolve;
-      if (reduced) animate(opacity, 0, { duration: 0.1, onComplete: resolve });
+      finishExit.current = () => { done(); resolve(); };
+      if (reduced) animate(opacity, 0, { duration: 0.1, onComplete: () => { done(); resolve(); } });
       else animate(x, target, {
-        duration: 0.3,
-        ease: [0.16, 1, 0.3, 1],
-        onComplete: resolve,
+        duration: Math.max(0.46, 0.5 - Math.min(Math.abs(velocity), 2) * 0.02),
+        ease: [0.28, 0.5, 0.4, 1],
+        onComplete: () => { done(); resolve(); },
       });
     });
     if (!reduced) void animate(screenOpacity, [screenOpacity.get(), 0.24, 0], {
@@ -204,8 +231,8 @@ export function SwipeSurface({
   useLayoutEffect(() => {
     wheelCallbacks.current = {
       disabled,
-      commit: (yes) => {
-        void commit(yes);
+      commit: (yes, velocity) => {
+        void commit(yes, velocity);
       },
       snap: () => {
         void snapBack();
@@ -215,6 +242,7 @@ export function SwipeSurface({
   useEffect(() => {
     const card = element.current;
     if (!wheelGate || !card) return;
+    const target = wheelTarget?.current || card;
     let timer: ReturnType<typeof setTimeout> | undefined;
     const controller = new WheelGesture(
       wheelGate.current,
@@ -225,9 +253,9 @@ export function SwipeSurface({
         setFailure("");
         setPhase("dragging");
       },
-      (vote) => {
+      (vote, velocity) => {
         if (vote === undefined || wheelCallbacks.current.disabled) wheelCallbacks.current.snap();
-        else wheelCallbacks.current.commit(vote);
+        else wheelCallbacks.current.commit(vote, velocity);
       },
     );
     wheel.current = controller;
@@ -238,6 +266,7 @@ export function SwipeSurface({
     const hidden = () => {
       if (document.hidden) cancel();
     };
+    const events: {time: number; dx: number; dy: number; ready: boolean; reason: string}[] = [];
     const onWheel = (event: WheelEvent) => {
       if (
         event.ctrlKey ||
@@ -246,31 +275,30 @@ export function SwipeSurface({
         (event.target as HTMLElement).closest("button,a,input,select,textarea")
       )
         return;
-      if (
-        controller.input(
-          event.deltaX,
-          event.deltaY,
-          event.deltaMode,
-          performance.now(),
-          !wheelCallbacks.current.disabled && !locked.current,
-        )
-      ) {
+      const ready = !wheelCallbacks.current.disabled && !locked.current;
+      const consumed = controller.input(event.deltaX, event.deltaY, event.deltaMode, performance.now(), ready);
+      if (process.env.NODE_ENV === "development") {
+        events.push({time: performance.now(), dx:event.deltaX, dy:event.deltaY, ready, reason:controller.reason});
+        if (events.length > 40) events.shift();
+        target.setAttribute("data-wheel-events", JSON.stringify(events));
+      }
+      if (consumed) {
         if (event.cancelable) event.preventDefault();
         clearTimeout(timer);
         timer = setTimeout(() => controller.end(performance.now()), 180);
       }
     };
-    card.addEventListener("wheel", onWheel, { passive: false });
+    target.addEventListener("wheel", onWheel, { passive: false });
     window.addEventListener("blur", cancel);
     document.addEventListener("visibilitychange", hidden);
     return () => {
       clearTimeout(timer);
-      card.removeEventListener("wheel", onWheel);
+      target.removeEventListener("wheel", onWheel);
       window.removeEventListener("blur", cancel);
       document.removeEventListener("visibilitychange", hidden);
       wheel.current = undefined;
     };
-  }, [wheelGate, x]);
+  }, [wheelGate, wheelTarget, x]);
   useImperativeHandle(controlRef, () => ({ swipe: commit }));
   function cancelPointer() {
     if (!start.current) return;
@@ -298,6 +326,7 @@ export function SwipeSurface({
         transformOrigin: "50% 85%",
       }}
       onPointerDown={(e) => {
+        if (process.env.NODE_ENV === "development") e.currentTarget.setAttribute("data-swipe-input", JSON.stringify({event:"down",disabled,locked:locked.current,wheel:wheel.current?.dragging,x:e.clientX,y:e.clientY,primary:e.isPrimary,button:e.button}));
         // A new tap is independent of the click synthesized by the previous drag.
         suppressClick.current = false;
         if (
@@ -356,11 +385,12 @@ export function SwipeSurface({
                 now - s.lastTime < 100 ? s.velocity : 0,
               )
             : undefined;
+        if (process.env.NODE_ENV === "development") e.currentTarget.setAttribute("data-swipe-input", JSON.stringify({event:"up",vote,dx:e.clientX-s.x,axis:s.axis}));
         start.current = undefined;
         if (e.currentTarget.hasPointerCapture(e.pointerId))
           e.currentTarget.releasePointerCapture(e.pointerId);
         if (vote === undefined) void snapBack();
-        else void commit(vote);
+        else void commit(vote, s.velocity);
       }}
       onPointerCancel={cancelPointer}
       onLostPointerCapture={(e) => {

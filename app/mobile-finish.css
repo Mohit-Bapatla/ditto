@@ -364,3 +364,41 @@ input[type="datetime-local"] {
   min-height: 48px;
 }
 input[type="datetime-local"]::-webkit-datetime-edit { padding: 0; min-width: 0; }
+
+/* One stationary wheel hit area; the moving card never owns the deck bounds. */
+.physical-stack, .group-stack { overscroll-behavior-x: contain; }
+.activity-metadata { font-size: 14px; line-height: 1.45; }
+.activity-metadata p { margin: 6px 0; }
+.group-voting-layout { display: grid; grid-template-columns: minmax(190px, 260px) minmax(0, 470px); gap: 40px; justify-content: center; align-items: start; margin: 20px auto; }
+.group-voting-layout .group-deck { width: 100%; margin: 0; }
+.voting-context { padding-top: 32px; }
+.voting-context h2 { font-size: 24px; }
+.voting-members { display: flex; flex-wrap: wrap; gap: 16px; margin: 24px 0; }
+.voting-members > span { display: grid; justify-items: center; gap: 6px; font-size: 13px; }
+.voting-members .avatar { width: 40px; height: 40px; }
+.group-caption .group-details { display: inline-flex; align-items: center; gap: 4px; color: white; background: transparent; border: 0; min-height: 44px; padding: 8px 0 0; font-weight: 700; }
+.group-caption .activity-metadata { margin-bottom: 12px; }
+.group-card-footer { display: flex; align-items: center; justify-content: space-between; gap: 12px; }
+.group-card-footer > .small { display: flex; align-items: center; gap: 6px; min-width: 0; font-size: 12px; }
+.group-card-footer .group-details { flex-shrink: 0; padding: 0; }
+@media (min-width: 761px) {
+  .main-content:has(.group-voting-layout) .circle-heading { margin-bottom: 12px; }
+  .main-content:has(.group-voting-layout) .circle-heading h1 { font-size: 32px; }
+  .main-content:has(.group-voting-layout) .tabs { margin-bottom: 12px; }
+  .group-voting-layout .group-swipe { height: clamp(360px, 55svh, 510px); }
+}
+@media (max-width: 760px) {
+  .group-voting-layout { display: block; margin: 8px auto; }
+  .voting-context { display: none; }
+  .group-voting-layout .group-swipe { height: clamp(260px, calc(100svh - 510px), 400px); }
+  .group-voting-layout .group-caption { padding: 18px; }
+  .group-voting-layout .group-caption h2 { font-size: clamp(24px, 6.6vw, 30px); }
+  .group-voting-layout .vote-buttons { position: static; margin-top: 10px; }
+  .group-voting-layout .section-meta { margin-bottom: 8px; }
+  .group-voting-layout .small.muted { margin: 8px 0; }
+  .main-content:has(.group-voting-layout) .round-banner { margin: 0; padding: 0; }
+  .main-content:has(.group-voting-layout) .round-banner summary { min-height: 44px; font-size: 16px; display: list-item; align-content: center; }
+  .main-content:has(.group-voting-layout) .back-link { margin-bottom: 8px; }
+}
+/* Circle exits must not enlarge Safari's visual viewport or move bottom navigation. */
+.app-shell { overflow-x: clip; }

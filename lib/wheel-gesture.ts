@@ -1,6 +1,6 @@
 import { swipeDecision } from "./swipe-gesture";
-export type WheelGate = { lastEvent: number; quietUntil: number };
-export const wheelQuietMs = 350;
+export type WheelGate = { lastEvent: number; quietUntil: number; lastDelta?: number; committedAt?: number; peak?: number; valley?: number };
+export const wheelQuietMs = 220;
 export function wheelPixels(
   dx: number,
   dy: number,
@@ -12,6 +12,7 @@ export function wheelPixels(
 }
 /** Per-deck gate survives keyed cards so momentum cannot vote on the next activity. */
 export class WheelGesture {
+  reason = "idle";
   private active = false;
   private distance = 0;
   private began = 0;
@@ -21,29 +22,46 @@ export class WheelGesture {
     public gate: WheelGate,
     private width: () => number,
     private move: (x: number) => void,
-    private finish: (vote: boolean | undefined) => void,
+    private finish: (vote: boolean | undefined, velocity?: number) => void,
   ) {}
   input(dx: number, dy: number, mode: number, now: number, ready: boolean) {
     const d = wheelPixels(dx, dy, mode, this.width());
     if (Math.abs(d.x) < 1 || Math.abs(d.x) < Math.abs(d.y) * 1.5) {
       if (Math.abs(d.y) > 4) this.cancel(now);
+      this.reason = "vertical-or-tiny";
       return false;
     }
     const previous = this.gate.lastEvent;
+    const previousDelta = this.gate.lastDelta || 0;
     this.gate.lastEvent = now;
+    this.gate.lastDelta = d.x;
+    // Momentum decays; a fresh, deliberate burst accelerates after a pause.
+    // Constant/alternating tails cannot unlock the next card.
+    const magnitude = Math.abs(d.x);
+    const valley = this.gate.valley ?? Math.abs(previousDelta);
+    const peak = this.gate.peak || Math.abs(previousDelta);
+    const reaccelerating = now - (this.gate.committedAt ?? now) >= 180 &&
+      valley <= Math.max(4, peak * 0.4) && magnitude >= Math.max(10, valley * 2.5);
+    const freshBurst = reaccelerating || (now - previous >= 80 && magnitude >= 12 &&
+      (magnitude >= Math.abs(previousDelta) * 2.5 ||
+       (now - previous >= 120 && Math.sign(d.x) !== Math.sign(previousDelta))));
+    this.gate.valley = Math.min(valley, magnitude);
     if (!ready) {
+      this.reason = "transaction-active";
       this.cancel(now);
       this.gate.quietUntil = now + wheelQuietMs;
       return true;
     }
     if (
-      !this.active &&
+      !this.active && !freshBurst &&
       (now < this.gate.quietUntil ||
         (now - previous < wheelQuietMs && this.gate.quietUntil > 0))
     ) {
+      this.reason = "momentum-tail";
       this.gate.quietUntil = now + wheelQuietMs;
       return true;
     }
+    this.reason = freshBurst ? "fresh-burst" : "tracking";
     if (!this.active) {
       this.active = true;
       this.began = now;
@@ -59,7 +77,14 @@ export class WheelGesture {
       Math.min(this.width(), this.distance + d.x),
     );
     this.move(this.distance);
-    if (now - this.began > 1600) this.end(now);
+    // Distance acceptance belongs to input, not the trailing momentum timer.
+    // Flicks need multiple samples so a single accidental wheel tick cannot vote.
+    const threshold = Math.max(64, Math.min(110, this.width() * 0.24));
+    if (Math.abs(this.distance) >= threshold ||
+        (now > this.began && Math.abs(this.distance) >= 48 &&
+         Math.abs(this.velocity) >= 0.8 && Math.sign(this.velocity) === Math.sign(this.distance))) {
+      this.end(now);
+    }
     return true;
   }
   end(now: number) {
@@ -71,9 +96,9 @@ export class WheelGesture {
       0,
       now - this.began,
       this.width(),
-      this.velocity,
+      now - this.last < 100 ? this.velocity : 0,
     );
-    this.finish(result);
+    this.finish(result, this.velocity);
   }
   cancel(now: number) {
     if (this.active) {
@@ -83,10 +108,11 @@ export class WheelGesture {
     }
   }
   discard(now: number) {
-    if (this.active) {
-      this.active = false;
-      this.gate.quietUntil = now + wheelQuietMs;
-    }
+    this.active = false;
+    this.gate.committedAt = now;
+    this.gate.peak = Math.max(12, Math.abs(this.gate.lastDelta || 0));
+    this.gate.valley = this.gate.peak;
+    this.gate.quietUntil = now + wheelQuietMs;
   }
   get dragging() {
     return this.active;

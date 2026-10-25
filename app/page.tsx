@@ -14,6 +14,8 @@ import { ActivityPhoto } from "./activity-photo";
 import { CircleCoordinator } from "./circle-coordinator";
 import { PlanEditor } from "./plan-editor";
 import { GroupVoting } from "./group-voting";
+import { ActivityMetadata } from "./activity-metadata";
+import { useSwipeDeck } from "./use-swipe-deck";
 import {
   SwipeSurface,
   type SwipeHandle,
@@ -182,6 +184,7 @@ function SwipeCard({
   focusHandoffRef,
   preview = false,
   wheelGate,
+  wheelTarget,
   returnFrom,
 }: {
   activity: Activity;
@@ -193,6 +196,7 @@ function SwipeCard({
   focusHandoffRef?: { current: boolean };
   preview?: boolean;
   returnFrom?: string;
+  wheelTarget?: import("react").RefObject<HTMLDivElement | null>;
   wheelGate?: { current: import("@/lib/wheel-gesture").WheelGate };
 }) {
   const [photoFailed, setPhotoFailed] = useState(false);
@@ -233,17 +237,8 @@ function SwipeCard({
       <div
         className={`outing-info ${activity.title.length > 70 ? "long-title" : ""}`}
       >
-        <div className="outing-when">
-          <span>
-            {activity.fixture
-              ? `${activity.fixture.area} · ${activity.budget ? `$${activity.budget} allowance` : "Free idea"}`
-              : fmt(activity.start)}
-          </span>
-        </div>
         <h2>{activity.title}</h2>
-        <p className="outing-place">
-          {activity.venueData?.name || activity.venue}
-        </p>
+        <ActivityMetadata activity={activity}/>
         <div className="outing-people">
           <span className="host-initial"><Avatar person={{ name: activity.host || "Your community", photo: activity.hostPhoto }} /></span>
           <span>With {activity.host || "your community"}</span>
@@ -267,6 +262,7 @@ function SwipeCard({
       disabled={disabled}
       onSwipe={onSwipe}
       returnFrom={returnFrom}
+      wheelTarget={wheelTarget}
       wheelGate={wheelGate}
       controlRef={controlRef}
       progress={progress}
@@ -279,7 +275,7 @@ function SwipeCard({
 }
 export default function Home() {
   const swipeControl = useRef<SwipeHandle>(null);
-  const wheelGate = useRef({ lastEvent: -Infinity, quietUntil: 0 });
+  const { wheelGate, wheelTarget } = useSwipeDeck();
   const swipeFocus = useRef(false);
   const swipeProgress = useMotionValue(0);
   const nextScale = useTransform(swipeProgress, [0, 1], [0.98, 1]);
@@ -913,7 +909,7 @@ export default function Home() {
                     onActivity={setDetail}
                   />
                   <section className="deck-section">
-                    <div className="deck-stack physical-stack">
+                    <div className="deck-stack physical-stack" ref={wheelTarget}>
                       {deck[1] && (
                         <motion.div
                           className="next-card"
@@ -937,6 +933,7 @@ export default function Home() {
                             key={top.id}
                             activity={top}
                             returnFrom={restored?.id === top.id ? restored.direction : undefined}
+                            wheelTarget={wheelTarget}
                             wheelGate={wheelGate}
                             controlRef={swipeControl}
                             focusHandoffRef={swipeFocus}
@@ -1207,6 +1204,8 @@ export default function Home() {
                     {c.round && !c.round.complete && (
                       <GroupVoting
                         circle={c}
+                        activities={data.activities}
+                        onDetails={setDetail}
                         busy={busy}
                         act={act}
                         onChat={() => setCircleTab("Chat & AI")}
@@ -1839,8 +1838,9 @@ export default function Home() {
                 <p>{detail.description}</p>
                 <p>
                   <MapPin size={16} />
-                  {detail.venue}
+                  {detail.venueData?.name || detail.venue}
                 </p>
+                {detail.venueData?.address && <p>{detail.venueData.address}</p>}
                 <p>
                   <CalendarDays size={16} />
                   {fmt(detail.start)}

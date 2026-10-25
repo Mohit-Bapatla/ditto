@@ -1,7 +1,9 @@
 "use client";
-import { CheckCheck, Heart, X, Undo2 } from "lucide-react";
-import type { Circle } from "@/lib/types";
-import { useRef } from "react";
+import { CheckCheck, Heart, X, Undo2, ArrowUpRight } from "lucide-react";
+import type { Activity, Circle } from "@/lib/types";
+import { useRef, useState } from "react";
+import { useSwipeDeck } from "./use-swipe-deck";
+import { ActivityMetadata } from "./activity-metadata";
 import { Avatar } from "./profile-photo";
 import { ActivityPhoto } from "./activity-photo";
 import { motion, useMotionValue, useTransform } from "motion/react";
@@ -12,11 +14,15 @@ import {
 } from "./swipe-surface";
 export function GroupVoting({
   circle: c,
+  activities = [],
+  onDetails,
   busy,
   act,
   onChat,
 }: {
   circle: Circle;
+  activities?: Activity[];
+  onDetails?: (activity: Activity) => void;
   busy: boolean;
   act: (
     body: unknown,
@@ -25,6 +31,8 @@ export function GroupVoting({
   ) => Promise<unknown>;
   onChat: () => void;
 }) {
+  const {wheelGate, wheelTarget} = useSwipeDeck();
+  const [details, setDetails] = useState(false);
   const control = useRef<SwipeHandle>(null);
   const swipeFocus = useRef(false);
   const progress = useMotionValue(0);
@@ -35,6 +43,7 @@ export function GroupVoting({
     (i) => round.ideaIds.includes(i.id) && i.vote === undefined,
   );
   const idea = remaining[0];
+  const activity = activities.find(a => a.id === idea?.activityId);
   if (!idea)
     return (
       <div className="waiting-state" role="status">
@@ -59,14 +68,21 @@ export function GroupVoting({
     );
   };
   return (
-    <section className="group-deck">
+    <section className="group-voting-layout">
+      <aside className="voting-context" aria-label="Circle voting progress">
+        <h2>Decide together</h2>
+        <div className="voting-members">{c.members.map(member => <span key={member.id}><Avatar person={member}/>{member.name}</span>)}</div>
+        <p><strong>{round.completed} of {round.total}</strong> members finished</p>
+        <p className="small muted">Your choices stay private until everyone finishes. {round.threshold === "everyone" ? "A match needs everyone’s yes." : "A majority makes a match."}</p>
+      </aside>
+      <div className="group-deck">
       <p className="section-meta">
         Your private vote{" "}
         <span>
           {round.ideaIds.length - remaining.length + 1} / {round.ideaIds.length}
         </span>
       </p>
-      <div className="group-stack">
+      <div className="group-stack" ref={wheelTarget}>
         {remaining[1] && (
           <motion.div
             className="group-preview group-swipe"
@@ -88,6 +104,8 @@ export function GroupVoting({
           </motion.div>
         )}
         <SwipeSurface
+          wheelGate={wheelGate}
+          wheelTarget={wheelTarget}
           progress={progress}
           controlRef={control}
           focusHandoffRef={swipeFocus}
@@ -108,11 +126,13 @@ export function GroupVoting({
           >
             <span className="pill white">{idea.category}</span>
             <h2>{idea.title}</h2>
-            <p>{idea.notes || "Would you be up for this?"}</p>
-            <span className="small">
+            {activity ? <ActivityMetadata activity={activity}/> : <p>{idea.slot || "Choose the details together"}</p>}
+            <div className="group-card-footer"><span className="small">
               <span className="inline-avatar"><Avatar person={c.members.find(m => m.id === idea.creator) || {name:"Member"}}/></span> Suggested by{" "}
               {c.members.find((m) => m.id === idea.creator)?.name || "a member"}
             </span>
+            <button className="group-details" onClick={() => { if (activity && onDetails) onDetails(activity); else setDetails(v => !v); }} aria-label="View activity details">Details <ArrowUpRight size={16}/></button>
+            </div>
           </div>
         </SwipeSurface>
       </div>
@@ -131,9 +151,9 @@ export function GroupVoting({
           <Heart size={20} /> Ditto
         </button>
       </div>
-      <p className="small muted">
-        Swipe, use the buttons, or focus the card and use ← / →.
-      </p>
+      <p className="small muted">Drag or swipe horizontally with two fingers. You can also use ← / →.</p>
+      {details && <div className="idea-details" role="region" aria-label="Activity details"><h3>{idea.title}</h3><p>{idea.notes || "No additional details yet."}</p>{idea.slot && <p>{idea.slot}</p>}<p>Venue and cost to decide together.</p><button className="text-button" onClick={() => setDetails(false)}>Close details</button></div>}
+      </div>
     </section>
   );
 }
