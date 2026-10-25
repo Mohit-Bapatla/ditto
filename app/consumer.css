@@ -741,3 +741,8 @@ a {
   color: #fff;
   font-size: 12px;
 }
+
+/* Official artwork: fixed optical size, intrinsic proportions, no decorative frame. */
+.ditto-logo{display:block;width:162px;height:54px;object-fit:contain;flex-shrink:0}.ditto-symbol{display:block;width:48px;height:32px;object-fit:contain}.loading>.ditto-logo{width:210px;height:70px;margin:0 auto 24px}.onboarding-brand{margin:0 0 24px}.onboarding-brand .ditto-logo{width:180px;height:60px}.footer .ditto-logo{width:135px;height:45px}
+@media(max-width:760px){.mobile-logo .ditto-logo{width:138px;height:46px}}
+@media(max-width:370px){.mobile-logo .ditto-logo{width:118px;height:40px}}

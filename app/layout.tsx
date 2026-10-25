@@ -27,9 +27,19 @@ export const viewport: Viewport = {
   interactiveWidget: "resizes-content",
 };
 export const metadata: Metadata = {
+  metadataBase: new URL(process.env.PUBLIC_ORIGIN || "http://localhost:3000"),
+  applicationName: "Ditto",
+  appleWebApp: { capable: true, title: "Ditto", statusBarStyle: "default" },
   title: "Ditto — Less scrolling. More living.",
   description:
     "Find your people through the things you love. Discover activities, match with friends, and make it happen.",
+  openGraph: {
+    title: "Ditto — Less scrolling. More living.",
+    description: "Friends, shared interests, and plans everyone says yes to.",
+    siteName: "Ditto",
+    type: "website",
+  },
+  twitter: { card: "summary_large_image", title: "Ditto — Less scrolling. More living." },
 };
 export default function RootLayout({
   children,

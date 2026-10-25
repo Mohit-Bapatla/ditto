@@ -2,6 +2,7 @@
 import "./discovery.css";
 import "./density.css";
 import "./mobile-finish.css";
+import { BrandLogo } from "./brand-logo";
 import { WeekAgenda } from "./week-agenda";
 import { Avatar, ProfilePhotoInput } from "./profile-photo";
 import {
@@ -107,17 +108,7 @@ async function request(url: string, body?: unknown) {
   if (!res.ok) throw new Error(data.error || "Could not complete the request.");
   return data;
 }
-function Logo() {
-  return (
-    <span className="wordmark">
-      <span className="brand-mark">
-        <i />
-        <i />
-      </span>
-      ditto
-    </span>
-  );
-}
+function Logo() { return <BrandLogo />; }
 function Avatars({
   members,
 }: {
@@ -1986,6 +1977,7 @@ export default function Home() {
             {modal === "profilePhoto" && <form onSubmit={e => submit(e,"profilePhoto")}><ProfilePhotoInput onBusy={setPhotoBusy} photo={data.user.photo} name={data.user.name}/><button className="primary full" disabled={busy || photoBusy}>Save picture</button></form>}
             {modal === "profile" && (
               <form onSubmit={(e) => submit(e, "profile")}>
+                <div className="onboarding-brand"><BrandLogo /></div>
                 <ProfilePhotoInput
                   onBusy={setPhotoBusy}
                   photo={data.user.photo}
