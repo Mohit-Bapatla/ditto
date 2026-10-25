@@ -83,88 +83,116 @@ for active in range(5):
   if i<4:d.line((115,y+40,115,y+108),fill='#DCCCD0',width=2)
   text(im,(150,y),name,32,color=color,bold=i==active,width=45)
   text(im,(150,y+45),desc,23,color=MUTED,width=55)
- d.rounded_rectangle((1200,130,1748,950),35,fill='#292326')
+ d.rounded_rectangle((1118,48,1562,1030),48,fill='#292326')
  save(im,f'architecture-{active}')
 im=Image.new('RGB',(1920,1080),BG);paste_logo(im,120,90,260);text(im,(120,280),'Built to bring\npeople together.',76,display=True,width=25)
 for i,(a,b) in enumerate([('Next.js + React','The mobile-first experience'),('TypeScript + SQLite','Application logic and persistence'),('Railway','Persistent Node.js hosting'),('Meta Muse Spark','AI-assisted planning'),('SerpApi','Real-world venue discovery')]):
  y=250+i*135;text(im,(1040,y),a,36,bold=True,width=35);text(im,(1040,y+52),b,26,color=MUTED,width=39)
 save(im,'tech')
-# An edit decision list: exact lengths sum to 180 seconds. Offsets remove idle wait only.
+# Connected journey edit. Every transition is real; only AI waiting is shortened.
+import bisect, functools, math
+J=C/'journey'
 shots=[]
-def shot(name,dur,plate,clip=None,start=0,mode='phone',extra=None):shots.append(dict(name=name,dur=dur,plate=plate,clip=clip,start=start,mode=mode,extra=extra))
-for i in range(1,5):shot(f'opening-{i}',2,f'chat-{i}',mode='graphic')
-shot('problem',8,'problem',mode='graphic');shot('brand',4,'logo',mode='graphic')
-shot('intro',10,'intro','09-discover-clean')
-shot('filters',6,'filter','29-filter',.7)
-shot('pass',6,'pass','10-left-clean')
-shot('ditto',6,'ditto','11-right-clean')
-shot('details',4,'details','12-details-clean',.8)
-shot('saved',3,'saved','30-saved')
-shot('circles',6,'circles','13-circles-clean',.9)
-shot('chat',7,'chat','27-chat-clean')
-shot('muse-processing',3,'muse','28-muse-clean',1)
-shot('muse-result',4,'suggestion','08-ai-result')
-shot('venues',5,'venues','31-venues-result',1.2)
-shot('mohit',7,'mohit','14-mohit-votes',5.7)
-shot('friends',7,'edwin','15-edwin-votes',5.7,'duo','16-paxton-votes')
-shot('progress',6,'paxton','16-paxton-votes',7.2)
-shot('consensus',5,'consensus','17-consensus',.7)
-shot('approve-paxton',2,'approve','19-paxton-approval',.7)
-shot('approve-mohit',3,'approve','20-mohit-approval',.7)
-shot('confirmed',4,'confirmed','21-confirmed',1)
-shot('calendar',4,'calendar','24-calendar-day',1)
-shot('export',2,'export','22-calendar-export',.8)
-shot('architecture-input',8,'architecture-0','27-chat-clean',0,'architecture')
-shot('architecture-model',4,'architecture-1','28-muse-clean',1,'architecture')
-shot('architecture-suggestion',4,'architecture-2','08-ai-result',0,'architecture')
-shot('architecture-venues',7,'architecture-3','31-venues-result',1,'architecture')
-shot('architecture-logic',7,'architecture-4','17-consensus',1,'architecture')
-shot('technology',9,'tech',mode='graphic')
-shot('montage-swipe',3,'ditto','11-right-clean',.4)
-shot('montage-chat',2,'chat','27-chat-clean')
-shot('montage-match',2,'consensus','17-consensus',1)
-shot('montage-approved',2,'confirmed','21-confirmed',2)
-shot('closing-app',7,'closing','25-calendar-detail',1)
-shot('final',5,'logo',mode='graphic')
-assert sum(s['dur'] for s in shots)==180,sum(s['dur'] for s in shots)
+def add(name,dur,plate,clip=None,start=0,extra=None,hold=None):
+ shots.append(dict(name=name,dur=dur,plate=plate,clip=clip,start=start,extra=extra,hold=hold))
+for i in range(1,5):add(f'opening-{i}',2,f'chat-{i}')
+add('problem',8,'problem');add('open-ditto',4,'logo')
+# One uninterrupted Discover take; change supporting captions after the action.
+for a,b,plate in [(0,10,'intro'),(10,16,'filter'),(16,19,'pass'),(19,22,'ditto'),(22,27,'details'),(27,30,'circles')]:
+ add('discover-'+plate,b-a,plate,'A-discover-to-circles',a)
+add('circle-to-chat',8.8,'chat','B1-circle-to-chat')
+add('select-and-request',6.2,'muse','B2-live-ai')
+add('real-model-result',1.5,'suggestion','B2-live-ai',9.5)
+add('review-to-ideas',4.5,'suggestion','B3-result-to-ideas')
+add('start-round',1.2,'mohit','C1-start-round')
+add('unanimous-rule',1.6,'mohit','C2-mohit-round')
+add('mohit-votes',8,'mohit','C3-mohit-votes')
+add('independent-friends',9.7,'friends','C5-paxton-consensus',extra='C4-edwin-votes')
+add('reveal-consensus',3,'consensus','C6-reveal-match')
+add('plan-from-match',1.7,'consensus','D1-plan-from-consensus')
+add('live-venue-request',2.7,'venues','D2-live-venue-plan')
+add('live-venue-result',2.5,'venues','D2-live-venue-plan',7.5)
+add('review-paxton-approval',5.3,'approve','D3-review-and-paxton-approve')
+add('mohit-approval',2,'approve','D4-mohit-approve')
+add('edwin-approval-calendar',5.3,'confirmed','D5-edwin-confirm')
+add('calendar-navigation',4.5,'calendar','D6-calendar-connected')
+add('calendar-export',4.4,'export','D7-export-final')
+# Return to the same calendar while its architecture is explained alongside it.
+add('architecture-with-calendar',4.1,'architecture-0','D8-return-final-clean')
+for i,d in [(1,5),(2,5),(3,7)]:add('architecture-'+str(i),d,'architecture-'+str(i),'D8-return-final-clean',hold=4)
+remaining=150-sum(s['dur'] for s in shots)
+add('architecture-logic',remaining,'architecture-4','D8-return-final-clean',hold=4)
+# Technology stays beside the same phone, rather than switching to a slide deck.
+im=base('Built to bring\npeople together.','','')
+for i,(a,b) in enumerate([('Next.js · React · TypeScript','Mobile-first interaction'),('SQLite · Railway','Persistent application data'),('Meta Muse Spark · SerpApi','AI planning + real-world places')]):
+ y=630+i*100;text(im,(124,y),a,29,bold=True,width=45);text(im,(124,y+43),b,24,color=MUTED,width=45)
+save(im,'tech-connected')
+add('technology-in-context',16,'tech-connected','D8-return-final-clean',hold=4)
+add('closing-in-app',9,'closing','D8-return-final-clean',hold=4)
+add('final-logo',5,'logo')
+# Labeled comparison uses separate recordings, never implies simultaneous filming.
+im=Image.new('RGB',(1920,1080),BG);paste_logo(im,70,65,220)
+text(im,(70,310),'Everyone\nhas a say.',58,display=True,width=15)
+text(im,(70,520),'Independent votes.\nOne shared decision.',28,color=MUTED,width=24)
+text(im,(70,930),'Separate sessions\nRecorded sequentially',20,color=MUTED,width=25)
+for x,name in [(650,'Edwin'),(1130,'Paxton')]:
+ ImageDraw.Draw(im).rounded_rectangle((x-12,48,x+432,1030),48,fill='#292326')
+ text(im,(x,16),name,24,bold=True,width=20)
+save(im,'friends')
+assert round(sum(s['dur'] for s in shots),5)==180
+start=0
+for s in shots:s['timeline_start']=round(start,3);start+=s['dur']
 (ROOT/'edit-decision-list.json').write_text(json.dumps(shots,indent=2))
-def run(args):
- p=subprocess.run(['ffmpeg','-hide_banner','-loglevel','error','-y']+args,stdout=subprocess.PIPE,stderr=subprocess.PIPE)
- if p.returncode:raise RuntimeError(p.stderr.decode()[-4000:])
-def encode_source(name):
- folder=C/name;meta=json.loads((folder/'manifest.json').read_text());frames=meta['frames'];lines=[]
- for i,f in enumerate(frames):
-  nxt=frames[i+1]['timestamp'] if i+1<len(frames) else meta['end']
-  duration=max(.001,nxt-f['timestamp']);lines+=['file '+str((folder/f['file']).resolve()),f'duration {duration:.6f}']
- lines+=['file '+str((folder/frames[-1]['file']).resolve())];lst=folder/'frames.ffconcat';lst.write_text('\n'.join(lines))
- out=C/(name+'.mp4')
- run(['-f','concat','-safe','0','-i',str(lst),'-vf','fps=30,scale=780:1688:force_original_aspect_ratio=disable,setsar=1','-an','-c:v','libx264','-preset','fast','-crf','18','-pix_fmt','yuv420p',str(out)])
- return name
-sources=sorted(set(s['clip'] for s in shots if s['clip'])|set(s['extra'] for s in shots if s['extra']))
-with concurrent.futures.ThreadPoolExecutor(max_workers=3) as ex:
- for name in ex.map(encode_source,sources):print('source',name,flush=True)
-def render(item):
- idx,s=item;out=W/f'{idx:02d}-{s["name"]}.mp4';bg=G/(s['plate']+'.png');dur=s['dur'];args=['-loop','1','-framerate','30','-i',str(bg)]
- if s['mode']=='graphic':filters='[0:v]format=yuv420p[v]'
- else:
-  args+=['-ss',str(s['start']),'-i',str(C/(s['clip']+'.mp4'))]
-  if s['mode']=='duo':
-   # Two large independently recorded views, clearly labeled; no claim of simultaneous filming.
-   im=Image.new('RGB',(1920,1080),BG);paste_logo(im,80,55,200);text(im,(80,255),'Everyone\nhas a say.',64,display=True,width=15);text(im,(80,500),'Independent votes.\nA shared decision.',29,color=MUTED,width=25)
-   text(im,(690,48),'Edwin',30,bold=True);text(im,(1250,48),'Paxton',30,bold=True);text(im,(80,970),'Separate sessions · recorded sequentially',20,color=MUTED,width=48)
-   im.save(G/'duo.png');args[5]=str(G/'duo.png')
-   args+=['-ss',str(s['start']),'-i',str(C/(s['extra']+'.mp4'))]
-   filters='[1:v]crop=750:1688:0:0,scale=410:922,setsar=1,tpad=stop_mode=clone:stop_duration=20[p1];[2:v]crop=750:1688:0:0,scale=410:922,setsar=1,tpad=stop_mode=clone:stop_duration=20[p2];[0:v][p1]overlay=630:112[a];[a][p2]overlay=1190:112,format=yuv420p[v]'
-  elif s['mode']=='architecture':
-   filters='[1:v]crop=750:1125:0:0,scale=520:780,setsar=1,tpad=stop_mode=clone:stop_duration=20[p];[0:v][p]overlay=1214:150,format=yuv420p[v]'
-  else:
-   args+=['-loop','1','-i',str(G/'phone-mask.png')]
-   filters='[1:v]crop=750:1688:0:0,scale=420:946,setsar=1,tpad=stop_mode=clone:stop_duration=20,format=rgb24[p];[p][2:v]alphamerge[round];[0:v][round]overlay=1130:64,format=yuv420p[v]'
- args+=['-filter_complex',filters,'-map','[v]','-t',str(dur),'-r','30','-an','-c:v','libx264','-preset','fast','-crf','18','-pix_fmt','yuv420p','-movflags','+faststart',str(out)]
- run(args);print('render',idx,s['name'],flush=True);return out
-with concurrent.futures.ThreadPoolExecutor(max_workers=2) as ex:outputs=list(ex.map(render,enumerate(shots)))
-listing=W/'timeline.ffconcat';listing.write_text('\n'.join('file '+str(p) for p in outputs))
-run(['-f','concat','-safe','0','-i',str(listing),'-c','copy','-an','-movflags','+faststart',str(ROOT/'ditto-demo-silent.mp4')])
-run(['-ss','6.7','-i',str(C/'14-mohit-votes.mp4'),'-frames:v','1',str(W/'thumbnail-source.png')])
-thumb=Image.open(G/'intro.png').convert('RGB');ui=Image.open(W/'thumbnail-source.png').crop((0,0,750,1688)).resize((420,946),Image.Resampling.LANCZOS);thumb.paste(ui,(1130,64),Image.open(G/'phone-mask.png'));thumb.save(ROOT/'thumbnail.png')
-print('DONE',ROOT/'ditto-demo-silent.mp4')
+metas={}
+for name in sorted({s[k] for s in shots for k in ['clip','extra'] if s[k]}):
+ m=json.loads((J/name/'manifest.json').read_text());m['times']=[f['timestamp']-m['start'] for f in m['frames']];metas[name]=m
+@functools.lru_cache(maxsize=128)
+def ui(name,index):
+ f=metas[name]['frames'][index]
+ return Image.open(J/name/f['file']).convert('RGB').crop((0,0,750,1688)).resize((420,946),Image.Resampling.LANCZOS)
+def source(name,t):
+ m=metas[name];return ui(name,max(0,bisect.bisect_right(m['times'],t)-1))
+plates={s['plate']:Image.open(G/(s['plate']+'.png')).convert('RGB') for s in shots}
+mask=Image.open(G/'phone-mask.png')
+def tap(im,name,t,x0=1130):
+ # Actual CSS coordinates; no synthetic UI state or cursor movement.
+ for action in metas[name].get('actions',[]):
+  age=t-action['time']
+  if 0<=age<.22:
+   alpha=int(180*(1-age/.22));radius=9+13*(age/.22)
+   x=x0+action['x']*1.12;y=64+action['y']*946/844
+   layer=Image.new('RGBA',(1920,1080));d=ImageDraw.Draw(layer)
+   d.ellipse((x-radius,y-radius,x+radius,y+radius),outline=(201,53,80,alpha),width=3)
+   d.ellipse((x-5,y-5,x+5,y+5),fill=(201,53,80,alpha//2))
+   im.paste(layer,(0,0),layer)
+def render_frame(s,local):
+ im=plates[s['plate']].copy()
+ if s['clip']:
+  t=s['hold'] if s['hold'] is not None else s['start']+local
+  im.paste(source(s['clip'],t),(1130,64),mask)
+  if s['hold'] is None:tap(im,s['clip'],t)
+  if s['extra']:
+   im.paste(source(s['extra'],s['start']+local),(650,64),mask);tap(im,s['extra'],s['start']+local,650)
+  label={'mohit-votes':'Mohit','review-paxton-approval':'Paxton','mohit-approval':'Mohit','edwin-approval-calendar':'Edwin'}.get(s['name'])
+  if label:text(im,(1130,16),label,24,bold=True,width=18)
+ return im
+# Stream exact 30fps frames; screenshot timestamps preserve gesture speed and pauses.
+out=ROOT/'ditto-demo-silent.mp4'
+cmd=['ffmpeg','-hide_banner','-loglevel','error','-y','-f','rawvideo','-pixel_format','rgb24','-video_size','1920x1080','-framerate','30','-i','-','-an','-c:v','libx264','-preset','fast','-crf','18','-pix_fmt','yuv420p','-movflags','+faststart',str(out)]
+p=subprocess.Popen(cmd,stdin=subprocess.PIPE)
+starts=[s['timeline_start'] for s in shots]
+last=-1
+review=W/'journey-review';review.mkdir(exist_ok=True)
+for n in range(5400):
+ t=n/30;idx=max(0,bisect.bisect_right(starts,t)-1);s=shots[idx];local=t-starts[idx]
+ im=render_frame(s,local)
+ # Only side graphics dissolve. The real phone remains perfectly fixed.
+ if idx and local<.25 and s['clip'] and shots[idx-1]['clip'] and s['plate']!='friends' and shots[idx-1]['plate']!='friends':
+  old=render_frame(s,local);old.paste(plates[shots[idx-1]['plate']].crop((0,0,1080,1080)),(0,0))
+  im=Image.blend(old,im,local/.25)
+ if n%180==0 or n in [1230,2040,2850,3570,3840,4260,4800,5340]:im.save(review/f'{n/30:06.2f}.jpg',quality=92)
+ p.stdin.write(im.tobytes())
+ if idx!=last:print(f'{t:6.2f} {s["name"]}',flush=True);last=idx
+p.stdin.close();assert p.wait()==0
+render_frame(next(s for s in shots if s['name']=='discover-ditto'),1).save(ROOT/'thumbnail.png')
+print('DONE',out,flush=True)

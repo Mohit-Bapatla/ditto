@@ -5,8 +5,9 @@
     "plate": "chat-1",
     "clip": null,
     "start": 0,
-    "mode": "graphic",
-    "extra": null
+    "extra": null,
+    "hold": null,
+    "timeline_start": 0
   },
   {
     "name": "opening-2",
@@ -14,8 +15,9 @@
     "plate": "chat-2",
     "clip": null,
     "start": 0,
-    "mode": "graphic",
-    "extra": null
+    "extra": null,
+    "hold": null,
+    "timeline_start": 2
   },
   {
     "name": "opening-3",
@@ -23,8 +25,9 @@
     "plate": "chat-3",
     "clip": null,
     "start": 0,
-    "mode": "graphic",
-    "extra": null
+    "extra": null,
+    "hold": null,
+    "timeline_start": 4
   },
   {
     "name": "opening-4",
@@ -32,8 +35,9 @@
     "plate": "chat-4",
     "clip": null,
     "start": 0,
-    "mode": "graphic",
-    "extra": null
+    "extra": null,
+    "hold": null,
+    "timeline_start": 6
   },
   {
     "name": "problem",
@@ -41,304 +45,328 @@
     "plate": "problem",
     "clip": null,
     "start": 0,
-    "mode": "graphic",
-    "extra": null
+    "extra": null,
+    "hold": null,
+    "timeline_start": 8
   },
   {
-    "name": "brand",
+    "name": "open-ditto",
     "dur": 4,
     "plate": "logo",
     "clip": null,
     "start": 0,
-    "mode": "graphic",
-    "extra": null
+    "extra": null,
+    "hold": null,
+    "timeline_start": 16
   },
   {
-    "name": "intro",
+    "name": "discover-intro",
     "dur": 10,
     "plate": "intro",
-    "clip": "09-discover-clean",
+    "clip": "A-discover-to-circles",
     "start": 0,
-    "mode": "phone",
-    "extra": null
+    "extra": null,
+    "hold": null,
+    "timeline_start": 20
   },
   {
-    "name": "filters",
+    "name": "discover-filter",
     "dur": 6,
     "plate": "filter",
-    "clip": "29-filter",
-    "start": 0.7,
-    "mode": "phone",
-    "extra": null
+    "clip": "A-discover-to-circles",
+    "start": 10,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 30
   },
   {
-    "name": "pass",
-    "dur": 6,
+    "name": "discover-pass",
+    "dur": 3,
     "plate": "pass",
-    "clip": "10-left-clean",
-    "start": 0,
-    "mode": "phone",
-    "extra": null
+    "clip": "A-discover-to-circles",
+    "start": 16,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 36
   },
   {
-    "name": "ditto",
-    "dur": 6,
+    "name": "discover-ditto",
+    "dur": 3,
     "plate": "ditto",
-    "clip": "11-right-clean",
-    "start": 0,
-    "mode": "phone",
-    "extra": null
+    "clip": "A-discover-to-circles",
+    "start": 19,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 39
   },
   {
-    "name": "details",
-    "dur": 4,
+    "name": "discover-details",
+    "dur": 5,
     "plate": "details",
-    "clip": "12-details-clean",
-    "start": 0.8,
-    "mode": "phone",
-    "extra": null
+    "clip": "A-discover-to-circles",
+    "start": 22,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 42
   },
   {
-    "name": "saved",
+    "name": "discover-circles",
     "dur": 3,
-    "plate": "saved",
-    "clip": "30-saved",
-    "start": 0,
-    "mode": "phone",
-    "extra": null
-  },
-  {
-    "name": "circles",
-    "dur": 6,
     "plate": "circles",
-    "clip": "13-circles-clean",
-    "start": 0.9,
-    "mode": "phone",
-    "extra": null
+    "clip": "A-discover-to-circles",
+    "start": 27,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 47
   },
   {
-    "name": "chat",
-    "dur": 7,
+    "name": "circle-to-chat",
+    "dur": 8.8,
     "plate": "chat",
-    "clip": "27-chat-clean",
+    "clip": "B1-circle-to-chat",
     "start": 0,
-    "mode": "phone",
-    "extra": null
+    "extra": null,
+    "hold": null,
+    "timeline_start": 50
   },
   {
-    "name": "muse-processing",
-    "dur": 3,
+    "name": "select-and-request",
+    "dur": 6.2,
     "plate": "muse",
-    "clip": "28-muse-clean",
-    "start": 1,
-    "mode": "phone",
-    "extra": null
+    "clip": "B2-live-ai",
+    "start": 0,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 58.8
   },
   {
-    "name": "muse-result",
-    "dur": 4,
+    "name": "real-model-result",
+    "dur": 1.5,
     "plate": "suggestion",
-    "clip": "08-ai-result",
+    "clip": "B2-live-ai",
+    "start": 9.5,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 65.0
+  },
+  {
+    "name": "review-to-ideas",
+    "dur": 4.5,
+    "plate": "suggestion",
+    "clip": "B3-result-to-ideas",
     "start": 0,
-    "mode": "phone",
-    "extra": null
+    "extra": null,
+    "hold": null,
+    "timeline_start": 66.5
   },
   {
-    "name": "venues",
-    "dur": 5,
-    "plate": "venues",
-    "clip": "31-venues-result",
-    "start": 1.2,
-    "mode": "phone",
-    "extra": null
-  },
-  {
-    "name": "mohit",
-    "dur": 7,
+    "name": "start-round",
+    "dur": 1.2,
     "plate": "mohit",
-    "clip": "14-mohit-votes",
-    "start": 5.7,
-    "mode": "phone",
-    "extra": null
+    "clip": "C1-start-round",
+    "start": 0,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 71.0
   },
   {
-    "name": "friends",
-    "dur": 7,
-    "plate": "edwin",
-    "clip": "15-edwin-votes",
-    "start": 5.7,
-    "mode": "duo",
-    "extra": "16-paxton-votes"
+    "name": "unanimous-rule",
+    "dur": 1.6,
+    "plate": "mohit",
+    "clip": "C2-mohit-round",
+    "start": 0,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 72.2
   },
   {
-    "name": "progress",
-    "dur": 6,
-    "plate": "paxton",
-    "clip": "16-paxton-votes",
-    "start": 7.2,
-    "mode": "phone",
-    "extra": null
-  },
-  {
-    "name": "consensus",
-    "dur": 5,
-    "plate": "consensus",
-    "clip": "17-consensus",
-    "start": 0.7,
-    "mode": "phone",
-    "extra": null
-  },
-  {
-    "name": "approve-paxton",
-    "dur": 2,
-    "plate": "approve",
-    "clip": "19-paxton-approval",
-    "start": 0.7,
-    "mode": "phone",
-    "extra": null
-  },
-  {
-    "name": "approve-mohit",
-    "dur": 3,
-    "plate": "approve",
-    "clip": "20-mohit-approval",
-    "start": 0.7,
-    "mode": "phone",
-    "extra": null
-  },
-  {
-    "name": "confirmed",
-    "dur": 4,
-    "plate": "confirmed",
-    "clip": "21-confirmed",
-    "start": 1,
-    "mode": "phone",
-    "extra": null
-  },
-  {
-    "name": "calendar",
-    "dur": 4,
-    "plate": "calendar",
-    "clip": "24-calendar-day",
-    "start": 1,
-    "mode": "phone",
-    "extra": null
-  },
-  {
-    "name": "export",
-    "dur": 2,
-    "plate": "export",
-    "clip": "22-calendar-export",
-    "start": 0.8,
-    "mode": "phone",
-    "extra": null
-  },
-  {
-    "name": "architecture-input",
+    "name": "mohit-votes",
     "dur": 8,
+    "plate": "mohit",
+    "clip": "C3-mohit-votes",
+    "start": 0,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 73.8
+  },
+  {
+    "name": "independent-friends",
+    "dur": 9.7,
+    "plate": "friends",
+    "clip": "C5-paxton-consensus",
+    "start": 0,
+    "extra": "C4-edwin-votes",
+    "hold": null,
+    "timeline_start": 81.8
+  },
+  {
+    "name": "reveal-consensus",
+    "dur": 3,
+    "plate": "consensus",
+    "clip": "C6-reveal-match",
+    "start": 0,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 91.5
+  },
+  {
+    "name": "plan-from-match",
+    "dur": 1.7,
+    "plate": "consensus",
+    "clip": "D1-plan-from-consensus",
+    "start": 0,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 94.5
+  },
+  {
+    "name": "live-venue-request",
+    "dur": 2.7,
+    "plate": "venues",
+    "clip": "D2-live-venue-plan",
+    "start": 0,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 96.2
+  },
+  {
+    "name": "live-venue-result",
+    "dur": 2.5,
+    "plate": "venues",
+    "clip": "D2-live-venue-plan",
+    "start": 7.5,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 98.9
+  },
+  {
+    "name": "review-paxton-approval",
+    "dur": 5.3,
+    "plate": "approve",
+    "clip": "D3-review-and-paxton-approve",
+    "start": 0,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 101.4
+  },
+  {
+    "name": "mohit-approval",
+    "dur": 2,
+    "plate": "approve",
+    "clip": "D4-mohit-approve",
+    "start": 0,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 106.7
+  },
+  {
+    "name": "edwin-approval-calendar",
+    "dur": 5.3,
+    "plate": "confirmed",
+    "clip": "D5-edwin-confirm",
+    "start": 0,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 108.7
+  },
+  {
+    "name": "calendar-navigation",
+    "dur": 4.5,
+    "plate": "calendar",
+    "clip": "D6-calendar-connected",
+    "start": 0,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 114.0
+  },
+  {
+    "name": "calendar-export",
+    "dur": 4.4,
+    "plate": "export",
+    "clip": "D7-export-final",
+    "start": 0,
+    "extra": null,
+    "hold": null,
+    "timeline_start": 118.5
+  },
+  {
+    "name": "architecture-with-calendar",
+    "dur": 4.1,
     "plate": "architecture-0",
-    "clip": "27-chat-clean",
+    "clip": "D8-return-final-clean",
     "start": 0,
-    "mode": "architecture",
-    "extra": null
+    "extra": null,
+    "hold": null,
+    "timeline_start": 122.9
   },
   {
-    "name": "architecture-model",
-    "dur": 4,
+    "name": "architecture-1",
+    "dur": 5,
     "plate": "architecture-1",
-    "clip": "28-muse-clean",
-    "start": 1,
-    "mode": "architecture",
-    "extra": null
-  },
-  {
-    "name": "architecture-suggestion",
-    "dur": 4,
-    "plate": "architecture-2",
-    "clip": "08-ai-result",
+    "clip": "D8-return-final-clean",
     "start": 0,
-    "mode": "architecture",
-    "extra": null
+    "extra": null,
+    "hold": 4,
+    "timeline_start": 127.0
   },
   {
-    "name": "architecture-venues",
+    "name": "architecture-2",
+    "dur": 5,
+    "plate": "architecture-2",
+    "clip": "D8-return-final-clean",
+    "start": 0,
+    "extra": null,
+    "hold": 4,
+    "timeline_start": 132.0
+  },
+  {
+    "name": "architecture-3",
     "dur": 7,
     "plate": "architecture-3",
-    "clip": "31-venues-result",
-    "start": 1,
-    "mode": "architecture",
-    "extra": null
+    "clip": "D8-return-final-clean",
+    "start": 0,
+    "extra": null,
+    "hold": 4,
+    "timeline_start": 137.0
   },
   {
     "name": "architecture-logic",
-    "dur": 7,
+    "dur": 6.0,
     "plate": "architecture-4",
-    "clip": "17-consensus",
-    "start": 1,
-    "mode": "architecture",
-    "extra": null
+    "clip": "D8-return-final-clean",
+    "start": 0,
+    "extra": null,
+    "hold": 4,
+    "timeline_start": 144.0
   },
   {
-    "name": "technology",
+    "name": "technology-in-context",
+    "dur": 16,
+    "plate": "tech-connected",
+    "clip": "D8-return-final-clean",
+    "start": 0,
+    "extra": null,
+    "hold": 4,
+    "timeline_start": 150.0
+  },
+  {
+    "name": "closing-in-app",
     "dur": 9,
-    "plate": "tech",
-    "clip": null,
-    "start": 0,
-    "mode": "graphic",
-    "extra": null
-  },
-  {
-    "name": "montage-swipe",
-    "dur": 3,
-    "plate": "ditto",
-    "clip": "11-right-clean",
-    "start": 0.4,
-    "mode": "phone",
-    "extra": null
-  },
-  {
-    "name": "montage-chat",
-    "dur": 2,
-    "plate": "chat",
-    "clip": "27-chat-clean",
-    "start": 0,
-    "mode": "phone",
-    "extra": null
-  },
-  {
-    "name": "montage-match",
-    "dur": 2,
-    "plate": "consensus",
-    "clip": "17-consensus",
-    "start": 1,
-    "mode": "phone",
-    "extra": null
-  },
-  {
-    "name": "montage-approved",
-    "dur": 2,
-    "plate": "confirmed",
-    "clip": "21-confirmed",
-    "start": 2,
-    "mode": "phone",
-    "extra": null
-  },
-  {
-    "name": "closing-app",
-    "dur": 7,
     "plate": "closing",
-    "clip": "25-calendar-detail",
-    "start": 1,
-    "mode": "phone",
-    "extra": null
+    "clip": "D8-return-final-clean",
+    "start": 0,
+    "extra": null,
+    "hold": 4,
+    "timeline_start": 166.0
   },
   {
-    "name": "final",
+    "name": "final-logo",
     "dur": 5,
     "plate": "logo",
     "clip": null,
     "start": 0,
-    "mode": "graphic",
-    "extra": null
+    "extra": null,
+    "hold": null,
+    "timeline_start": 175.0
   }
 ]

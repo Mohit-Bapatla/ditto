@@ -1,32 +1,31 @@
-# Ditto silent submission video
+# Ditto · three-minute Meta demo video
 
-Open `ditto-demo-silent.mp4` in a video player. The master is exactly 180 seconds, 1920×1080, H.264, 30 fps, and contains no audio stream. Add the separately recorded narration using `VOICEOVER_TIMING.md`.
+The revised silent master tells one connected product journey: Discover → Weekend Crew → real Muse Spark planning → independent votes → unanimous bouldering → three approvals → confirmed calendar → manual export.
 
-- `STORYBOARD.md`: exact scene/shot timing.
-- `VOICEOVER_TIMING.md`: unchanged narration and speaking rates.
-- `RECORDING_SOURCES.md`: genuine UI/AI/multiplayer evidence and capture limitations.
-- `VIDEO_QA.md`: validation and review findings.
-- `clips/`: original timestamped compositor frames and derived source MP4s.
-- `graphics/`: original branded plates, diagrams, and phone mask.
-- `edit.py` + `edit-decision-list.json`: reproducible editing project.
-- `thumbnail.png`: actual app interface and official branding.
+- **Final:** `ditto-demo-silent.mp4` — 180 seconds, 1920×1080, H.264, 30fps, no audio.
+- **Preview:** `review.html`, served locally at `http://localhost:3130/review.html` while the preview server is running.
+- **Connected originals:** `clips/journey/*.mp4`; original JPEG screencast frames and timestamp/click manifests in corresponding folders.
+- **Representative frames:** `work/journey-review/`; `thumbnail.png`.
+- **Storyboard:** `STORYBOARD.md`; exact cuts: `edit-decision-list.json`.
+- **Unchanged narration:** `VOICEOVER_TIMING.md` with revised visual cues.
+- **Evidence and limits:** `CONTINUITY_QA.md`, `VIDEO_QA.md`, `RECORDING_SOURCES.md`.
+- **Reproduction:** `edit.py`, `export-sources.py`, `capture-journey.js`.
+- **Preserved first version:** `work/v1-backup/ditto-demo-silent.mp4`, `edit-v1.py`, original `clips/` takes.
 
 ## Rebuild
 
-From the repository root, use Python 3 with Pillow installed and `ffmpeg` / `ffprobe` on PATH:
+From the repository root, with Python + Pillow and FFmpeg installed:
 
 ```sh
-python3 -m venv /tmp/ditto-video-tools
-/tmp/ditto-video-tools/bin/pip install pillow
-/tmp/ditto-video-tools/bin/python docs/submission/video/edit.py
-```
-
-The renderer reads the local captured sources; it does not call providers, access cookies, or alter application state. Run it only after source capture. Videos, captured frames and generated graphics are ignored by Git to avoid committing private imagery or large binaries. Keep a local copy of the entire video directory to preserve the editing project.
-
-To view in a browser locally:
-
-```sh
+python3 docs/submission/video/edit.py
+python3 docs/submission/video/export-sources.py
 python3 -m http.server 3130 --bind 127.0.0.1 --directory docs/submission/video
 ```
 
-Open `http://localhost:3130/review.html`. This does not deploy the app or publish the video.
+The renderer reads actual capture timestamps and adds only surrounding graphics and tap indicators. It does not invoke APIs, mutate app state, or generate fake product responses. Sources and media are intentionally local ignored artifacts, not committed to Git. Back them up with the deliverable folder before moving machines.
+
+## Capture setup
+
+Use `capture-journey.js` inside `cua_repl` after selecting the dedicated isolated recording tab and reading the browser/CDP documentation. Supply Node file access, an output folder, the documented CDP capability, and a pacing helper. Each `jRecord(name, async () => { ... })` records a connected sequence; use `jTap(locator, label)` for logged taps and native tab drag for genuine swipes. Derive locators from fresh UI observations. Independent sample-session setup remains off camera and is never stored in these scripts. Do not reuse real production sessions.
+
+Two bounded live model requests produced the recorded suggestion and venue plan. No external invitations, reservations, SMS or calendar writes were performed. Railway production is unchanged.

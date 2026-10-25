@@ -1,46 +1,31 @@
-# Storyboard and edit decision list
+# Connected product journey · revision 2
 
-1920×1080, 30 fps, silent H.264. Actual mobile layout for all application footage. Official supplied Ditto artwork, local Syne/Manrope fonts, warm off-white and existing brand red.
+The silent 1920×1080 master is exactly 180 seconds. The original narration is unchanged. The edited footage is a real mobile-browser walkthrough, not physical-iPhone footage. The opening chat is explicitly illustrative; all subsequent application responses, swipes, votes and approvals are real.
 
-| Time | Shot | Source |
+| Time | Visible journey | Supporting treatment |
 |---|---|---|
-| 0:00–0:02 | opening-1 | Original explanatory/illustrative graphic |
-| 0:02–0:04 | opening-2 | Original explanatory/illustrative graphic |
-| 0:04–0:06 | opening-3 | Original explanatory/illustrative graphic |
-| 0:06–0:08 | opening-4 | Original explanatory/illustrative graphic |
-| 0:08–0:16 | problem | Original explanatory/illustrative graphic |
-| 0:16–0:20 | brand | Original explanatory/illustrative graphic |
-| 0:20–0:30 | intro | 09-discover-clean |
-| 0:30–0:36 | filters | 29-filter |
-| 0:36–0:42 | pass | 10-left-clean |
-| 0:42–0:48 | ditto | 11-right-clean |
-| 0:48–0:52 | details | 12-details-clean |
-| 0:52–0:55 | saved | 30-saved |
-| 0:55–1:01 | circles | 13-circles-clean |
-| 1:01–1:08 | chat | 27-chat-clean |
-| 1:08–1:11 | muse-processing | 28-muse-clean |
-| 1:11–1:15 | muse-result | 08-ai-result |
-| 1:15–1:20 | venues | 31-venues-result |
-| 1:20–1:27 | mohit | 14-mohit-votes |
-| 1:27–1:34 | friends | 15-edwin-votes |
-| 1:34–1:40 | progress | 16-paxton-votes |
-| 1:40–1:45 | consensus | 17-consensus |
-| 1:45–1:47 | approve-paxton | 19-paxton-approval |
-| 1:47–1:50 | approve-mohit | 20-mohit-approval |
-| 1:50–1:54 | confirmed | 21-confirmed |
-| 1:54–1:58 | calendar | 24-calendar-day |
-| 1:58–2:00 | export | 22-calendar-export |
-| 2:00–2:08 | architecture-input | 27-chat-clean |
-| 2:08–2:12 | architecture-model | 28-muse-clean |
-| 2:12–2:16 | architecture-suggestion | 08-ai-result |
-| 2:16–2:23 | architecture-venues | 31-venues-result |
-| 2:23–2:30 | architecture-logic | 17-consensus |
-| 2:30–2:39 | technology | Original explanatory/illustrative graphic |
-| 2:39–2:42 | montage-swipe | 11-right-clean |
-| 2:42–2:44 | montage-chat | 27-chat-clean |
-| 2:44–2:46 | montage-match | 17-consensus |
-| 2:46–2:48 | montage-approved | 21-confirmed |
-| 2:48–2:55 | closing-app | 25-calendar-detail |
-| 2:55–3:00 | final | Original explanatory/illustrative graphic |
+| 0:00–0:20 | Illustrative group indecision → official Ditto logo | Original problem framing |
+| 0:20–0:50 | Discover → filters → PASS → DITTO → details → close → tap Circles | One continuous 30-second take; captions follow actions |
+| 0:50–0:58.8 | Circle list → Weekend Crew → Chat & AI → select messages | Actual navigation remains visible |
+| 0:58.8–1:06.5 | Select three messages → consent → Muse Spark request → actual suggestion | 3.3 seconds removed inside authentic AI waiting |
+| 1:06.5–1:13.8 | Review proposal → approve adding to Ideas → Ideas → New round → everyone agrees rule | Same bouldering proposal |
+| 1:13.8–1:21.8 | Mohit physically drags all five voting cards | Named independent session |
+| 1:21.8–1:31.5 | Edwin and Paxton physically vote in their own sessions | Labeled split view; explicitly recorded sequentially |
+| 1:31.5–1:36.2 | Reveal matches → unanimous bouldering → Plan our hangout | Same Circle and members |
+| 1:36.2–1:41.4 | Select matched activity → Meta AI + real places → actual venue itinerary | 4.8 seconds removed inside genuine loading |
+| 1:41.4–1:54 | Review venue → Paxton approves → Mohit approves → Edwin approves → tap Plans | Independent approvers labeled; no fabricated confirmation |
+| 1:54–2:02.9 | Next week → Monday October 26 → expand confirmed bouldering → RSVP → Add to Calendar | Real manual ICS download; no external calendar event created |
+| 2:02.9–2:30 | Scroll back and collapse into confirmed calendar; architecture appears beside the same phone | Phone does not move; only side graphics transition |
+| 2:30–2:46 | Same confirmed calendar with stack explanation alongside it | No disconnected feature montage |
+| 2:46–2:55 | Same final outcome, closing message | Deliberate reading hold |
+| 2:55–3:00 | Official logo and tagline | Final narration line |
 
-The opening chat is explicitly illustrative. Separate participant recordings are combined in the two-phone composition; the edit does not claim simultaneous filming. The real model-generated bouldering idea is the unanimous match. Calendar download is an ICS export, not an automatic event or invitation.
+## Continuity and editing
+
+- Phone position is fixed at x=1130, y=64 with a 420×946 content area. The labeled two-person comparison adds Edwin on the left; Paxton occupies the standard position.
+- Tap ripples last 220ms and use logged CSS coordinates from actual clicks. They are editorial overlays, never application-state overlays.
+- Native swipe motion is not sped up. Event timestamps preserve the captured animation cadence in a 30fps output.
+- Long AI waits are shortened within loading, with an explicit waiting-time note. No instant or simulated AI results.
+- Final calendar: **Monday Evening Bouldering in Austin**, Bouldering Project–Springdale, Monday October 26 at 6 PM; three approvals and one RSVP. Group approval is not a venue reservation.
+- Cut points between adjacent takes retain the same UI state. Only participant changes intentionally switch sessions; these are labeled.
+- Original version and useful source recordings remain preserved. No Railway deployment or production-data modification.

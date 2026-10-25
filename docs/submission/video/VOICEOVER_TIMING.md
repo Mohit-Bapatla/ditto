@@ -73,7 +73,10 @@ It was to help people put their phones down and actually spend time together.
 
 This is Ditto. Less scrolling. More doing.
 
-## Alignment notes
-Hold the opening logo transition at 0:16, PASS at 0:36, DITTO at 0:42, Muse at 1:08, consensus at 1:40, final approval at 1:50, and closing logo at 2:55. The last five seconds are reserved for “This is Ditto. Less scrolling. More doing.”
+## Revised visual alignment
+
+The narration above is unchanged. Keep its original approximate section boundaries; the connected UI leads some lines by a few seconds rather than cutting away from navigation. Discover begins at 0:20 under the product introduction. Filters appear around 0:30; the left/right swipes follow, then details and the actual Circles tap. Weekend Crew opens at 0:50, the Muse request at about 1:03, independent votes at 1:14, consensus at 1:32, final approval at 1:49, calendar at 1:54, and export at 2:01. Architecture appears alongside the calendar at 2:03, technology at 2:30, and the final logo at 2:55.
+
+For recording, let the AI explanation begin over the final calendar/export before the diagram appears. This keeps the full navigation legible without rushing the spoken section. The final five seconds remain reserved for “This is Ditto. Less scrolling. More doing.”
 
 For a narration WAV exactly aligned from zero: `ffmpeg -i ditto-demo-silent.mp4 -i narration.wav -map 0:v -map 1:a -c:v copy -c:a aac -b:a 192k -t 180 -movflags +faststart ditto-demo-narrated.mp4`. Record and review before publication.

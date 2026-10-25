@@ -28,3 +28,12 @@ The opening group chat is original illustrative motion graphics, visibly labeled
 Activity-category photography comes from the app’s existing Unsplash assets and remains labeled as illustrative in the UI. Real venue images are those actually returned/displayed by the provider integration, not generated approximations. Profile images were supplied by the user for this showcase/video. Existing font licenses and asset provenance are documented in `THIRD_PARTY_NOTICES.md` and the app manifests. No third-party design-reference screenshots are included.
 
 This is a local video deliverable. No upload, public release, repository visibility change or production deployment was performed.
+
+
+## Revision 2: connected journey
+
+New sources are under `clips/journey/`. Every selected take has an exported MP4 and a frame/click timestamp manifest. `edit-decision-list.json` maps source offsets to the final timeline. A is the complete Discover-to-Circles sequence; B continues through Chat & AI; C contains the new unanimous round and three genuine participants; D continues from that consensus through a live venue itinerary, approvals and calendar.
+
+The database was a disposable SQLite backup at `/tmp/ditto-video-journey.sqlite`, never Railway. The original Weekend Crew fixture plan was removed only from this copy before filming; sample chat and a new round were prepared. Model responses and filmed votes were never preloaded or faked. Private sample-session tokens remain outside the repository and media.
+
+The final plan is “Monday Evening Bouldering in Austin,” not the similarly named v1 plan. It uses the same real Springdale venue and an actual three-person unanimous decision. The original capture folders remain intact. Failed intermediate D6/D7 recordings without valid manifests were excluded. Only final clean calendar/export/return takes are selected.
